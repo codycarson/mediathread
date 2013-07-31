@@ -1,0 +1,109 @@
+
+/* Navigation */
+/* -------------------------------------------------- */
+
+
+.navbar {
+  color: #fff;
+  background: @color-7;
+  background: @navbar-color;
+  #nav ul{
+    font-size: 15px;
+    float: right;
+    margin: 0;
+  }
+}
+
+#nav ul a {
+  .transition(~"color 0.4s ease-out, background 0.4s ease-in");
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  line-height: 40px;
+  padding: 0 20px ;
+}
+
+
+/* Navigation button, hidden on desktop */
+
+#toggle {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  font-size: 18px;
+  color:@color-7;
+  z-index: 99999;
+  .hide;
+  cursor: pointer;
+}
+
+.btn-highlite {
+  i {color: @color-4}
+}
+
+
+/* Make navigation bar static for iOS <5. */
+.iphone {
+  .logo {display: block!important; float: left;}
+  #toggle {.pull-right; padding: 40px;}
+  position: static!important;
+}
+
+/* Menu colors */
+.active .brand-2 {
+  background-color: @color-2 !important;
+} 
+
+.brand-2:hover  {
+  background-color: @color-2 !important;
+} 
+
+.active .brand-3 {
+  background-color: @color-3 !important;
+} 
+
+.brand-3:hover {
+  background-color: @color-3 !important;
+} 
+
+.active .brand-4 {
+  background-color: @color-4 !important;
+} 
+
+.brand-4:hover  {
+  background-color: @color-4 !important;
+} 
+
+
+
+#nav ul {
+  margin: 0;
+  padding: 0;
+  display: block;
+  list-style: none;
+}
+
+#nav li {
+  display: inline-block;
+}
+
+.js #nav {
+  clip: rect(0 0 0 0);
+  max-height: 0;
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  zoom: 1;
+}
+
+#nav.opened {
+  max-height: 9999px;
+}
+
+@media screen and (min-width: 40em) {
+  .js #nav {
+    position: relative;
+    max-height: none;
+  }
+
+}
