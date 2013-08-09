@@ -4127,9 +4127,8 @@ div.invite-students-form select {
     margin-bottom: 10px;
 }
 
-div.invite-students-form input[type=submit] {
-    float: left;
-    margin-right: 10px;
-    margin-top: 10px;
-    width: 125px;
+
+.invite-students-form .form-actions {
+    background-color: transparent;
+    padding-left: 0;
 }

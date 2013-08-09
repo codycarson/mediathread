@@ -177,6 +177,7 @@ INSTALLED_APPS = [
     'mediathread.user_accounts',
     'autocomplete_light',
     'mediathread.course',
+    'crispy_forms',
 
 ]
 
