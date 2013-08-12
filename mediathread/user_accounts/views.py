@@ -1,4 +1,5 @@
 import customerio
+import textwrap
 from django.views.generic.edit import FormView
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -148,6 +149,23 @@ class InviteStudentsView(FormView):
         context = super(InviteStudentsView, self).get_context_data(**kwargs)
         context['course_name'] = self.request.session['ccnmtl.courseaffils.course']
         return context
+
+    def get_initial(self):
+        initial = self.initial.copy()
+        initial['email_from'] = self.request.user.email
+        initial['message'] = textwrap.dedent("""
+        Dear students,
+
+        It's my pleasure to invite you to the {0} class.
+
+        If you're new to Mediathread, you'll also get an activation link in a separate email,
+        otherwise you can just log in using your existing username and password.
+
+        Thanks,
+        {1}
+        """.format(self.request.session['ccnmtl.courseaffils.course'].title,
+                   self.request.user.get_full_name()))
+        return initial
 
 
 invite_students = InviteStudentsView.as_view()
