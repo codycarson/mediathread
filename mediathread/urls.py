@@ -48,6 +48,7 @@ auth_urls = (r'^accounts/', include('allauth.urls'))
 urlpatterns = patterns(
     '',
 
+    (r'^about$', 'django.views.generic.simple.redirect_to', {'url': 'http://www.getmediathread.com/'}),
     (r'^crossdomain.xml$', 'django.views.static.serve',
      {'document_root': os.path.abspath(os.path.dirname(__file__)),
       'path': 'crossdomain.xml'}),
