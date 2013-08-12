@@ -2,6 +2,7 @@ import customerio
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.template.defaultfilters import pluralize
 from django.utils.html import linebreaks
 from django.views.generic.edit import FormView
 from allauth.account.forms import SignupForm
@@ -145,7 +146,8 @@ class InviteStudentsView(FormView):
                 )
         student_count = len(emails)
         messages.success(self.request,
-                         "You've successfully invited {0} students.".format(student_count),
+                         "You've successfully invited {0} student{1}.".format(
+                             student_count, pluralize(student_count)),
                          fail_silently=True)
         return super(InviteStudentsView, self).form_valid(form)
 

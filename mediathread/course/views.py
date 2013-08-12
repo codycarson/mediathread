@@ -39,7 +39,8 @@ class CourseCreateFormView(FormView):
 
         self.request.session['ccnmtl.courseaffils.course'] = course.course
         messages.success(self.request,
-                         "You've successfully created a new course: {0}".format(course_title))
+                         "You've successfully created a new course: {0}".format(course_title),
+                         fail_silently=True)
         return super(CourseCreateFormView, self).form_valid(form)
 
     def get_initial(self):
