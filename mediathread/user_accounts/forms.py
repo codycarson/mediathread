@@ -7,11 +7,16 @@ from .models import RegistrationModel
 
 
 class RegistrationForm(forms.ModelForm):
-    email = forms.EmailField(required=True)
-    agree_to_term = forms.BooleanField(required=True,
-                                       label=mark_safe('I agree to the <a href="/terms-of-use">Terms of Service</a>'))
-    organization = forms.CharField(widget=autocomplete_light.TextWidget('OrganizationAutocomplete'))
-    password = forms.CharField(widget=forms.PasswordInput())
+    email = forms.EmailField()
+    agree_to_term = forms.BooleanField(
+        label=mark_safe('I agree to the <a href="/terms-of-use">Terms of Service</a>')
+    )
+    organization = forms.CharField(
+        widget=autocomplete_light.TextWidget('OrganizationAutocomplete')
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput()
+    )
     first_name = forms.CharField()
     last_name = forms.CharField()
 
@@ -19,9 +24,25 @@ class RegistrationForm(forms.ModelForm):
         model = RegistrationModel
         widget = autocomplete_light.get_widgets_dict(RegistrationModel)
         fields = [
+            'email',
+            'password',
+            'first_name',
+            'last_name',
+            'organization',
             'position_title',
             'hear_mediathread_from',
-            'subscribe_to_newsletter']
+            'subscribe_to_newsletter',
+            'agree_to_term',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(RegistrationForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.form_action = '.'
+        submit_button = Submit('submit', 'Create my account')
+        submit_button.field_classes = 'btn'
+        self.helper.add_input(submit_button)
 
 
 class InviteStudentsForm(forms.Form):
