@@ -1,9 +1,9 @@
 import autocomplete_light
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Submit, Layout, Fieldset, ButtonHolder
 from django import forms
 from django.utils.safestring import mark_safe
-from .models import RegistrationModel
+from .models import RegistrationModel, OrganizationModel
 
 
 class RegistrationForm(forms.ModelForm):
@@ -43,6 +43,12 @@ class RegistrationForm(forms.ModelForm):
         submit_button = Submit('submit', 'Create my account')
         submit_button.field_classes = 'btn'
         self.helper.add_input(submit_button)
+
+    def clean_organization(self):
+        org_name = self.cleaned_data['organization']
+        if org_name:
+            org_name, created = OrganizationModel.objects.get_or_create(name=org_name)
+        return org_name
 
 
 class InviteStudentsForm(forms.Form):
