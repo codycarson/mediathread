@@ -265,6 +265,9 @@ MAILCHIMP_REGISTRATION_LIST_ID = ''
 
 SAMPLE_COURSE_ID = 2
 
+GETMEDIATHREAD_URL = "http://www.getmediathread.com/"
+
+
 # this gets around Django 1.2's stupidity for commenting
 # we're already checking that the request is from someone in the class
 def no_reject(request, reason):
