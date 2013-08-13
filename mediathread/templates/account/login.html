@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}
    Please Login
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
 {% endblock %}
 
 {% block content %}
@@ -29,10 +34,10 @@
         <tr><td style="border: hidden"><label for="id_username">Username:</label></td><td style="border: hidden">{{ form.login }}</td></tr>
         <tr><td style="border: hidden"><label for="id_password">Password:</label></td><td style="border: hidden">{{ form.password }}</td></tr>
     </table>
-    <input type="submit" value="Log In" />
-    <a href="{% url registration-form %}">
-        <input type="button" value="Sign Up" />
-    </a>
+    <div class="form-actions">
+        <input type="submit" value="Log In" class="btn" />
+        <a href="{% url registration-form %}" class="btn">Sign up</a>
+    </div>
     <input type="hidden" name="next" value="{{ next|urlencode }}" />
 </form>
 

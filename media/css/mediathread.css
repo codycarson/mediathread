@@ -4131,7 +4131,7 @@ div.invite-students-form input[type=submit] {
     float: left;
     margin-right: 10px;
     margin-top: 10px;
-    width: 125px;
+    width: 150px;
 }
 
 
@@ -4160,7 +4160,15 @@ ul.messagelist li.error{
     background-image: url(/site_media/img/icons/icon_error.gif);
 }
 
-.invite-students-form .form-actions {
+form .form-actions {
     background-color: transparent;
     padding-left: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-actions a.btn {
+    margin-left: 5px;
+    font-weight: normal;
+    color: #000;
 }
