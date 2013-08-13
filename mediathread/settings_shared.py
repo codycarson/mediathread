@@ -104,6 +104,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
     'mediathread.main.views.django_settings',
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
@@ -146,6 +147,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.flatpages',
+    'django.contrib.messages',
     'django.contrib.markup',
     'sorl.thumbnail',
     'courseaffils',
@@ -266,6 +268,7 @@ MAILCHIMP_REGISTRATION_LIST_ID = ''
 
 SAMPLE_COURSE_ID = 2
 
+
 # this gets around Django 1.2's stupidity for commenting
 # we're already checking that the request is from someone in the class
 def no_reject(request, reason):
@@ -273,6 +276,9 @@ def no_reject(request, reason):
     return None
 
 CSRF_FAILURE_VIEW = no_reject
+
+HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
+
 
 # if you add a 'deploy_specific' directory
 # then you can put a settings.py file and templates/ overrides there
