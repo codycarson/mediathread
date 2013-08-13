@@ -41,7 +41,7 @@ class RegistrationForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.form_action = '.'
         submit_button = Submit('submit', 'Create my account')
-        submit_button.field_classes = 'btn'
+        submit_button.field_classes = 'btn btn-success'
         self.helper.add_input(submit_button)
 
     def clean_organization(self):

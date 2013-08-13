@@ -28,5 +28,5 @@ class CourseForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.form_action = '.'
         submit_button = Submit('submit', 'Create course')
-        submit_button.field_classes = 'btn'
+        submit_button.field_classes = 'btn btn-success'
         self.helper.add_input(submit_button)
