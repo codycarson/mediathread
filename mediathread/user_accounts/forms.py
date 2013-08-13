@@ -56,8 +56,14 @@ class InviteStudentsForm(forms.Form):
         label="From"
     )
     student_emails = forms.CharField(
-        widget=forms.Textarea(attrs={'cols': 80, 'rows': 20}),
-        label="To"
+        initial="student1@example.com\nstudent2@example.com",
+        widget=forms.Textarea(
+            attrs={
+                'cols': 80,
+                'rows': 20,
+            },
+        ),
+        label="To (enter the student email addresses in separate lines)",
     )
     message = forms.CharField(
         widget=forms.Textarea(attrs={'cols': 80, 'rows': 20})
@@ -69,7 +75,7 @@ class InviteStudentsForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.form_action = '.'
         submit_button = Submit('submit', 'Invite students')
-        submit_button.field_classes = 'btn'
+        submit_button.field_classes = 'btn btn-success'
         self.helper.add_input(submit_button)
 
     def clean_student_emails(self):
