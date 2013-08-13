@@ -1001,9 +1001,11 @@ div.button-form form, div.button-form.inline form {
 
 
 /* LOGIN PAGE */
+/*
 #id_username, #id_password {
-    width: 125px;    
+    width: 125px;
 }
+*/
 
 #introduction {
     text-align: left; 
@@ -4171,4 +4173,31 @@ form .form-actions {
     margin-left: 5px;
     font-weight: normal;
     color: #000;
+}
+
+.text-error {
+    color: #b94a48;
+}
+
+#login-form legend {
+    font-size: 2.142em;
+}
+
+#login-form .control-label {
+    width: 80px;
+}
+
+#login-form .controls {
+    margin-left: 100px;
+}
+
+#login-form .form-actions {
+    border-top: none;
+    padding-top: 0;
+    padding-left: 100px;
+    margin-bottom: 20px;
+}
+
+#login-form input[type=submit] {
+    float: left;
 }
