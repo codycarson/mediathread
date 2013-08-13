@@ -165,8 +165,9 @@ class InviteStudentsView(FormView):
 
         It's my pleasure to invite you to the {0} class.
 
-        If you're new to Mediathread, you'll also get an activation link in a separate email,
-        otherwise you can just log in using your existing username and password.
+        If you're new to Mediathread, you'll also get an activation link in a separate email, otherwise you can just log in using your existing username and password.
+
+        If you need help getting started, check out this <a href="http://support.appsembler.com/knowledgebase/articles/236385-mediathread-quickstart-guide-for-students">quick start guide</a> to using Mediathread
 
         Thanks,
         {1}
