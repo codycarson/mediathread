@@ -16,18 +16,24 @@
   {% csrf_token %}
     <legend>Log in</legend>
     <div class="control-group{% if form.login.errors %} error{% endif %}">
-      <label for="id_username" class="control-label">Username:</label>
+      <label for="id_username" class="control-label">{{ form.login.label }}:</label>
         <div class="controls">
-            {{ form.login }}
+            <div class="input-prepend">
+                <span class="add-on"><i class="icon-envelope"></i></span>
+                {{ form.login }}
+            </div>
             {% if form.login.errors %}
                 <span class="help-block">{{ form.login.errors.0 }}</span>
             {% endif %}
         </div>
     </div>
     <div class="control-group{% if form.password.errors %} error{% endif %}">
-        <label for="id_password" class="control-label">Password:</label>
+        <label for="id_password" class="control-label">{{ form.password.label }}:</label>
         <div class="controls">
-            {{ form.password }}
+            <div class="input-prepend">
+                <span class="add-on"><i class="icon-lock"></i></span>
+                {{ form.password }}
+            </div>
             {% if form.password.errors %}
                 <span class="help-block">{{ form.password.errors.0 }}</span>
             {% endif %}
