@@ -10599,7 +10599,7 @@ footer {
   box-shadow: none !important;
   text-shadow: none !important;
   line-height: 40px;
-  padding: 0 20px ;
+  padding: 2.5px 20px ;
 }
 /* Navigation button, hidden on desktop */
 #toggle {
@@ -10961,7 +10961,7 @@ h6 {
 }
 .logo {
   margin: 0;
-  padding: 6px;
+  padding: 0 6px 0 6px;
   font-size: 25px;
   float: left;
   letter-spacing: 1px;
