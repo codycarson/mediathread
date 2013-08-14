@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <title>The Story - responsive landing page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Twitter bootstrap theme">
+    <meta name="author" content="prettystrap">
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet' type='text/css'>
+    <!-- Le styles -->
+    <link href="assets/less/style.min.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav  -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    if (typeof jQuery == 'undefined') {
+      document.write(unescape("%3Cscript src='assets/js/jquery-1.9.1.min.js' type='text/javascript'%3E%3C/script%3E"));
+    }
+    </script>
+
+    <!--Has to be in head, to lazy load images.
+    Minimize in production. -->
+
+    <script src="assets/js/lazyload.js"></script>
+    <script src="assets/js/jRespond.js"></script>
+    <script src="assets/js/spin.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/lightbox.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <script src="assets/js/responsive-nav.js"></script>
+
+    <!-- Main js fail. -->
+    <script src="assets/js/main.js"></script>
+
+  </head>
+
+  <!-- activate scrollspy -->
+  <body id="top" data-spy="scroll" data-target=".navbar" data-offset="50">
+       <!-- Nav button -->
+      <a id="toggle"  class="closed">
+        <i class="icon-reorder"></i>
+      </a>
+
+      <!-- Navigation -->
+      <header class="navbar navbar-fixed-top">
+        <div class="inner-page">
+          <h1 class="logo">The Story</h1>
+            <div id="nav">
+              <ul class="nav">
+                <li><a title="Home page" class="scroll brand-1" href="index.html#home">Home</a></li>
+                <li><a title="Check out our awesome services" href="index.html#features" class="scroll brand-4">Features</a></li>
+                <li><a title="Download this app" href="index.html#assets" class="scroll brand-3">Assets</a></li>
+                <li><a title="Who we are" href="index.html#about" class="scroll brand-4"> About us</a></li>
+                <li><a title="Get in touch!" href="index.html#contact" class="scroll brand-2">Contact</a></li>
+                <li class="active"><a title="External page sample" href="sample-page.html" class="brand-4">Sample Page</a></li>
+              </ul>
+            </div>
+        </div> 
+      </header>
+
+      <!--  Page -->
+      <div id="sample-page" class="page color-4">
+        <div class="inner-page">
+          <h2 class="page-headline">Clinical training for Social Work students</h2>
+        </div>  
+        <div class="row-fluid inner-page">
+          <div class="span5 lazy-container btn-container">
+            <img class="figurette lazy img-rounded" src="assets/img/mediathread_sswroleplay.jpg" data-original="assets/img/mediathread_sswroleplay.jpg" />
+            <a href="assets/img/mediathread_sswroleplay.jpg" class="lightbox btn-play" target="_blank">
+              <i class="icon-zoom-in"></i>
+            </a> 
+          </div>
+
+          <div class="span7">
+
+            <h3><b>Course:</b> Foundations of Social Work, Social Work Practice II</h3>
+            <p><strong>Department:</strong> School of Social Work, Columbia University<br />
+               <strong>Instructor(s):</strong> Various<br />
+
+                <h4>Background</h4>
+                <p>At the Columbia University School of Social Work, first-year students take a core course entitled "Foundations of Social Work" in their first semester, followed by "Social Work Practice II" in their second semester.</p>
+                <p>The curriculum emphasizes assessment, intervention, and evaluation; clinical applications of risk and resiliency theories to at-risk populations; and clinical issues with specific client populations.</p>
+                <p>In both courses students use Mediathread to connect class readings to videos of clinical sessions and role-play assignments.</p>
+                <h4>Implementation</h4>
+                <p>Students watch videos of clinical sessions and role-play assignments, clip segments, and make annotations.</p>
+                <p>They then add the video annotations to essays in which they analyze theoretical models and clinical techniques and reflect on their own intervention methods.</p>
+                <p>These multimedia essays encourage closer readings of clinician/patient interactions and improve students' evidence-based reasoning.</p>
+                <p>Sharing completed multimedia essays with other social work students fosters group discussion and learning from peers.</p>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="inner-page row-fluid">
+          <ul class="features list-inline">
+            <li>
+              <h3><i class="icon-book"></i> Teacher Ed </h3>
+              <p>Professor Pappas Schattman uses Mediathread throughout her course on early childhood mathematics education. <a href="teachered.html">Read more</a></p>
+            </li>
+            <li>
+              <h3><i class="icon-group"></i> Social Work</h3>
+              <p>At the Columbia University School of Social Work, first-year students use Mediathread to connect class readings to videos of clinical sessions and role-play assignments. <a href="socialwork.html">Read more</a></p>
+            </li>
+            <li>
+              <h3><i class="icon-film"></i> Film Study</h3>
+              <p>"Projecting the American Empire on Film" is a course at Barnard College in which Mediathread is used for a series of close reading exercises of film footage. <a href="filmstudy.html">Read more</a></p>
+            </li>
+          </ul>
+        </div>
+
+    </div> <!-- /sample page -->
+
+
+      <!-- Newsletter -->
+      <div class="newsletter color-1">
+        <div class="inner-page row-fluid">
+          <div class="span4">
+            <h4><strong>Be cool</strong>, subscribe to get our latest news</h4>
+          </div>
+          <div class="span6">
+            <input type="email" placeholder="your@e-mail.com" name="EMAIL" class="subscribe">
+          </div>
+          <div class="span2">
+            <button type="submit"  class="btn pull-right subscribe">Subscribe</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- The footer, social media icons, and copyright -->        
+      <footer class="page color-5">
+        <div class="inner-page row-fluid">
+          <div class="span6 social">
+            <a href="#contact"><i class="icon-twitter"></i></a>
+            <a href="#contact"><i class="icon-github-sign"></i></a>    
+            <a href="#contact"><i class="icon-facebook-sign"></i></a>
+            <a href="#contact"><i class="icon-google-plus-sign"></i></a>
+          </div>
+          <div class="span6 text-right copyright">
+            &copy; 2013 <a  href="http://prettystrap.com"  title="twitter bootstrap themes">prettystrap.com</a> | all rights reserved |  <a href="#top"   title="Got to top" class="scroll">To top <i class="icon-caret-up"></i></a>
+          </div>
+        </div>
+      </footer>
+  </body>
+
+</html>
