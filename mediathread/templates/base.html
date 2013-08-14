@@ -247,7 +247,7 @@
         <script type="text/javascript" src="{% static 'js/app/projects/projectlist.js' %}"></script>
     
         {% if not settings.DEBUG %}
-            <script>                
+            <script type="text/javascript">
                 {% if settings.GOOGLE_ANALYTICS_ID %}
                     var _gaq = _gaq || [];
                     _gaq.push(['_setAccount', '{{settings.GOOGLE_ANALYTICS_ID}}']);
@@ -307,7 +307,7 @@
         {% block js %}{% endblock %}
     {% endcompress %}
     {% if request.user.is_authenticated %}
-        <script>
+        <script type="text/javascript">
             analytics.identify("{{ request.user.email }}", {
                 email: "{{ request.user.email }}",
                 firstName: "{{ request.user.first_name }}",
