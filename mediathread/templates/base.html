@@ -309,8 +309,9 @@
     {% if request.user.is_authenticated %}
         <script>
             analytics.identify("{{ request.user.email }}", {
-                email   : "{{ request.user.email }}",
-                name    : "{% public_name for request.user %}"
+                email: "{{ request.user.email }}",
+                firstName: "{{ request.user.first_name }}",
+                lastName: "{{ request.user.last_name }}"
             });
         </script>
     {% endif %}
