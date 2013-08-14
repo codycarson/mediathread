@@ -68,9 +68,9 @@
             itemFallbackDimension: 300
           });
 
-          jQuery('.get-started-link').click(function(e){
-            analytics.track("Clicked Get started");
-          });
+          var getStartedLink = jQuery('.get-started-link')
+          analytics.trackLink(getStartedLink, "Clicked Get started");
+
       });
 
     </script>
