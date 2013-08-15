@@ -308,7 +308,7 @@
         
         {% block js %}{% endblock %}
     {% endcompress %}
-    {% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated and not settings.DEBUG %}
         <script type="text/javascript">
             analytics.identify("{{ request.user.email }}", {
                 email: "{{ request.user.email }}",
