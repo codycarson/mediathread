@@ -272,6 +272,8 @@ SEGMENTIO_API_KEY = ''
 # The sample course that all registered users are added to
 SAMPLE_COURSE_ID = 2
 
+CRISPY_TEMPLATE_PACK = 'bootstrap'
+
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"
 HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
