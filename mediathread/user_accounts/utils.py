@@ -1,5 +1,6 @@
 from django.conf import settings
-import mailsnake
+
+import mailchimp
 
 
 def add_email_to_mailchimp_list(email_address, list_id, **kwargs):
@@ -12,10 +13,16 @@ def add_email_to_mailchimp_list(email_address, list_id, **kwargs):
         print "did not defined api key for Mailchimp, skip Mailchimp related action now"
         return False
 
-    ms = mailsnake.MailSnake(settings.MAILCHIMP_API_KEY)
-    ms.listSubscribe(
+    ms = mailchimp.Mailchimp(settings.MAILCHIMP_API_KEY)
+
+    # new version API require email as a struct with an email field.
+    email_struct = {
+        'email': email_address
+        }
+
+    ms.lists.subscribe(
         id=list_id,
-        email_address=email_address,
+        email=email_struct,
         merge_vars=merge_vars_dict,
         update_existing=True,
         double_optin=False)
