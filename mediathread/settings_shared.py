@@ -58,7 +58,8 @@ PROJECT_APPS = ['mediathread.main',
                 'mediathread.assetmgr',
                 'mediathread.projects',
                 'mediathread.reports',
-                'mediathread.discussions']
+                'mediathread.discussions',
+                'mediathread.general']
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
@@ -180,6 +181,7 @@ INSTALLED_APPS = [
     'autocomplete_light',
     'mediathread.course',
     'crispy_forms',
+    'mediathread.general',
 
 ]
 
