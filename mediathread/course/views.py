@@ -1,13 +1,42 @@
 import analytics
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
 from mediathread.user_accounts.models import RegistrationModel
 from .models import CourseInformation
-from .forms import CourseForm
+from .forms import CourseForm, PromoteStudentForm
+
+
+class PromoteStudentView(FormView):
+    http_method_names = ['post']
+    form_class = PromoteStudentForm
+
+    def form_valid(self, form):
+        course = self.request.session['ccnmtl.courseaffils.course']
+        user = User.objects.get(id=form.cleaned_data['user_id'])
+        course.faculty_group.add(user)
+        messages.success(
+            self.request,
+            "Successfully promoted {0} to faculty group on course {1}".format(
+                user.get_full_name(), course.title
+            ))
+        self.next_url = form.cleaned_data['next_url']
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        messages.error(self.request, "An error occurred while trying to promote the student to the faculty group")
+        self.next_url = form.cleaned_data['next_url']
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return self.next_url
+
+promote_student = PromoteStudentView.as_view()
 
 
 class MemberListView(TemplateView):

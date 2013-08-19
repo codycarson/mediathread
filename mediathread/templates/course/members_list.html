@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" xmlns="http://www.w3.org/1999/html"/>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +41,11 @@
                     <td>Activated</td>
                     <td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
                     <td>
-                        <button class="btn btn-success">Promote</button>
+                        <form action="{% url promote_student %}" method="post">
+                            <input type="hidden" name="user_id" value="{{ student.id }}" />
+                            <input type="hidden" name="next_url" value="{% url member_list %}" />
+                            <input type="submit" class="btn btn-success" value="Promote" />
+                        </form>
                     </td>
                 </tr>
             {% endfor %}

@@ -5,6 +5,11 @@ from django import forms
 from .models import CourseInformation, STUDENT_AMOUNT_CHOICES
 
 
+class PromoteStudentForm(forms.Form):
+    user_id = forms.IntegerField()
+    next_url = forms.CharField(max_length=50)
+
+
 class CourseForm(forms.Form):
     title = forms.CharField(
         label="Course title",

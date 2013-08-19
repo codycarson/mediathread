@@ -4210,3 +4210,7 @@ form .form-actions {
     border-left: none;
     border-right: none;
 }
+
+#class-members-list form {
+    margin: 0;
+}
