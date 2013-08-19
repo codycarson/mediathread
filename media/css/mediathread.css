@@ -4212,5 +4212,6 @@ form .form-actions {
 }
 
 #class-members-list form {
-    margin: 0;
+    float: left;
+    margin: 0 10px 0 0;
 }

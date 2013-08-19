@@ -1,4 +1,5 @@
 import analytics
+from allauth.account.models import EmailAddress
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -47,6 +48,18 @@ class MemberListView(TemplateView):
         course = self.request.session['ccnmtl.courseaffils.course']
         context['faculty'] = course.faculty
         context['students'] = course.students
+        for student in context['students']:
+            try:
+                EmailAddress.objects.get(user_id=student.id, verified=True)
+                student.status = "Activated"
+            except EmailAddress.DoesNotExist:
+                student.status = "Invited"
+        for instructor in context['faculty']:
+            try:
+                EmailAddress.objects.get(user_id=instructor.id, verified=True)
+                instructor.status = "Activated"
+            except EmailAddress.DoesNotExist:
+                instructor.status = "Invited"
         context['members_count'] = len(context['faculty']) + len(context['students'])
         return context
 

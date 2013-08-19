@@ -30,6 +30,13 @@
                     <td>Activated</td>
                     <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
                     <td>
+                    {% if instructor.status == "Invited" %}
+                        <form action="" method="post">
+                            <input type="hidden" name="user_id" value="{{ student.id }}" />
+                            <input type="hidden" name="next_url" value="{% url member_list %}" />
+                            <input type="submit" class="btn btn-info" value="Resend Invite" />
+                        </form>
+                    {% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -38,7 +45,7 @@
                 <tr>
                     <td>{{ student.get_full_name }}</td>
                     <td>Student</td>
-                    <td>Activated</td>
+                    <td>{{ student.status }}</td>
                     <td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
                     <td>
                         <form action="{% url promote_student %}" method="post">
@@ -46,6 +53,13 @@
                             <input type="hidden" name="next_url" value="{% url member_list %}" />
                             <input type="submit" class="btn btn-success" value="Promote" />
                         </form>
+                        {% if student.status == "Invited" %}
+                            <form action="" method="post">
+                                <input type="hidden" name="user_id" value="{{ student.id }}" />
+                                <input type="hidden" name="next_url" value="{% url member_list %}" />
+                                <input type="submit" class="btn btn-info" value="Resend Invite" />
+                            </form>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
