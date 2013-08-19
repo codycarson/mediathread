@@ -2,11 +2,26 @@ import analytics
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
 from mediathread.user_accounts.models import RegistrationModel
 from .models import CourseInformation
 from .forms import CourseForm
+
+
+class MemberListView(TemplateView):
+    template_name = "course/members_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(MemberListView, self).get_context_data(**kwargs)
+        course = self.request.session['ccnmtl.courseaffils.course']
+        context['faculty'] = course.faculty
+        context['students'] = course.students
+        context['members_count'] = len(context['faculty']) + len(context['students'])
+        return context
+
+member_list = MemberListView.as_view()
 
 
 class CourseCreateFormView(FormView):

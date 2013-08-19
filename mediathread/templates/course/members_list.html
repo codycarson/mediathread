@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
+{% endblock %}
+
+{% block content %}
+
+    <div class="dashboard-module-header">
+        <h2>Class members list</h2>
+    </div>
+
+    <div id="dashboard-module-body">
+        <table class="table" id="class-members-list">
+            <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Role</th>
+                <th>Account status</th>
+                <th>Email address</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for instructor in faculty %}
+                 <tr class="info">
+                    <td>{{ instructor.get_full_name }}</td>
+                    <td>Instructor</td>
+                    <td>Activated</td>
+                    <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
+                    <td>
+                    </td>
+                </tr>
+            {% endfor %}
+
+            {% for student in students %}
+                <tr>
+                    <td>{{ student.get_full_name }}</td>
+                    <td>Student</td>
+                    <td>Activated</td>
+                    <td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
+                    <td>
+                        <button class="btn btn-success">Promote</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p>Total class members: {{ members_count }}</p>
+    </div>
+
+
+
+{% endblock %}
