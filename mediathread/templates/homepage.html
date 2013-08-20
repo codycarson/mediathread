@@ -266,12 +266,21 @@
                                           <li>Drag the link below onto your browser bookmarks toolbar:  <br />Analyze w/Mediathread</li>
                                         </ol>
                                     </div>
-                                    {% include "assetmgr/bookmarklet.html" %} 
+                                    {% include "assetmgr/bookmarklet.html" %}
+                                    <div id="ios" class="browser-instruction">
+                                        <strong>Install Bookmarklet on iOS</strong>
+                                        <ol>
+                                          <li>Click the button and follow the instructions on the next page.</li>
+                                        </ol>
+                                    </div>
                                     <script type="text/javascript">
                                         var u = navigator.userAgent;
                                         if (/Chrome/.test(u)) {
                                             jQuery('.browser-instruction').hide();
                                             jQuery('#chrome').show();
+                                        } else if (/(iPad|iPhone|iPod)/g.test(u)) {
+                                            jQuery('.browser-instruction').hide();
+                                            jQuery('#ios').show();
                                         } else if (/Safari/.test(u)) {
                                             jQuery('.browser-instruction').hide();
                                             jQuery('#safari').show();
@@ -281,7 +290,7 @@
                                         } else if (/Gecko/.test(u)) {
                                             jQuery('.browser-instruction').hide();
                                             jQuery('#firefox').show();
-                                        } 
+                                        }
                                     </script>
                         </p>
                     </div> <!-- end import into collection box --> 

@@ -4201,3 +4201,7 @@ form .form-actions {
 #login-form input[type=submit] {
     float: left;
 }
+
+#ios-bookmarklet-code {
+    width: 80%;
+}
