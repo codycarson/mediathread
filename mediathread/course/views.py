@@ -10,32 +10,67 @@ from django.views.generic.edit import FormView
 
 from mediathread.user_accounts.models import RegistrationModel
 from .models import CourseInformation
-from .forms import CourseForm, PromoteStudentForm
+from .forms import CourseForm, MemberActionForm
 
 
-class PromoteStudentView(FormView):
+class MemberActionView(FormView):
     http_method_names = ['post']
-    form_class = PromoteStudentForm
+    form_class = MemberActionForm
 
     def form_valid(self, form):
-        course = self.request.session['ccnmtl.courseaffils.course']
-        user = User.objects.get(id=form.cleaned_data['user_id'])
-        course.faculty_group.add(user)
-        messages.success(
-            self.request,
-            "Successfully promoted {0} to faculty group on course {1}".format(
-                user.get_full_name(), course.title
-            ))
+        self.course = self.request.session['ccnmtl.courseaffils.course']
         self.next_url = form.cleaned_data['next_url']
+        self.user = User.objects.get(id=form.cleaned_data['user_id'])
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
-        messages.error(self.request, "An error occurred while trying to promote the student to the faculty group")
         self.next_url = form.cleaned_data['next_url']
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return self.next_url
+
+
+class ResendInviteView(MemberActionView):
+
+    def form_valid(self, form):
+        response = super(ResendInviteView, self).form_valid(form)
+        try:
+            email = EmailAddress.objects.get(user=self.user, verified=False)
+            email.send_confirmation(self.request, signup=False)
+            messages.success(
+                self.request,
+                "You've successfully sent the activation email to {0}".format(self.user.email)
+            )
+        except EmailAddress.DoesNotExist:
+            messages.error(self.request, "User already activated his account.")
+
+        return response
+
+    def form_invalid(self, form):
+        response = super(ResendInviteView, self).form_invalid(form)
+        messages.error(self.request, "An error occurred while trying to send the activation email.")
+        return response
+
+resend_invite = ResendInviteView.as_view()
+
+
+class PromoteStudentView(MemberActionView):
+
+    def form_valid(self, form):
+        response = super(PromoteStudentView, self).form_valid(form)
+        self.course.faculty_group.add(self.user)
+        messages.success(
+            self.request,
+            "Successfully promoted {0} to faculty group on course {1}".format(
+                self.user.get_full_name(), self.course.title
+            ))
+        return response
+
+    def form_invalid(self, form):
+        response = super(PromoteStudentView, self).form_invalid(form)
+        messages.error(self.request, "An error occurred while trying to promote the student to the faculty group")
+        return response
 
 promote_student = PromoteStudentView.as_view()
 

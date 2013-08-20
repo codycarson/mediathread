@@ -5,7 +5,7 @@ from django import forms
 from .models import CourseInformation, STUDENT_AMOUNT_CHOICES
 
 
-class PromoteStudentForm(forms.Form):
+class MemberActionForm(forms.Form):
     user_id = forms.IntegerField()
     next_url = forms.CharField(max_length=50)
 
