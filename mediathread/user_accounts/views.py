@@ -1,6 +1,7 @@
 import analytics
 import customerio
 import textwrap
+from django.http import Http404
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -35,6 +36,14 @@ class ConfirmEmailView(AllauthConfirmEmailView):
     """
     View for comfirming user's email address and automatically login user
     """
+    def get(self, *args, **kwargs):
+        # return 404 if verified
+        confirmation = self.get_object()
+        if confirmation.email_address.verified:
+            raise Http404
+
+        return super(ConfirmEmailView, self).get(*args, **kwargs)
+
     def post(self, *args, **kwargs):
         # perform login
         email_address = self.get_object().email_address
