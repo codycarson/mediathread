@@ -4,9 +4,9 @@ python:
   - "2.7"
 install:
   - ./bootstrap.py
-  - pip install python-coveralls
+  - pip install coveralls
 script:
-  - ./manage.py test --with-coverage
+  - ./manage.py test
 branches:
     except:
         - /feature\/*/
