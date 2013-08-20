@@ -268,6 +268,7 @@ MAILCHIMP_REGISTRATION_LIST_ID = ''
 
 # Segment.io key
 SEGMENTIO_API_KEY = ''
+SEGMENTIO_JS_KEY = ''
 
 # The sample course that all registered users are added to
 SAMPLE_COURSE_ID = 2
