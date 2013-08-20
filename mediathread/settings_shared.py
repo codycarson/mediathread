@@ -58,8 +58,7 @@ PROJECT_APPS = ['mediathread.main',
                 'mediathread.assetmgr',
                 'mediathread.projects',
                 'mediathread.reports',
-                'mediathread.discussions',
-                'mediathread.general']
+                'mediathread.discussions']
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
@@ -181,7 +180,6 @@ INSTALLED_APPS = [
     'autocomplete_light',
     'mediathread.course',
     'crispy_forms',
-    'mediathread.general',
 
 ]
 
@@ -279,6 +277,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap'
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"
 HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
+
 
 # this gets around Django 1.2's stupidity for commenting
 # we're already checking that the request is from someone in the class
