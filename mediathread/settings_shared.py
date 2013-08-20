@@ -213,6 +213,7 @@ ANONYMOUS_PATHS = ('/user_accounts/'
                    )
 
 NON_ANONYMOUS_PATHS = ('/user_accounts/invite_students/',
+                       '/course/',
                        '/asset/',
                        '/annotations/',
                        '/contact/',
