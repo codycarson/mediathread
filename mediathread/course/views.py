@@ -18,7 +18,6 @@ from .forms import CourseForm, MemberActionForm
 class MemberActionView(FormView):
     http_method_names = ['post']
     form_class = MemberActionForm
-    success_url = reverse('members_list')
 
     def form_valid(self, form):
         self.course = self.request.session['ccnmtl.courseaffils.course']
@@ -28,6 +27,9 @@ class MemberActionView(FormView):
     def form_invalid(self, form):
         self.next_url = form.cleaned_data['next_url']
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('member_list')
 
 
 class ResendInviteView(MemberActionView):
@@ -57,8 +59,8 @@ resend_invite = ResendInviteView.as_view()
 class PromoteStudentView(MemberActionView):
     def form_valid(self, form):
         response = super(PromoteStudentView, self).form_valid(form)
-        if self.course.faculty_group.user_set.filter(user=self.request.user).exists():
-            self.course.faculty_group.add(self.user)
+        if self.course.faculty_group.user_set.filter(id=self.request.user.id).exists():
+            self.course.faculty_group.user_set.add(self.user)
             messages.success(
                 self.request,
                 "Successfully promoted {0} to faculty group on course {1}".format(
@@ -83,7 +85,7 @@ class MemberListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MemberListView, self).get_context_data(**kwargs)
         course = self.request.session['ccnmtl.courseaffils.course']
-        context['faculty'] = course.faculty
+        context['faculty'] =    course.faculty
         context['students'] = course.students
         for student in context['students']:
             try:

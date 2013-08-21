@@ -27,7 +27,7 @@
                  <tr class="info">
                     <td>{{ instructor.get_full_name }}</td>
                     <td>Instructor</td>
-                    <td>Activated</td>
+                    <td>{{ instructor.status }}</td>
                     <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
                     <td>
                     {% if instructor.status == "Invited" %}
