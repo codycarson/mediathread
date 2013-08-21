@@ -1,0 +1,22 @@
+[
+    {
+    "pk": 1,
+    "model": "account.emailaddress",
+    "fields": {
+      "verified": false,
+      "user": 3,
+      "primary": true,
+      "email": "test_student@one.com"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "account.emailaddress",
+    "fields": {
+      "verified": true,
+      "user": 4,
+      "primary": true,
+      "email": "test_student@two.com"
+    }
+  }
+]
