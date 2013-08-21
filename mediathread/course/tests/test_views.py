@@ -41,6 +41,21 @@ class CourseCreateTest(TestCase):
         self.assertFormError(response, 'form', 'organization', 'This field is required.')
 
 
+class MemberListTest(TestCase):
+    fixtures = ['unittest_sample_course.json', 'registration_data.json']
+
+    def setUp(self):
+        self.client.login(username="test_instructor", password="test")
+
+    def test_list_of_all_class_members(self):
+        response = self.client.get(reverse('member_list'))
+        self.assertContains(response, '<td>Instructor</td>', count=2, html=True)
+        self.assertContains(response, '<td>Student</td>', count=4, html=True)
+        self.assertContains(response, 'Resend Invite', count=2)
+        self.assertContains(response, 'Promote', count=4)
+        self.assertContains(response, 'Total class members: 6')
+
+
 class PromoteStudentTest(TestCase):
     fixtures = ['unittest_sample_course.json']
 
