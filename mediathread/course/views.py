@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
@@ -20,7 +21,7 @@ class MemberActionView(FormView):
     def form_valid(self, form):
         self.course = self.request.session['ccnmtl.courseaffils.course']
         self.next_url = form.cleaned_data['next_url']
-        self.user = User.objects.get(id=form.cleaned_data['user_id'])
+        self.user = get_object_or_404(User, id=form.cleaned_data['user_id'])
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
@@ -32,7 +33,6 @@ class MemberActionView(FormView):
 
 
 class ResendInviteView(MemberActionView):
-
     def form_valid(self, form):
         response = super(ResendInviteView, self).form_valid(form)
         try:
@@ -52,25 +52,29 @@ class ResendInviteView(MemberActionView):
         messages.error(self.request, "An error occurred while trying to send the activation email.")
         return response
 
+
 resend_invite = ResendInviteView.as_view()
 
 
 class PromoteStudentView(MemberActionView):
-
     def form_valid(self, form):
         response = super(PromoteStudentView, self).form_valid(form)
-        self.course.faculty_group.add(self.user)
-        messages.success(
-            self.request,
-            "Successfully promoted {0} to faculty group on course {1}".format(
-                self.user.get_full_name(), self.course.title
-            ))
+        if self.course.faculty_group.user_set.filter(user=self.request.user).exists():
+            self.course.faculty_group.add(self.user)
+            messages.success(
+                self.request,
+                "Successfully promoted {0} to faculty group on course {1}".format(
+                    self.user.get_full_name(), self.course.title
+                ))
+        else:
+            messages.error(self.request, "You must be an instructor in this course to do that.")
         return response
 
     def form_invalid(self, form):
         response = super(PromoteStudentView, self).form_invalid(form)
         messages.error(self.request, "An error occurred while trying to promote the student to the faculty group")
         return response
+
 
 promote_student = PromoteStudentView.as_view()
 
@@ -97,6 +101,7 @@ class MemberListView(TemplateView):
                 instructor.status = "Invited"
         context['members_count'] = len(context['faculty']) + len(context['students'])
         return context
+
 
 member_list = MemberListView.as_view()
 
