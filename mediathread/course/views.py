@@ -3,6 +3,7 @@ from allauth.account.models import EmailAddress
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -17,19 +18,16 @@ from .forms import CourseForm, MemberActionForm
 class MemberActionView(FormView):
     http_method_names = ['post']
     form_class = MemberActionForm
+    success_url = reverse('members_list')
 
     def form_valid(self, form):
         self.course = self.request.session['ccnmtl.courseaffils.course']
-        self.next_url = form.cleaned_data['next_url']
         self.user = get_object_or_404(User, id=form.cleaned_data['user_id'])
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
         self.next_url = form.cleaned_data['next_url']
         return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return self.next_url
 
 
 class ResendInviteView(MemberActionView):
