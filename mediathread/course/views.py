@@ -85,7 +85,7 @@ class MemberListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MemberListView, self).get_context_data(**kwargs)
         course = self.request.session['ccnmtl.courseaffils.course']
-        context['faculty'] =    course.faculty
+        context['faculty'] = course.faculty
         context['students'] = course.students
         for student in context['students']:
             try:

@@ -1,4 +1,5 @@
 import analytics
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from courseaffils.models import Course
@@ -37,3 +38,31 @@ class CourseCreateTest(TestCase):
         })
         self.assertFormError(response, 'form', 'title', 'This field is required.')
         self.assertFormError(response, 'form', 'organization', 'This field is required.')
+
+
+class PromoteStudentTest(TestCase):
+    fixtures = ['unittest_sample_course.json']
+
+    def test_promote_student(self):
+        self.client.login(username="test_instructor", password="test")
+        user = User.objects.get(id=3)
+        course = Course.objects.get(id=1)
+        self.assertFalse(user in course.faculty_group.user_set.all())
+        response = self.client.post(reverse("promote_student"), {
+            'user_id': 3
+        }, follow=True)
+        self.assertTrue(user in course.faculty_group.user_set.all(), response)
+        self.assertRedirects(response, reverse('member_list'))
+        self.assertContains(response, "Successfully promoted")
+
+    def test_promote_student_without_permissions(self):
+        self.client.login(username="test_student_two", password="test")
+        user = User.objects.get(id=3)
+        course = Course.objects.get(id=1)
+        self.assertFalse(user in course.faculty_group.user_set.all())
+        response = self.client.post(reverse("promote_student"), {
+            'user_id': 3
+        }, follow=True)
+        self.assertFalse(user in course.faculty_group.user_set.all(), response)
+        self.assertRedirects(response, reverse('member_list'))
+        self.assertContains(response, "You must be an instructor in this course to do that")
