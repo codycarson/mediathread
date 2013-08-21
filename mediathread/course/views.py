@@ -24,10 +24,6 @@ class MemberActionView(FormView):
         self.user = get_object_or_404(User, id=form.cleaned_data['user_id'])
         return HttpResponseRedirect(self.get_success_url())
 
-    def form_invalid(self, form):
-        self.next_url = form.cleaned_data['next_url']
-        return HttpResponseRedirect(self.get_success_url())
-
     def get_success_url(self):
         return reverse('member_list')
 
@@ -47,12 +43,6 @@ class ResendInviteView(MemberActionView):
 
         return response
 
-    def form_invalid(self, form):
-        response = super(ResendInviteView, self).form_invalid(form)
-        messages.error(self.request, "An error occurred while trying to send the activation email.")
-        return response
-
-
 resend_invite = ResendInviteView.as_view()
 
 
@@ -69,12 +59,6 @@ class PromoteStudentView(MemberActionView):
         else:
             messages.error(self.request, "You must be an instructor in this course to do that.")
         return response
-
-    def form_invalid(self, form):
-        response = super(PromoteStudentView, self).form_invalid(form)
-        messages.error(self.request, "An error occurred while trying to promote the student to the faculty group")
-        return response
-
 
 promote_student = PromoteStudentView.as_view()
 
