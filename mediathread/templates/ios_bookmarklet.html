@@ -1,12 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}
+    Analyze w/ Mediathread
+{% endblock %}
+
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
 {% endblock %}
 
 {% block content %}
-
+    <script type="text/javascript">
+        // hack because it's not possible to override the whole title in the template
+        document.title = "Analyze with Mediathread";
+    </script>
     {{ block.super }}
     <div class="dashboard-module-header">
         <h2>iOS bookmarklet</h2>
@@ -28,8 +35,7 @@
             <li>Now click on the Bookmarks icon (<img src="{% static "img/ios-safari-bookmarks.gif" %}" height="18" width="30" alt="Bookmarks Icon">) to reveal your bookmarks. Navigate to your new bookmark
                 and click “Edit” in the corner of the bookmarks window.
             </li>
-            <li>Select your newly created bookmark and change the name to the item you copied above (e.g., “Read
-                Now”).
+            <li>Select your newly created bookmark and change the name to the item you copied above (e.g., “Analyze with Mediathread”).
             </li>
             <li>Next, delete the URL shown and paste the code you copied in step 1: tap the URL shown in the second
                 field, tap "Select All", tap "Paste".
@@ -39,6 +45,6 @@
             </li>
         </ol>
         <a href="/" class="btn">Back to class homepage</a>
-
     </div>
+
 {% endblock %}
