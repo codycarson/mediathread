@@ -4,6 +4,9 @@ from django.conf import settings
 from mediathread.user_accounts.utils import add_email_to_mailchimp_list
 
 import mailsnake
+from mock import patch, MagicMock
+
+mock_mailsnake = MagicMock(spec=mailsnake)
 
 """
 Exceptions
@@ -21,7 +24,7 @@ class ListIdNotValid(Exception):
 Test Cases
 """
 
-
+@patch("mailsnake.MailSnake", mock_mailsnake)
 class MailChimpTest(TestCase):
     def setUp(self):
         self.test_mailchimp_data = {
