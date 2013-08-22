@@ -180,6 +180,7 @@ INSTALLED_APPS = [
     'autocomplete_light',
     'mediathread.course',
     'crispy_forms',
+    'tos',
 
 ]
 
