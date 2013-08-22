@@ -148,8 +148,8 @@ class RegistrationTest(TestCase):
 
     @override_settings(SAMPLE_COURSE_ID=1)
     def test_registration_post(self):
-        response = self.client.post(reverse("registration-form"), self.post_params, follow=True)
-        self.assertRedirects(response, "/")
+        response = self.client.post(reverse("registration-form"), self.post_params)
+        self.assertEqual(response.status_code, 200)
         self.assertEquals(User.objects.filter(email="testmediathread@appsembler.com").count(), 1)
         user = User.objects.get(email="testmediathread@appsembler.com")
         self.assertEquals(user.get_full_name(), "Appsembler Rocks")
