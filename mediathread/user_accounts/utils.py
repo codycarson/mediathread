@@ -3,7 +3,7 @@ from django.conf import settings
 import mailchimp
 
 
-def add_email_to_mailchimp_list(email_address, list_id, **kwargs):
+def add_email_to_mailchimp_list(email_address, list_id, test_client=None, **kwargs):
     merge_vars_dict = {}
 
     for k, v in kwargs.items():
@@ -13,19 +13,24 @@ def add_email_to_mailchimp_list(email_address, list_id, **kwargs):
         print "did not defined api key for Mailchimp, skip Mailchimp related action now"
         return False
 
-    ms = mailchimp.Mailchimp(settings.MAILCHIMP_API_KEY)
+    if test_client:
+        ms = test_client
+    else:
+        ms = mailchimp.Mailchimp(settings.MAILCHIMP_API_KEY)
 
     # new version API require email as a struct with an email field.
     email_struct = {
         'email': email_address
         }
 
-    ms.lists.subscribe(
+    result = ms.lists.subscribe(
         id=list_id,
         email=email_struct,
         merge_vars=merge_vars_dict,
         update_existing=True,
         double_optin=False)
+
+    print result
 
     return True
 
