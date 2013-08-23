@@ -12,7 +12,6 @@ from mediathread.main.api import CourseResource, CourseSummaryResource
 from mediathread.projects.api import ProjectResource
 from mediathread.taxonomy.api import TermResource, VocabularyResource
 from tastypie.api import Api
-from allauth.account.forms import LoginForm
 
 
 v1_api = Api(api_name='v1')
@@ -52,11 +51,8 @@ urlpatterns = patterns(
     (r'^about/$', 'django.views.generic.simple.redirect_to', {'url': settings.ABOUT_URL}),
     (r'^help/$', 'django.views.generic.simple.redirect_to', {'url': settings.HELP_URL}),
     (r'^terms-of-use/$', direct_to_template,
-    {'template': 'main/terms-of-use.html'}),
-    url(r'^terms-of-service/', include('tos.urls')),
-    url(r'^login/', 'tos.views.login', kwargs={
-        'template_name': 'account/login.html',
-        'authentication_form': LoginForm}, name='tos_login'),
+        {'template': 'main/terms-of-use.html'}),
+
 
     (r'^privacy-policy/$', direct_to_template,
      {'template': 'main/privacy-policy.html'}),
@@ -72,8 +68,13 @@ urlpatterns = patterns(
 
     (r'^comments/', include('django.contrib.comments.urls')),
 
+    # tos
+    (r'^terms-of-service/', include('tos.urls')),
+    url(r'^accounts/login/', 'mediathread.user_accounts.views.login_view', {}, name="tos-login"),
+
     auth_urls,
     logout_page,
+
 
     (r'^user_accounts/', include('mediathread.user_accounts.urls')),
     (r'^course/', include('mediathread.course.urls')),
