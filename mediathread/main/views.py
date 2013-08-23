@@ -30,6 +30,7 @@ def django_settings(request):
                  'REVISION',
                  'DATABASES',
                  'GOOGLE_ANALYTICS_ID',
+                 'SEGMENTIO_JS_KEY'
                  ]
 
     rv = {'settings': dict([(k, getattr(settings, k, None))

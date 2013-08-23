@@ -1,0 +1,3 @@
+[run]
+source = mediathread
+omit = */migrations/*

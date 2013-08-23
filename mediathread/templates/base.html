@@ -10,7 +10,7 @@
         {% if not settings.DEBUG %}
         <script type="text/javascript">
             var analytics=analytics||[];(function(){var e=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group"],t=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var n=0;n<e.length;n++)analytics[e[n]]=t(e[n])})(),analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)};
-            analytics.load("3ts2xu858r");
+            analytics.load("{{ settings.SEGMENTIO_JS_KEY }}");
         </script>
         {% endif %}
         
@@ -201,6 +201,8 @@
                <li><a href="mailto:{{settings.PUBLIC_CONTACT_EMAIL}}">E-Mail Us</a></li>
            {% endif %}
            <li><a href="/help/">Help</a></li>
+           <li><a href="/terms-of-use/">Terms of Use</a></li>
+           <li><a href="/privacy-policy/">Privacy Policy</a></li>
         </ul>
 			
 		<!-- Appsembler title/logo -->

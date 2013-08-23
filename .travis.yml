@@ -4,8 +4,11 @@ python:
   - "2.7"
 install:
   - ./bootstrap.py
+  - pip install coveralls
 script:
   - ./manage.py test
 branches:
     except:
         - /feature\/*/
+after_success:
+  - coveralls
