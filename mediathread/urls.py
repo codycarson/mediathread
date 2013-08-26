@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from djangosherd.api import SherdNoteResource
+from mediathread.api import TagResource
 from mediathread.assetmgr.api import AssetResource
 from mediathread.main.api import CourseResource, CourseSummaryResource
 from mediathread.projects.api import ProjectResource
@@ -22,6 +23,7 @@ v1_api.register(CourseResource())
 v1_api.register(CourseSummaryResource())
 v1_api.register(TermResource())
 v1_api.register(VocabularyResource())
+v1_api.register(TagResource())
 
 autocomplete_light.autodiscover()
 admin.autodiscover()
