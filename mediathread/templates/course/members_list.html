@@ -31,8 +31,8 @@
                     <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
                     <td>
                     {% if instructor.status == "Invited" %}
-                        <form action="" method="post">
-                            <input type="hidden" name="user_id" value="{{ student.id }}" />
+                        <form action="{% url resend_invite %}" method="post">
+                            <input type="hidden" name="user_id" value="{{ instructor.id }}" />
                             <input type="submit" class="btn btn-info" value="Resend Invite" />
                         </form>
                     {% endif %}
