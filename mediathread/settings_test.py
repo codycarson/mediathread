@@ -25,8 +25,8 @@ LETTUCE_APPS = (
     'mediathread.djangosherd'
 )
 
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+#ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+#ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 
 LETTUCE_DJANGO_APP = ['lettuce.django']
