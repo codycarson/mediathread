@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load coursetags %}
+{% load account coursetags %}
 
 {% block coursetitle %}
     Select a Course
@@ -73,8 +73,10 @@
   {% comment %}
   <td>{% if course.details.instructor %}{{course.details.instructor.value}}{% endif %}</td>
   {% endcomment %}
+
  <td>{% for instructor in course.faculty.all %}
-    {{ instructor.get_full_name }}<br/>
+     {% user_display instructor as user_display %}
+    {{ user_display }}<br/>
  {% endfor %}</td>
   <td>{% course_role for request.user in course as foo %}{{foo}}</td>
   {% if add_privilege %}
