@@ -40,6 +40,9 @@
                             <input type="hidden" name="user_id" value="{{ instructor.id }}" />
                         </form>
                     {% endif %}
+                    <form action="{% url demote_faculty %}" id="demote_faculty_{{ instructor.id }}" method="post">
+                        <input type="hidden" name="user_id" value="{{ instructor.id }}"/>
+                    </form>
                     <div class="btn-group">
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                             Action
@@ -47,6 +50,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             {% if instructor.status == "Invited" %}<li><a href="#" onclick="$('#resend_invite_{{ instructor.id }}').submit();return false;">Resend Invite</a></li>{% endif %}
+                            <li><a href="#" onclick="$('#demote_faculty_{{ instructor.id }}').submit();return false;">Demote Faculty</a></li>
                         </ul>
                     </div>
                     </td>
