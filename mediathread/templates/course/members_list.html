@@ -5,6 +5,10 @@
 <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" xmlns="http://www.w3.org/1999/html"/>
 {% endblock %}
 
+{% block js %}
+    <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
     <div class="dashboard-module-header">
@@ -31,11 +35,19 @@
                     <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
                     <td>
                     {% if instructor.status == "Invited" %}
-                        <form action="{% url resend_invite %}" method="post">
+                        <form action="{% url resend_invite %}" id="resend_invite_{{ instructor.id }}" method="post">
                             <input type="hidden" name="user_id" value="{{ instructor.id }}" />
-                            <input type="submit" class="btn btn-info" value="Resend Invite" />
                         </form>
                     {% endif %}
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Action
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if instructor.status == "Invited" %}<li><a href="#" onclick="$('#resend_invite_{{ instructor.id }}').submit();return false;">Resend Invite</a></li>{% endif %}
+                        </ul>
+                    </div>
                     </td>
                 </tr>
             {% endfor %}
@@ -47,21 +59,30 @@
                     <td>{{ student.status }}</td>
                     <td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
                     <td>
-                        <form action="{% url promote_student %}" method="post">
-                            <input type="hidden" name="user_id" value="{{ student.id }}" />
-                            <input type="submit" class="btn btn-success" value="Promote" />
+                    <form action="{% url promote_student %}" id="promote_student_{{ student.id }}" method="post">
+                        <input type="hidden" name="user_id" value="{{ student.id }}"/>
+                    </form>
+                    {% if student.status == "Invited" %}
+                        <form action="{% url resend_invite %}" id="resend_invite_{{ student.id }}" method="post">
+                            <input type="hidden" name="user_id" value="{{ student.id }}"/>
                         </form>
-                        {% if student.status == "Invited" %}
-                            <form action="{% url resend_invite %}" method="post">
-                                <input type="hidden" name="user_id" value="{{ student.id }}" />
-                                <input type="submit" class="btn btn-info" value="Resend Invite" />
-                            </form>
-                        {% endif %}
+                    {% endif %}
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            Action
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" onclick="$('#promote_student_{{ student.id }}').submit();return false;">Promote</a></li>
+                            {% if student.status == "Invited" %}<li><a href="#" onclick="$('#resend_invite_{{ student.id }}').submit();return false;">Resend Invite</a></li>{% endif %}
+                        </ul>
+                    </div>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+
         <p>Total class members: {{ members_count }}</p>
     </div>
 
