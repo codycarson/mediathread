@@ -4585,3 +4585,7 @@ form .form-actions {
     font-weight: bold;
     float: right;
 }
+
+.invite-students-btn {
+    margin: 0 10px;
+}
