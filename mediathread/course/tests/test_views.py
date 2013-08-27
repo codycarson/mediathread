@@ -53,7 +53,6 @@ class MemberListTest(TestCase):
         self.assertContains(response, '<td>Student</td>', count=4, html=True)
         self.assertContains(response, 'Resend Invite', count=2)
         self.assertContains(response, 'Promote', count=4)
-        self.assertContains(response, 'Total class members: 6')
 
 
 class PromoteStudentTest(TestCase):
