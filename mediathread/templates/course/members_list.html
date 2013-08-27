@@ -56,7 +56,7 @@
                 <tr>
                     <td>{{ student.get_full_name }}</td>
                     <td>Student</td>
-                    <td>{{ student.status }}</td>
+                    <td class="student_status">{{ student.status }}</td>
                     <td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
                     <td>
                     <form action="{% url promote_student %}" id="promote_student_{{ student.id }}" method="post">
@@ -86,7 +86,16 @@
             {% endfor %}
             </tbody>
         </table>
-
-        <p>Total class members: {{ members_count }}</p>
+        <p>Invited students: <span id="invited_count"></span><br>
+        Activated students: <span id="activated_count"></span><br>
+        Total students: <span id="members_count"></span></p>
     </div>
+    <script type="text/javascript">
+        var invited = $(".student_status").filter(":contains(Invited)").length;
+        var activated = $(".student_status").filter(":contains(Activated)").length;
+        var total = invited + activated;
+        $("#invited_count").text(invited);
+        $("#activated_count").text(activated);
+        $("#members_count").text(total);
+    </script>
 {% endblock %}
