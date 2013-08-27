@@ -6,4 +6,5 @@ urlpatterns = patterns('',
     url(r'member-list/$', member_list, name='member_list'),
     url(r'promote-user/$', promote_student, name='promote_student'),
     url(r'resend-invite/$', resend_invite, name='resend_invite'),
+    url(r'remove-student/$', remove_student, name='remove_student'),
 )

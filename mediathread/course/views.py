@@ -46,6 +46,23 @@ class ResendInviteView(MemberActionView):
 resend_invite = ResendInviteView.as_view()
 
 
+class RemoveStudentFromClassView(MemberActionView):
+    def form_valid(self, form):
+        response = super(RemoveStudentFromClassView, self).form_valid(form)
+        if self.course.faculty_group.user_set.filter(id=self.request.user.id).exists():
+            self.course.group.user_set.remove(self.user)
+            messages.success(
+                self.request,
+                "Successfully removed {0} from the course {1}".format(
+                    self.user.get_full_name(), self.course.title
+                ))
+        else:
+            messages.error(self.request, "You must be an instructor in this course to do that.")
+        return response
+
+remove_student = RemoveStudentFromClassView.as_view()
+
+
 class PromoteStudentView(MemberActionView):
     def form_valid(self, form):
         response = super(PromoteStudentView, self).form_valid(form)

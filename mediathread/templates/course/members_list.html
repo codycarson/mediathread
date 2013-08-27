@@ -67,6 +67,9 @@
                             <input type="hidden" name="user_id" value="{{ student.id }}"/>
                         </form>
                     {% endif %}
+                    <form action="{% url remove_student %}" id="remove_student_{{ student.id }}" method="post">
+                        <input type="hidden" name="user_id" value="{{ student.id }}"/>
+                    </form>
                     <div class="btn-group">
                         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                             Action
@@ -75,6 +78,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="#" onclick="$('#promote_student_{{ student.id }}').submit();return false;">Promote</a></li>
                             {% if student.status == "Invited" %}<li><a href="#" onclick="$('#resend_invite_{{ student.id }}').submit();return false;">Resend Invite</a></li>{% endif %}
+                            <li><a href="#" onclick="$('#remove_student_{{ student.id }}').submit();return false;">Remove from class</a></li>
                         </ul>
                     </div>
                     </td>
@@ -85,7 +89,4 @@
 
         <p>Total class members: {{ members_count }}</p>
     </div>
-
-
-
 {% endblock %}

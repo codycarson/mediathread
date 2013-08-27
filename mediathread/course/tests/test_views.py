@@ -106,3 +106,34 @@ class ResendInviteTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "User already activated his account.")
+
+
+class RemoveStudentTest(TestCase):
+    fixtures = ['unittest_sample_course.json', 'registration_data.json']
+
+    def test_remove_student(self):
+        self.client.login(username="test_instructor", password="test")
+
+        course = Course.objects.get(id=1)
+        self.assertEquals(course.user_set.count(), 6)
+        response = self.client.post(reverse("remove_student"), {
+            'user_id': 3
+        }, follow=True)
+        user = User.objects.get(id=3)
+        self.assertFalse(user in course.group.user_set.all(), response)
+        self.assertEquals(course.user_set.count(), 5)
+        self.assertRedirects(response, reverse('member_list'))
+        self.assertContains(response, "Successfully removed {0}".format(user.email))
+
+    def test_remove_student_without_permissions(self):
+        self.client.login(username="test_student_one", password="test")
+        course = Course.objects.get(id=1)
+        self.assertEquals(course.user_set.count(), 6)
+        response = self.client.post(reverse("remove_student"), {
+            'user_id': 4
+        }, follow=True)
+        user = User.objects.get(id=4)
+        self.assertTrue(user in course.group.user_set.all(), response)
+        self.assertEquals(course.user_set.count(), 6)
+        self.assertRedirects(response, reverse('member_list'))
+        self.assertContains(response, "You must be an instructor in this course to do that")
