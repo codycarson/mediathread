@@ -86,9 +86,10 @@
             {% endfor %}
             </tbody>
         </table>
-        <p>Invited students: <span id="invited_count"></span><br>
+        <p class="students_count">Invited students: <span id="invited_count"></span><br>
         Activated students: <span id="activated_count"></span><br>
-        Total students: <span id="members_count"></span></p>
+        Total students: <span id="members_count"></span><br>
+        <a href="{% url invite-students %}">Invite more students</a></p>
     </div>
     <script type="text/javascript">
         var invited = $(".student_status").filter(":contains(Invited)").length;
