@@ -1,5 +1,6 @@
 import analytics
 from allauth.account.models import EmailAddress
+from courseaffils.models import CourseInfo
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -142,6 +143,7 @@ class CourseCreateFormView(FormView):
         course_title = form.cleaned_data['title']
         course_student_amount = form.cleaned_data['student_amount']
         course_organization_name = form.cleaned_data['organization']
+        term = form.cleaned_data['term']
 
         # creating course
         course = CourseInformation(
@@ -149,6 +151,12 @@ class CourseCreateFormView(FormView):
             organization_name=course_organization_name,
             student_amount=course_student_amount)
         course.save()
+
+        # save term data
+        CourseInfo.objects.create(
+            course=course.course,
+            term=term
+        )
 
         # add user to that class as a faculty
         course.add_member(self.request.user, faculty=True)

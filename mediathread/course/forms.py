@@ -1,7 +1,9 @@
 import autocomplete_light
+from courseaffils.models import CourseInfo
 from crispy_forms.layout import Submit
 from crispy_forms.helper import FormHelper
 from django import forms
+
 from .models import CourseInformation, STUDENT_AMOUNT_CHOICES
 
 
@@ -13,6 +15,9 @@ class CourseForm(forms.Form):
     title = forms.CharField(
         label="Course title",
         required=True,
+    )
+    term = forms.ChoiceField(
+        choices=CourseInfo.term_choices.items()
     )
     student_amount = forms.ChoiceField(
         choices=STUDENT_AMOUNT_CHOICES,
