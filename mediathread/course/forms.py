@@ -1,3 +1,5 @@
+from datetime import date
+
 import autocomplete_light
 from courseaffils.models import CourseInfo
 from crispy_forms.layout import Submit
@@ -12,12 +14,18 @@ class MemberActionForm(forms.Form):
 
 
 class CourseForm(forms.Form):
+    # current year and 2 next
+    YEAR_CHOICES = [(y, y) for y in range(date.today().year, date.today().year+3)]
+
     title = forms.CharField(
         label="Course title",
         required=True,
     )
     term = forms.ChoiceField(
         choices=CourseInfo.term_choices.items()
+    )
+    year = forms.ChoiceField(
+        choices=YEAR_CHOICES
     )
     student_amount = forms.ChoiceField(
         choices=STUDENT_AMOUNT_CHOICES,

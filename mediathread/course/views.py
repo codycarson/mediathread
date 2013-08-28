@@ -144,6 +144,7 @@ class CourseCreateFormView(FormView):
         course_student_amount = form.cleaned_data['student_amount']
         course_organization_name = form.cleaned_data['organization']
         term = form.cleaned_data['term']
+        year = form.cleaned_data['year']
 
         # creating course
         course = CourseInformation(
@@ -155,7 +156,8 @@ class CourseCreateFormView(FormView):
         # save term data
         CourseInfo.objects.create(
             course=course.course,
-            term=term
+            term=term,
+            year=year
         )
 
         # add user to that class as a faculty
