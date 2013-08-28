@@ -23,7 +23,8 @@ class CourseCreateTest(TestCase):
         response = self.client.post(reverse("course_create"), {
             'title': "Sample course #1",
             'organization': "Test organization",
-            'student_amount': '10'
+            'student_amount': '10',
+            'term': 1
         })
         self.assertRedirects(response, '/')
         self.assertTrue(Course.objects.filter(title="Sample course #1").exists())
