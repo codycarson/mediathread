@@ -5,6 +5,7 @@
 # (see bottom)
 
 from courseaffils import policies
+from django.contrib.messages import constants as message_constants
 import os
 import re
 import sys
@@ -166,7 +167,6 @@ INSTALLED_APPS = [
     'djangohelpers',
     'mediathread.reports',
     'mediathread.main',
-    'sentry.client',
     'south',
     'django_nose',
     'compressor',
@@ -213,6 +213,7 @@ ANONYMOUS_PATHS = ('/user_accounts/'
                    )
 
 NON_ANONYMOUS_PATHS = ('/user_accounts/invite_students/',
+                       '/course/',
                        '/asset/',
                        '/annotations/',
                        '/contact/',
@@ -268,11 +269,15 @@ MAILCHIMP_REGISTRATION_LIST_ID = ''
 
 # Segment.io key
 SEGMENTIO_API_KEY = ''
+SEGMENTIO_JS_KEY = ''
 
 # The sample course that all registered users are added to
 SAMPLE_COURSE_ID = 2
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+# Don't show info messages from allauth
+MESSAGE_LEVEL = message_constants.SUCCESS
 
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"

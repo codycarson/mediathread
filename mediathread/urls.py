@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from djangosherd.api import SherdNoteResource
+from mediathread.api import TagResource
 from mediathread.assetmgr.api import AssetResource
 from mediathread.main.api import CourseResource, CourseSummaryResource
 from mediathread.projects.api import ProjectResource
@@ -22,16 +23,14 @@ v1_api.register(CourseResource())
 v1_api.register(CourseSummaryResource())
 v1_api.register(TermResource())
 v1_api.register(VocabularyResource())
+v1_api.register(TagResource())
 
 autocomplete_light.autodiscover()
 admin.autodiscover()
 
 analytics.init(settings.SEGMENTIO_API_KEY)
 
-site_media_root = os.path.join(os.path.dirname(__file__), "../media")
-bookmarklet_root = os.path.join(os.path.dirname(__file__),
-                                "../media",
-                                "bookmarklets")
+bookmarklet_root = os.path.join(settings.STATIC_ROOT, "bookmarklets")
 
 redirect_after_logout = getattr(settings, 'LOGOUT_REDIRECT_URL', None)
 
@@ -53,6 +52,10 @@ urlpatterns = patterns(
 
     (r'^about/$', 'django.views.generic.simple.redirect_to', {'url': settings.ABOUT_URL}),
     (r'^help/$', 'django.views.generic.simple.redirect_to', {'url': settings.HELP_URL}),
+    (r'^terms-of-use/$', direct_to_template,
+     {'template': 'main/terms-of-use.html'}),
+    (r'^privacy-policy/$', direct_to_template,
+     {'template': 'main/privacy-policy.html'}),
 
     (r'^crossdomain.xml$', 'django.views.static.serve',
      {'document_root': os.path.abspath(os.path.dirname(__file__)),
@@ -81,9 +84,6 @@ urlpatterns = patterns(
 
     (r'^jsi18n/$', 'django.views.i18n.javascript_catalog'),
 
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-     {'document_root': site_media_root}),
-
     # Bookmarklet + cache defeating
     url(r'^bookmarklets/(?P<path>analyze.js)$', 'django.views.static.serve',
         {'document_root': bookmarklet_root}, name='analyze-bookmarklet'),
@@ -103,6 +103,7 @@ urlpatterns = patterns(
 
     # Homepage
     (r'^$', 'mediathread.main.views.triple_homepage'),
+    url(r'^ios_bookmarklet/$', direct_to_template, kwargs={'template': 'ios_bookmarklet.html'}, name="ios_bookmarklet"),
     (r'^yourspace/', include('mediathread.main.urls')),
     (r'^_main/api/', include(v1_api.urls)),
 

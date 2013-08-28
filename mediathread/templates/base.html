@@ -10,7 +10,7 @@
         {% if not settings.DEBUG %}
         <script type="text/javascript">
             var analytics=analytics||[];(function(){var e=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group"],t=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var n=0;n<e.length;n++)analytics[e[n]]=t(e[n])})(),analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n)};
-            analytics.load("3ts2xu858r");
+            analytics.load("{{ settings.SEGMENTIO_JS_KEY }}");
         </script>
         {% endif %}
         
@@ -29,7 +29,7 @@
             <link rel="stylesheet" href="{% static 'css/print.css' %}" media="print" />
             <link rel="stylesheet" href="{% static 'css/mediathread.css' %}" media="screen" />
             {% block css %}{% endblock %}
-        {% endcompress %}
+        {% endcompress %}   
         
         {% block extrahead %}
             <!--  For uncompress-able resources -->
@@ -46,8 +46,7 @@
     </head>
     
     {% course_role for request.user in course as role_in_course %}
-    <body class="one_column role-{{role_in_course}} {% block extra_body_class %}{% endblock %}">
-    <div class="ajaxloader" style="display: none"></div>
+    <body class="one_column role-{{role_in_course}} {% block extra_body_class %}{% endblock %}">    
     <div id="dialog-confirm" style="display: none"></div>    
     <div id="container">
         {% block masthead %}
@@ -105,6 +104,7 @@
                                     <a href="/dashboard/migrate/">Migrations</a>
                                     <a href="/taxonomy/">Vocabulary</a>
                                     <a href="{% url invite-students %}">Invite students</a>
+                                    <a href="{% url member_list %}">Class roster</a>
                                 </div>
                             </li>
                             <li>
@@ -155,8 +155,9 @@
             <div id="course_information">
                 <h1 id="course_title">
                 {% block coursetitle %}
-                    <a href="/" id="course_title_link">{{course.title}}</a></h1>
+                    <a href="/" id="course_title_link">{{course.title}}</a>
                 {% endblock %}
+                </h1>
                 <div class="clear: right;"></div>
             </div>
             
@@ -193,24 +194,29 @@
     </div><!-- id="container" -->
 
 	{% block footer %}
-	<!-- ###### Footer ###### -->
-    <div id="footer">
-	   <ul id="footernav">
-           <li><a href="/about/">About</a></li>
-           {% if settings.PUBLIC_CONTACT_EMAIL %}                          
-               <li><a href="mailto:{{settings.PUBLIC_CONTACT_EMAIL}}">E-Mail Us</a></li>
-           {% endif %}
-           <li><a href="/help/">Help</a></li>
-        </ul>
-			
-		<!-- Appsembler title/logo -->
+    	<!-- ###### Footer ###### -->
+        <div id="footer">
+          <!-- Appsembler title/logo -->
         <a href="http://appsembler.com" target="_blank" title="Appsembler">
             <h4 id="logo_appsembler"></h4>
         </a>
-		</div><!-- id="footer" -->
+            <!-- CCNMTL title/logo -->
+    	   <ul id="footernav">
+               <li><a href="/about/">About</a></li>
+               {% if settings.PUBLIC_CONTACT_EMAIL %}     
+			 <li><a href="mailto:{{settings.PUBLIC_CONTACT_EMAIL}}">E-Mail Us</a></li>
+               {% endif %}
+               <li><a href="/help/">Help</a></li>                     
+           <li><a href="/help/">Help</a></li>
+           <li><a href="/terms-of-use/">Terms of Use</a></li>
+           <li><a href="/privacy-policy/">Privacy Policy</a></li>
+        </ul>
+			
+		
+        </div><!-- id="footer" -->
     {% endblock %}
     
-    {% compress js %}
+    {% compress js %}   
         <script type="text/javascript">
             var lt = String.fromCharCode(60);
             if (window.jQuery) {
@@ -248,15 +254,35 @@
         <script type="text/javascript" src="{% static 'js/app/projects/projectpanel.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/app/projects/projectlist.js' %}"></script>
     
+        {% if not settings.DEBUG %}
+            <script>                
+                {% if settings.GOOGLE_ANALYTICS_ID %}
+                    var _gaq = _gaq || [];
+                    _gaq.push(['_setAccount', '{{settings.GOOGLE_ANALYTICS_ID}}']);
+                    _gaq.push(['_trackPageview']);
+            
+                    (function () {
+                        var ga = document.createElement('script');
+                        ga.type = 'text/javascript';
+                        ga.async = true;
+                        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                        var s = document.getElementsByTagName('script')[0];
+                        s.parentNode.insertBefore(ga, s);
+                    })();
+                
+                    var analytics = new MediathreadAnalytics(_gaq);
+                {% endif %}
+            </script>
+        {% endif %}        
+           
+    
         <script type="text/javascript">
             jQuery(document).ready(function() {
                 // setup some ajax progress indicator
                 jQuery("html").bind("ajaxStart", function(){  
                    jQuery(this).addClass("busy");
-                   jQuery("div.ajaxloader").show();
                 }).bind("ajaxStop", function(){  
                    jQuery(this).removeClass("busy");
-                   jQuery("div.ajaxloader").hide();
                 });
                 
                 /* Select from list: Chrome, Firefox, Safari, MSIE */
