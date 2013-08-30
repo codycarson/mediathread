@@ -28,6 +28,7 @@
         {% compress css %}                        
             <link rel="stylesheet" href="{% static 'css/print.css' %}" media="print" />
             <link rel="stylesheet" href="{% static 'css/mediathread.css' %}" media="screen" />
+            <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
             {% block css %}{% endblock %}
         {% endcompress %}   
         
@@ -53,7 +54,17 @@
         	<!-- ###### Site banner ###### -->
         	<div id="header">
     
-                <div id="standardnav_container">   
+                <div id="standardnav_container">
+                {% if request.no_students %}
+                    <div id="call-to-action">
+                        <h2>You haven't invited any students to this course. Click here to invite them: </h2><button class="btn btn-success">Invite students</button>
+                    </div>
+                {% endif %}
+                {% if request.no_courses_created %}
+                    <div id="call-to-action">
+                        <h2>Want to create your own course? Click here:</h2><a href="{% url course_create %}" class="btn btn-success">Create course</a>
+                    </div>
+                {% endif %}
                 <div id="mediathread_logo">
                     <a href="/">
                         <img src="{% static 'img/logo_mediathread_new.png' %}" alt="mediathread logo" width="156" height="45"/>
