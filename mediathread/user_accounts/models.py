@@ -23,6 +23,9 @@ POSITION_CHOICES = (
     ('other', 'Other')
 )
 
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True, related_name="profile")
+    profile_picture = models.ImageField(upload_to='profile_pictures')
 
 class RegistrationModel(models.Model):
     user = models.OneToOneField(User, editable=True, null=True, related_name="registration_model")

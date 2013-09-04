@@ -48,6 +48,51 @@ class ConfirmEmailView(AllauthConfirmEmailView):
 
 confirm_email_view = ConfirmEmailView.as_view()
 
+from .forms import UserProfileForm
+from .models import UserProfile
+from allauth.account.forms import ChangePasswordForm
+
+
+from django.contrib.auth.decorators import login_required
+
+
+class UserProfileView(FormView):
+    """
+    View for creating and updating profile data
+    """
+    form_class = UserProfileForm
+    success_url = '/'
+    template_name = 'user_accounts/user_profile.html'
+    
+    def get_initial(self):
+        user_instance = self.request.user
+        
+        return {
+            'first_name': user_instance.first_name,
+            'last_name': user_instance.last_name
+        }
+
+    def form_valid(self, form):
+        user = User.objects.get(pk=self.request.user.pk)
+        profile_defaults = {}
+        profile, profile_created = UserProfile.objects.get_or_create(user=user, defaults=profile_defaults)
+        
+        user.first_name = form.cleaned_data['first_name']
+        user.last_name = form.cleaned_data['last_name']
+        
+        user.save()
+        
+        messages.success(self.request, "You've successfully updated your user profile.", fail_silently=True)
+        return super(UserProfileView, self).form_valid(form)
+
+
+    def form_invalid(self, form):
+        return super(UserProfileView, self).form_invalid(form)
+
+
+user_profile_view = login_required(UserProfileView.as_view())
+
+
 
 class RegistrationFormView(FormView):
     """

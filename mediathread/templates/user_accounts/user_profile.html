@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags static %}
+{% load avatar_tags %}
+
+{% block title %}User Profile{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
+{% endblock %}
+
+{% block content %}
+    <!-- avatar -->
+    <div>
+        <p><strong>Current Avatar</strong></p>
+    </div>
+    {% avatar user %}
+    <div>
+        <p><a href="{% url avatar_change %}">Change Avatar</a></p>
+    </div>
+
+    <!-- other fields -->
+    {% crispy form %}
+{% endblock content %}

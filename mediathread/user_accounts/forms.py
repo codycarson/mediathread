@@ -7,6 +7,22 @@ from django.utils.safestring import mark_safe
 from .models import RegistrationModel, OrganizationModel
 
 
+class UserProfileForm(forms.Form):
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.form_action = '.'
+
+        submit_button = Submit('submit', 'Update my profile')
+        submit_button.field_classes = 'btn btn-success'
+        self.helper.add_input(submit_button)
+
+
 class RegistrationForm(forms.ModelForm):
     email = forms.EmailField()
     agree_to_term = forms.BooleanField(

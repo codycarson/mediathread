@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 from django.contrib.auth.views import password_change
 from .forms import SetUserPasswordForm
-from .views import invite_students, registration_form, confirm_email_view
+from .views import invite_students, registration_form, confirm_email_view, user_profile_view
 
 urlpatterns = patterns('',
     url(r'^set_password/$',
@@ -20,4 +20,7 @@ urlpatterns = patterns('',
     url(r'^confirm_email/(?P<key>\w+)/$',
         confirm_email_view,
         name='account_confirm_email'),
+    url(r'^user_profile/$',
+        user_profile_view,
+        name='user_profile_view'),
 )

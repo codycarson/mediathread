@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RegistrationModel, OrganizationModel
+from .models import RegistrationModel, OrganizationModel, UserProfile
 import autocomplete_light
 
 
@@ -15,5 +15,11 @@ class OrganizationAdmin(admin.ModelAdmin):
         model = OrganizationModel
 
 
+class UserProfileAdmin(admin.ModelAdmin):
+    class Meta:
+        model = UserProfile
+
+
 admin.site.register(RegistrationModel, RegistrationAdmin)
 admin.site.register(OrganizationModel, OrganizationAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)
