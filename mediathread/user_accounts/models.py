@@ -25,7 +25,6 @@ POSITION_CHOICES = (
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, null=True, editable=True, related_name="profile")
-    profile_picture = models.ImageField(upload_to='profile_pictures')
     organization = models.ForeignKey('OrganizationModel', null=True)
     subscribe_to_newsletter = models.BooleanField(default=False)
     position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, null=True, blank=True)

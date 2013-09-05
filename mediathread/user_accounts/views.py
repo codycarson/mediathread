@@ -70,7 +70,7 @@ class UserProfileView(FormView):
         user_registration_model = RegistrationModel.objects.get(user=user_instance)
         profile, profile_created = UserProfile.objects.get_or_create(user=user_instance, defaults={})
 
-        organization_value = profile.organizatoin.name if profile.organization else user_registration_model.organization.name
+        organization_value = profile.organization.name if profile.organization else user_registration_model.organization.name
         position_title_value = profile.position_title if profile.position_title else user_registration_model.position_title
         subscribe_to_newsletter_value = profile.subscribe_to_newsletter if profile.subscribe_to_newsletter != None else user_registration_model.subscribe_to_newsletter
 
