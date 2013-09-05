@@ -95,7 +95,7 @@ class UserProfileView(FormView):
             profile.organization.name = form.cleaned_data['organization']
             profile.organization.save()
         else:
-            profile.organization = OrganizationModel(name=form.cleaned_data['organization'])
+            profile.organization, created = OrganizationModel.objects.get_or_create(name=form.cleaned_data['organization'])
             profile.organization.save()
 
         profile.position_title = form.cleaned_data['position_title']
