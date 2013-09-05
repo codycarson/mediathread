@@ -14,6 +14,7 @@ from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
 from .forms import InviteStudentsForm, RegistrationForm
+from .models import OrganizationModel
 
 
 def login_user(request, user):
@@ -49,7 +50,7 @@ class ConfirmEmailView(AllauthConfirmEmailView):
 confirm_email_view = ConfirmEmailView.as_view()
 
 from .forms import UserProfileForm
-from .models import UserProfile
+from .models import UserProfile, RegistrationModel
 from allauth.account.forms import ChangePasswordForm
 
 
@@ -65,9 +66,18 @@ class UserProfileView(FormView):
     template_name = 'user_accounts/user_profile.html'
     
     def get_initial(self):
-        user_instance = self.request.user
-        
+        user_instance = User.objects.get(id=self.request.user.id)
+        user_registration_model = RegistrationModel.objects.get(user=user_instance)
+        profile, profile_created = UserProfile.objects.get_or_create(user=user_instance, defaults={})
+
+        organization_value = profile.organizatoin.name if profile.organization else user_registration_model.organization.name
+        position_title_value = profile.position_title if profile.position_title else user_registration_model.position_title
+        subscribe_to_newsletter_value = profile.subscribe_to_newsletter if profile.subscribe_to_newsletter != None else user_registration_model.subscribe_to_newsletter
+
         return {
+            'organization': organization_value,
+            'position_title': position_title_value,
+            'subscribe_to_newsletter': subscribe_to_newsletter_value,
             'first_name': user_instance.first_name,
             'last_name': user_instance.last_name
         }
@@ -79,8 +89,26 @@ class UserProfileView(FormView):
         
         user.first_name = form.cleaned_data['first_name']
         user.last_name = form.cleaned_data['last_name']
+
+
+        if profile.organization:
+            profile.organization.name = form.cleaned_data['organization']
+            profile.organization.save()
+        else:
+            profile.organization = OrganizationModel(name=form.cleaned_data['organization'])
+            profile.organization.save()
+
+        profile.position_title = form.cleaned_data['position_title']
+        profile.subscribe_to_newsletter = form.cleaned_data['subscribe_to_newsletter']
+
+        if profile.subscribe_to_newsletter:
+            pass
+            # TODO: subscribe user to the list
+        else:
+            pass
+            # TODO: unsubscribe user to the list
         
-        user.save()
+        profile.save()
         
         messages.success(self.request, "You've successfully updated your user profile.", fail_silently=True)
         return super(UserProfileView, self).form_valid(form)
@@ -121,6 +149,14 @@ class RegistrationFormView(FormView):
             form.errors.update(signup_error)
             return self.form_invalid(form)
         registration.save()
+
+        # save to profile
+        profile_defaults = {
+            'organization': form.cleaned_data['organization'],
+            'position_title': form.cleaned_data['position_title'],
+            'subscribe_to_newsletter': form.cleaned_data['subscribe_to_newsletter']
+        }
+        profile, profile_created = UserProfile.objects.get_or_create(user=success, defaults=profile_defaults)
 
         # subscribe in mailchimp
         if registration.subscribe_to_newsletter:

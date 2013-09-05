@@ -4,12 +4,18 @@ from crispy_forms.layout import Submit, Layout, Fieldset, ButtonHolder
 from django.contrib.auth.forms import SetPasswordForm
 from django import forms
 from django.utils.safestring import mark_safe
-from .models import RegistrationModel, OrganizationModel
+from .models import RegistrationModel, OrganizationModel, POSITION_CHOICES
 
 
 class UserProfileForm(forms.Form):
     first_name = forms.CharField()
     last_name = forms.CharField()
+
+    organization = forms.CharField(
+        widget=autocomplete_light.TextWidget('OrganizationAutocomplete')
+    )
+    subscribe_to_newsletter = forms.BooleanField(required=False)
+    position_title = forms.ChoiceField(choices=POSITION_CHOICES)
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
