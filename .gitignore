@@ -52,3 +52,10 @@ venv
 .TrashesIcon?
 ehthumbs.db
 Thumbs.db
+
+collected_static/
+coverage/
+ve/
+lettuce.db
+Ghostdriver.log
+local_settings.py
