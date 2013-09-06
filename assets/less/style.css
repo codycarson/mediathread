@@ -11754,6 +11754,7 @@ html {
 .inline-el h5,
 .inline-el p {
   margin: 0;
+  color: black;
 }
 
 .pad-right {
@@ -11762,6 +11763,12 @@ html {
 }
 .pad-left {
   padding-left: 0.5em;
+  color: black;
+}
+
+.pad-left a {
+  padding-left: 0.5em;
+  color: black;
 }
 
 .faq h2, 
