@@ -10955,7 +10955,7 @@ h5,
 h6 {
   font-weight: 300;
   line-height: 110%;
-  color: #ffffff;
+  color: #fff;
   padding: 0px 20px 0px 0;
   margin: 30px 0;
 }
@@ -10971,9 +10971,11 @@ h6 {
   font-size: 42px;
   text-align: center;
   padding-top: 30px;
+  color: black;
 }
 .large {
   font-size: 52px;
+  color: #fff;
 }
 .lead {
   font-size: 22px;
@@ -11615,4 +11617,159 @@ html {
 }
 .border {
   border: 1px solid #3a9ac4;
+}
+
+/* Pricing page */
+
+.upsell {
+  text-align: center;
+}
+.upsell .title {
+  display: inline-block;
+  padding: 0 0.5em;
+  margin: 0;
+}
+.upsell .title small {
+  display: block;
+}
+.upsell p {
+  margin: 0;
+  padding: 0.5em 0 0 0;
+}
+
+.fancy {
+  font-family: 'Calligraffitti', cursive;
+  text-transform: lowercase;
+}
+
+.pricing-stack .well {
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  border: 1px solid #cdcdcd;
+  padding: 10px;
+  background: #ffffff;
+  -webkit-box-shadow: 1px 1px 5px #cdcdcd;
+  -moz-box-shadow: 1px 1px 5px #cdcdcd;
+  box-shadow: 1px 1px 5px #cdcdcd;
+}
+.pricing-stack .well .title {
+  margin: 10px 0 0 0;
+  color: rgba(36, 36, 36, 0.8);
+  font-size: 22px;
+  text-shadow: 1px 1px 1px rgba(240, 240, 240, 0.8);
+  text-align: center;
+  font-weight: normal;
+  text-transform: none;
+}
+.pricing-stack .well .price {
+  margin: 1em -14px;
+  padding: 20px 0;
+  text-shadow: none;
+  color: #3a9ac4;
+  display: block;
+  border: 1px solid #cdcdcd;
+  background: #ffffff;
+  text-align: center;
+  font-size: 16px;
+  height: 30px;
+}
+.pricing-stack .well .price .fancy {
+  font-size: 28px;
+}
+.pricing-stack .well .price .digits {
+  font-size: 32px;
+  font-weight: bold;
+}
+.pricing-stack .well ul.points li {
+  border-bottom: 1px dotted rgba(189, 189, 189, 0.8);
+  padding: 0.2em;
+}
+.pricing-stack .well .btn {
+  display: block;
+  width: auto;
+  margin: 20px auto 0 auto;
+}
+.pricing-stack .well.active {
+  border-color: #3a9ac4;
+  border-width: 1px;
+  -webkit-box-shadow: 1px 2px 5px #cdcdcd;
+  -moz-box-shadow: 1px 2px 5px #cdcdcd;
+  box-shadow: 1px 2px 5px #cdcdcd;
+}
+.pricing-stack .well.active .title {
+  font-size: 28px;
+  text-transform: uppercase;
+}
+.pricing-stack .well.active .price {
+  background: #4baad3;
+  background-color: #5bab9e;
+  background-image: -moz-linear-gradient(top, #4baad3, #3a9ac4);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#4baad3), to(#3a9ac4));
+  background-image: -webkit-linear-gradient(top, #4baad3, #3a9ac4);
+  background-image: -o-linear-gradient(top, #4baad3, #3a9ac4);
+  background-image: linear-gradient(to bottom, #4baad3, #3a9ac4);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff4baad3;', endColorstr='#ff3a9ac4', GradientType=0);
+  border-color: #4baad3;
+  color: #ffffff;
+}
+.pricing-stack .well.active .btn,
+                            .btn-success:hover,
+                            .btn-success:focus,
+                            .btn-success:active,
+                            .btn-success.active,
+                            .btn-success.disabled,
+                            .btn-success[disabled] {
+  color: #ffffff;
+  background-color: #51a351;
+  *background-color: #499249;
+  margin-top: 40px;
+}
+
+.pricing-stack .well ul li a {
+  color: #333;
+  text-decoration: none;
+}
+.pricing-stack .well ul li a:hover,
+                           a:focus {
+  color: black;
+}
+
+.pull-center {
+  text-align: center;
+}
+
+.well-mini {
+  padding: 5px;
+}
+
+.inline-el {
+  display: inline-block;
+}
+.inline-el h1,
+.inline-el h2,
+.inline-el h3,
+.inline-el h4,
+.inline-el h5,
+.inline-el p {
+  margin: 0;
+}
+
+.pad-right {
+  padding-right: 0.5em;
+  color: black;
+}
+.pad-left {
+  padding-left: 0.5em;
+}
+
+.faq h2, 
+.faq h3, 
+.faq h4 {
+  color: black;
+}
+
+.faq h2 {
+  text-align: center;
 }

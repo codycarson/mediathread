@@ -4,7 +4,7 @@ $(document).ready(function() {
 
 $('.lazy-container').spin({ color: '#000'});
 
-
+$('.help').tooltip()
 
 
 
