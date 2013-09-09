@@ -10,7 +10,7 @@ class CallToActionMiddleware(object):
     """
     def process_request(self, request):
         if 'set_course' in request.REQUEST or 'unset_course' in request.GET:
-            request.session.pop('no_students')
+            request.session.pop('no_students', False)
 
         if not request.is_ajax() and request.user.is_authenticated() and \
                 request.session.get('courses_created', False) and not 'no_students' in request.session:
