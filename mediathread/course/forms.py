@@ -8,6 +8,8 @@ from django import forms
 
 from .models import CourseInformation, STUDENT_AMOUNT_CHOICES
 
+EMPTY_CHOICE = [('', '---------')]
+
 
 class MemberActionForm(forms.Form):
     user_id = forms.IntegerField()
@@ -22,10 +24,12 @@ class CourseForm(forms.Form):
         required=True,
     )
     term = forms.ChoiceField(
-        choices=CourseInfo.term_choices.items()
+        choices=EMPTY_CHOICE + CourseInfo.term_choices.items(),
+        required=False
     )
     year = forms.ChoiceField(
-        choices=YEAR_CHOICES
+        choices=EMPTY_CHOICE + YEAR_CHOICES,
+        required=False
     )
     student_amount = forms.ChoiceField(
         choices=STUDENT_AMOUNT_CHOICES,

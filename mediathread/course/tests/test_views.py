@@ -43,8 +43,6 @@ class CourseCreateTest(TestCase):
         })
         self.assertFormError(response, 'form', 'title', 'This field is required.')
         self.assertFormError(response, 'form', 'organization', 'This field is required.')
-        self.assertFormError(response, 'form', 'term', 'This field is required.')
-        self.assertFormError(response, 'form', 'year', 'This field is required.')
 
 
 class MemberListTest(TestCase):

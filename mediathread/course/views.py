@@ -153,12 +153,13 @@ class CourseCreateFormView(FormView):
             student_amount=course_student_amount)
         course.save()
 
-        # save term data
-        CourseInfo.objects.create(
-            course=course.course,
-            term=term,
-            year=year
-        )
+        # save term and/or year data
+        if term or year:
+            CourseInfo.objects.create(
+                course=course.course,
+                term=term,
+                year=year
+            )
 
         # add user to that class as a faculty
         course.add_member(self.request.user, faculty=True)
