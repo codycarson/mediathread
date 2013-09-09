@@ -44,6 +44,7 @@ class LoginView(AllauthLoginView):
         created_courses = Group.objects.exclude(
             id=sample_course_faculty_group_id).filter(user=self.request.user, name__startswith="faculty_").exists()
 
+        # logs to the session,whether the user has created any courses, needed for call to action middleware
         if registration_model_exists and not created_courses:
             self.request.session['courses_created'] = False
         else:
