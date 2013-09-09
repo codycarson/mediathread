@@ -62,7 +62,7 @@
                 {% endif %}
                 {% if not request.session.courses_created and request.user.is_authenticated %}
                     <div id="call-to-action">
-                        <h2>Want to create your own course? Click here:</h2><a href="{% url course_create %}" class="btn btn-success">Create course</a>
+                        <h2>Want to create your own course? Click here:</h2><a href="http://appsembler.wufoo.com/forms/z7p9k5/" class="btn btn-success" onclick="window.open(this.href,  null, 'height=1081, width=680, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false">Create course</a>
                     </div>
                 {% endif %}
                 <div id="mediathread_logo">
