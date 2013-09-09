@@ -4,6 +4,7 @@ import textwrap
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import pluralize
 from django.utils.html import linebreaks
 from django.views.generic.edit import FormView
@@ -101,7 +102,6 @@ class InviteStudentsView(FormView):
     """
     form_class = InviteStudentsForm
     template_name = 'user_accounts/invite_students.html'
-    success_url = '/'
 
     def form_valid(self, form):
         course = self.request.session['ccnmtl.courseaffils.course']
@@ -187,6 +187,9 @@ class InviteStudentsView(FormView):
         """.format(self.request.session['ccnmtl.courseaffils.course'].title,
                    self.request.user.get_full_name()))
         return initial
+
+    def get_success_url(self):
+        return reverse('member_list')
 
 
 invite_students = InviteStudentsView.as_view()

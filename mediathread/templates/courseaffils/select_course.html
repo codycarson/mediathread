@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load coursetags %}
+{% load account coursetags %}
 
 {% block coursetitle %}
     Select a Course
@@ -33,16 +33,18 @@
 
 <div id="course-list">
     <div id="coursefilter">
-        <div class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left" role="button" aria-disabled="true">
+        <div style="width: 200px" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left" role="button" aria-disabled="true">
             <span class="ui-button-text">View courses from:</span>
         </div>
         
-        <input type="radio" id="thisyear" name="view-choice" {% if not list_all_link %}checked=checked{% endif %} value="?{{next_redirect}}" /><label for="thisyear">This Year</label>
-        <input type="radio" id="allyears" name="view-choice" {% if list_all_link %}checked=checked{% endif %} value="?list_all=true{{next_redirect}}"/><label for="allyears">All Years</label>
+        <input type="radio" id="thisyear" name="view-choice" {% if not list_all_link %}checked=checked{% endif %} value="?{{next_redirect}}" />
+        <label style="width: 100px" for="thisyear">This Year</label>
+        <input type="radio" id="allyears" name="view-choice" {% if list_all_link %}checked=checked{% endif %} value="?list_all=true{{next_redirect}}"/>
+        <label style="width: 100px" for="allyears">All Years</label>
     </div>
     <div id="create-course-container">
         {% if add_privilege %}
-            <a id="create-course" class="create-course" href="{%url course_create %}">Create new course</a>
+            <a id="create-course" class="create-course" href="http://appsembler.wufoo.com/forms/z7p9k5/" onclick="window.open(this.href,  null, 'height=1081, width=680, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false">Create new course</a>
         {% endif %}
     </div>
 </div>
@@ -68,7 +70,14 @@
   <a class="choose-course" href="?set_course={{course.group.name|urlencode}}{{next_redirect}}">{{course.title}}</a>
   </td>
   <td>{{course.info.termyear}}</td>
+  {% comment %}
   <td>{% if course.details.instructor %}{{course.details.instructor.value}}{% endif %}</td>
+  {% endcomment %}
+
+ <td>{% for instructor in course.faculty.all %}
+     {% user_display instructor as user_display %}
+    {{ user_display }}<br/>
+ {% endfor %}</td>
   <td>{% course_role for request.user in course as foo %}{{foo}}</td>
   {% if add_privilege %}
      <td class="manage-course">  

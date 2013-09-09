@@ -1,6 +1,7 @@
 import autocomplete_light
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, ButtonHolder
+from django.contrib.auth.forms import SetPasswordForm
 from django import forms
 from django.utils.safestring import mark_safe
 from .models import RegistrationModel, OrganizationModel
@@ -87,3 +88,20 @@ class InviteStudentsForm(forms.Form):
             else:
                 raise forms.ValidationError("Error in an email address")
         return emails
+
+
+class SetUserPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super(SetUserPasswordForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.form_action = '.'
+        submit_button = Submit('submit', 'Set password')
+        submit_button.field_classes = 'btn btn-success'
+        self.helper.add_input(submit_button)
+
+    def clean_new_password2(self):
+        password = super(SetUserPasswordForm, self).clean_new_password2()
+        if len(password) < 6:
+            raise forms.ValidationError("Password must be longer than 6 characters.")
+        return password

@@ -1423,7 +1423,6 @@ SherdBookmarklet = {
       },      
       "image": {
           find:function(callback,context) {
-              try{throw ''} catch(e){};
               var imgs = context.document.getElementsByTagName("img");
               var result = [];
               var zoomify_urls = {};

@@ -5,6 +5,7 @@
 # (see bottom)
 
 from courseaffils import policies
+from django.contrib.messages import constants as message_constants
 import os
 import re
 import sys
@@ -111,6 +112,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'johnny.middleware.LocalStoreClearMiddleware',
+    'johnny.middleware.QueryCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -166,7 +169,6 @@ INSTALLED_APPS = [
     'djangohelpers',
     'mediathread.reports',
     'mediathread.main',
-    'sentry.client',
     'south',
     'django_nose',
     'compressor',
@@ -198,6 +200,21 @@ DATE_FORMAT = DATETIME_FORMAT = "g:i a, m/d/y"
 LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL = '/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'django',
+    },
+    'johnny': {
+        'BACKEND': 'johnny.backends.locmem.LocMemCache',
+        'LOCATION': 'johnny',
+        'JOHNNY_CACHE': True,
+    }
+}
+CACHE_MIDDLEWARE_KEY_PREFIX = 'django'
+JOHNNY_MIDDLEWARE_KEY_PREFIX = 'johnny'
+
 
 # for AuthRequirementMiddleware. this should be a list of
 # url prefixes for paths that can be accessed by anonymous
@@ -213,6 +230,7 @@ ANONYMOUS_PATHS = ('/user_accounts/'
                    )
 
 NON_ANONYMOUS_PATHS = ('/user_accounts/invite_students/',
+                       '/course/',
                        '/asset/',
                        '/annotations/',
                        '/contact/',
@@ -256,7 +274,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 14
 ACCOUNT_USER_DISPLAY = 'mediathread.user_accounts.utils.display_user'
+
 
 # Customer.io keys
 CUSTOMERIO_SITE_ID = ''
@@ -274,6 +294,9 @@ SEGMENTIO_JS_KEY = ''
 SAMPLE_COURSE_ID = 2
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+# Don't show info messages from allauth
+MESSAGE_LEVEL = message_constants.SUCCESS
 
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"

@@ -36,16 +36,10 @@ if (!Sherd.Image.Annotators.OpenLayers) {
                         if (!options || !options.mode || options.mode === 'browse') {
                             // whole asset view. no annotations. or, just browsing
                             self.openlayers.editingtoolbar.deactivate();
-                            if (self.components.instructions) {
-                                self.components.instructions.style.display = 'none';
-                            }
                             self.mode = "browse";
                         } else {
                             // create, edit, copy
                             self.openlayers.editingtoolbar.activate();
-                            if (self.components.instructions) {
-                                self.components.instructions.style.display = 'block';
-                            }
                             self.mode = options.mode;
                         }
                     }
@@ -153,16 +147,19 @@ if (!Sherd.Image.Annotators.OpenLayers) {
                 return {
                     htmlID: id,
                     text: '<div id="' + id + '">' +
-                    '   <p style="display:none;" id="instructions" class="sherd-instructions">Choose a drawing tool, located on the upper, right-hand side of the image. ' +
-                    '   The polygon tool works by clicking on the points of the polygon and then double-clicking the last point.</p>' +
-                    '</div>'
+                    '<p style="display:none;" id="instructions" class="sherd-instructions">' +
+                    'To create a selection of an image, choose a drawing tool, located on the upper, ' +
+                    'right-hand side of the image. The polygon tool works by clicking on the points of ' +
+                    'the polygon and then double-clicking the last point.<br /><br />' +
+                    'Add title, tags and notes. If a Course Vocabulary has been enabled by ' +
+                    'the instructor, apply vocabulary terms. Click Save when you are finished.' +                                        
+                    '</p></div>'
                 };
             },
             'components': function (html_dom, create_obj) {
                 return {
                     'top': html_dom,
                     'center': document.getElementById("btnCenter"),
-                    'instructions': document.getElementById("instructions")
                 };
             }
         };
