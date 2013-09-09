@@ -9,10 +9,6 @@ def add_email_to_mailchimp_list(email_address, list_id, test_client=None, **kwar
     for k, v in kwargs.items():
         merge_vars_dict[k.upper()] = v
 
-    if not settings.MAILCHIMP_API_KEY:
-        print "did not defined api key for Mailchimp, skip Mailchimp related action now"
-        return False
-
     if test_client:
         ms = test_client
     else:
@@ -29,8 +25,6 @@ def add_email_to_mailchimp_list(email_address, list_id, test_client=None, **kwar
         merge_vars=merge_vars_dict,
         update_existing=True,
         double_optin=False)
-
-    print result
 
     return True
 
