@@ -187,6 +187,10 @@ INSTALLED_APPS = [
 ]
 
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter'
+]
 
 THUMBNAIL_SUBDIR = "thumbs"
 EMAIL_SUBJECT_PREFIX = "[mediathread] "
