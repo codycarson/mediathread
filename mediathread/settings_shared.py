@@ -13,7 +13,7 @@ import sys
 APP_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)))
 PROJECT_ROOT = os.path.join(APP_ROOT, '..')
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     ('admin', 'mediathread@example.com'),
@@ -182,7 +182,8 @@ INSTALLED_APPS = [
     'autocomplete_light',
     'mediathread.course',
     'crispy_forms',
-
+    'storages',
+    'collectfast'
 ]
 
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
