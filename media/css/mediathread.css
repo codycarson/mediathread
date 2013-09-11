@@ -4616,8 +4616,12 @@ form .form-actions {
 }
 
 a.btn {
-    color: #FFF;
     font-weight: 400;
+    color: #444;
+}
+
+a.btn-success {
+    color: #FFF;
 }
 
 .no-courses-div a {
