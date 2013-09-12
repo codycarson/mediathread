@@ -206,8 +206,7 @@ class InviteStudentsView(FormView):
         context = super(InviteStudentsView, self).get_context_data(**kwargs)
         course = self.request.session['ccnmtl.courseaffils.course']
         context['course_name'] = course
-        invites_left = course.course_information.invites_left
-        context['invites_left'] = invites_left
+        context['invites_left'] = course.course_information.invites_left
         return context
 
     def get_initial(self):
