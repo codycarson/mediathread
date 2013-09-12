@@ -15,8 +15,8 @@ from allauth.account import app_settings
 from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
 from allauth.account.views import LoginView as AllauthLoginView
 from courseaffils.models import Course
-from .forms import InviteStudentsForm, RegistrationForm
 from mediathread.user_accounts.models import RegistrationModel
+from .forms import InviteStudentsForm, RegistrationForm
 
 
 def login_user(request, user):
