@@ -94,7 +94,8 @@ class InviteStudentsForm(forms.Form):
         if invited_students_count > invites_left:
             raise forms.ValidationError(
                 mark_safe("You exceeded your available number of invitations!<br/> You have "
-                          "{0} available invite{1}, but you tried to invite {2} students".format(
+                          "{0} available invite{1}, but you tried to invite {2} students, "
+                          '<a href="http://getmediathread.com/plans.html">click here</a> to upgrade to a larger plan.'.format(
                           invites_left, pluralize(invites_left), invited_students_count)))
         return emails
 
