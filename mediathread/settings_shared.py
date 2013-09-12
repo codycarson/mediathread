@@ -227,7 +227,8 @@ JOHNNY_MIDDLEWARE_KEY_PREFIX = 'johnny'
 # users. we need to allow anonymous access to the login
 # page, and to static resources.
 
-ANONYMOUS_PATHS = ('/user_accounts/'
+ANONYMOUS_PATHS = ('/course/create/',
+                   '/user_accounts/'
                    '/site_media/',
                    '/accounts/',
                    '/admin/',
