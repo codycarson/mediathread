@@ -141,6 +141,11 @@ class CourseCreateFormView(FormView):
         self.request.session.pop('ccnmtl.courseaffils.course', None)
         return super(CourseCreateFormView, self).get(*args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super(CourseCreateFormView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super(CourseCreateFormView, self).get_context_data(**kwargs)
         courses_num = self.request.user.groups.filter(name__startswith='faculty').count()
