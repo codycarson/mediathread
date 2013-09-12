@@ -7,9 +7,18 @@
 <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
 {% endblock %}
 
+{% block call_to_action %}
+    {% if request.user.is_authenticated and request.course and invites_left <= 1 %}
+        <div id="call-to-action">
+            <h2>We notice you're close to your invites limit. Click here to upgrade to a larger plan: </h2><a class="btn btn-success" href="http://getmediathread.com/plans.html">Upgrade</a>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="invite-students-form">
         <h2 class="title">Invite students to your course</h2>
+        <h3 class="remaining-invites">Remaining invites: <strong>{{ invites_left }}</strong></h3>
         {% crispy form %}
     </div>
 {% endblock content %}

@@ -22,7 +22,7 @@ mock_analytics = MagicMock(spec=analytics)
 @patch("analytics.track", mock_analytics)
 @patch("customerio.CustomerIO", mock_customerio)
 class InviteStudentsTest(TestCase):
-    fixtures = ['unittest_sample_course.json']
+    fixtures = ['unittest_sample_course.json', 'registration_data.json']
 
     def setUp(self):
         self.client.login(username="test_instructor", password="test")

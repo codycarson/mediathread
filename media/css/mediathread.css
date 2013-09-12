@@ -4609,3 +4609,7 @@ form .form-actions {
     color: #FFF;
     font-weight: normal;
 }
+
+.remaining-invites {
+    padding-left: 30px;
+}
