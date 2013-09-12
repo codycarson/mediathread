@@ -4,6 +4,7 @@ from settings_shared import *
 STATSD_HOST = '127.0.0.1'
 
 DEBUG = True
+COMPRESS_ENABLED = False
 
 DATABASES = {
     'default': {
@@ -28,8 +29,8 @@ LETTUCE_APPS = (
     'mediathread.djangosherd'
 )
 
-#ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-#ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 
 LETTUCE_DJANGO_APP = ['lettuce.django']
