@@ -60,10 +60,10 @@ class ConfirmEmailView(AllauthConfirmEmailView):
     """
     def post(self, *args, **kwargs):
         # perform login
-        email_address = self.get_object().email_address
-        user_to_login = User.objects.get(email=email_address.email)
+        email_address_object = self.get_object().email_address
+        user_to_login = User.objects.get(email=email_address_object.email)
         login_user(self.request, user_to_login)
-        analytics.track(email_address, "Activated account")
+        analytics.track(email_address_object.email, "Activated account")
         messages.success(self.request, "You've successfully activated your account.", fail_silently=True)
         return super(ConfirmEmailView, self).post(*args, **kwargs)
 
