@@ -14,7 +14,7 @@
 {% block call_to_action %}
     {% if request.user.is_authenticated and limit_reached %}
         <div class="call-to-action call-to-action-warning">
-            <h2>We notice you're close to your invites limit. Click here to upgrade to a larger plan: </h2><a class="btn btn-success" href="http://getmediathread.com/plans.html">Upgrade</a>
+            <h2>You've used your available courses on this plan. Click here to upgrade to a larger plan: </h2><a class="btn btn-success" href="http://getmediathread.com/plans.html">Upgrade</a>
         </div>
     {% endif %}
 {% endblock %}
