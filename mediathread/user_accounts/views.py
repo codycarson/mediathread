@@ -38,7 +38,7 @@ def login_user(request, user):
 class LoginView(AllauthLoginView):
     def form_valid(self, form):
         response = super(LoginView, self).form_valid(form)
-        # check if professor is only in faculty group of sample course or in no course at all
+        # check if the user is a professor and is only in faculty group of sample course or in no course at all
         registration_model_exists = RegistrationModel.objects.filter(user=form.user).exists()
         sample_course_faculty_group_id = Course.objects.get(id=settings.SAMPLE_COURSE_ID).faculty_group_id
         created_courses = Group.objects.exclude(

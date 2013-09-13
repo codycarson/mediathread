@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block call_to_action %}
+{% comment %}
+Disable the "create course" call to action on this page since we already have a button for that.
+{% endcomment %}
+{% endblock %}
 
 {% block content %}
     <div style="" class="no-courses-div">
