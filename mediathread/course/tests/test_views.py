@@ -9,6 +9,7 @@ from mediathread.course.models import CourseInformation
 
 mock_analytics = MagicMock(spec=analytics)
 
+
 @patch("analytics.track", mock_analytics)
 class CourseCreateTest(TestCase):
     fixtures = ['unittest_sample_course.json', 'registration_data.json']
