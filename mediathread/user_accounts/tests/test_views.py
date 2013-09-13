@@ -133,7 +133,7 @@ class InviteStudentsTest(TestCase):
         response = self.client.get(reverse("invite-students"))
         self.assertContains(response, "Click here to upgrade to a larger plan")
 
-    def dont_show_call_to_action_with_multiple_invites_remaining(self):
+    def test_dont_show_call_to_action_with_multiple_invites_remaining(self):
         """
         Don't show a call to action for inviting more students when user has more than 1 invite left
         """
