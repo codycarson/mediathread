@@ -122,6 +122,25 @@ class InviteStudentsTest(TestCase):
         self.assertFormError(response, 'form', 'student_emails', 'This field is required.')
         self.assertFormError(response, 'form', 'message', 'This field is required.')
 
+    def test_show_call_to_action_when_1_invite_left(self):
+        """
+        Show a call to action for inviting more students when user has only 1 or 0 invite(s) left
+        """
+        self.client.logout()
+        self.client.login(username="test_instructor_alt", password="test")
+        course = Course.objects.get(pk=2)
+        session = self.client.session
+        session['ccnmtl.courseaffils.course'] = course
+        session.save()
+        response = self.client.get(reverse("invite-students"))
+        self.assertContains(response, "Click here to upgrade to a larger plan")
+
+    def dont_show_call_to_action_with_multiple_invites_remaining(self):
+        """
+        Don't show a call to action for inviting more students when user has more than 1 invite left
+        """
+        response = self.client.get(reverse("invite-students"))
+        self.assertNotContains(response, "Click here to upgrade to a larger plan")
 
 @patch("analytics.identify", mock_analytics)
 @patch("analytics.track", mock_analytics)
