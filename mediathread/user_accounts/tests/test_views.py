@@ -11,8 +11,6 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from courseaffils.models import Course
-from mediathread.user_accounts import autocomplete_light_registry
-from mediathread.user_accounts import forms
 
 mock_customerio = MagicMock(spec=CustomerIO)
 mock_analytics = MagicMock(spec=analytics)
@@ -141,6 +139,7 @@ class InviteStudentsTest(TestCase):
         """
         response = self.client.get(reverse("invite-students"))
         self.assertNotContains(response, "Click here to upgrade to a larger plan")
+
 
 @patch("analytics.identify", mock_analytics)
 @patch("analytics.track", mock_analytics)
