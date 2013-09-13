@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from courseaffils.models import Course
 from mock import MagicMock, patch
+from mediathread.course.models import CourseInformation
 
 mock_analytics = MagicMock(spec=analytics)
 
@@ -47,6 +48,8 @@ class CourseCreateTest(TestCase):
         """
         Show a call to action for upgrading to a bigger plan when they have no courses left
         """
+        ci = CourseInformation.objects.create(title="test", organization_name="test_org", student_amount=10)
+        ci.add_member(self.user, faculty=True)
         response = self.client.get(reverse("course_create"))
         self.assertContains(response, "You've used your available courses on this plan")
         self.assertContains(response, "<h1>Courses limit reached!</h1>")
