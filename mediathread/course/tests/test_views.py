@@ -4,10 +4,13 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from courseaffils.models import Course
+from django.test.utils import override_settings
 from mock import MagicMock, patch
 
 mock_analytics = MagicMock(spec=analytics)
 
+
+@patch("analytics.identify", mock_analytics)
 @patch("analytics.track", mock_analytics)
 class CourseCreateTest(TestCase):
     fixtures = ['unittest_sample_course.json']
@@ -62,6 +65,7 @@ class MemberListTest(TestCase):
 class PromoteStudentTest(TestCase):
     fixtures = ['unittest_sample_course.json']
 
+    @patch("analytics.identify", mock_analytics)
     def test_promote_student(self):
         self.client.login(username="test_instructor", password="test")
         user = User.objects.get(id=3)
@@ -70,7 +74,7 @@ class PromoteStudentTest(TestCase):
         response = self.client.post(reverse("promote_student"), {
             'user_id': 3
         }, follow=True)
-        self.assertTrue(user in course.faculty_group.user_set.all(), response)
+        self.assertTrue(user in course.faculty_group.user_set.all())
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "Successfully promoted")
 
@@ -82,7 +86,7 @@ class PromoteStudentTest(TestCase):
         response = self.client.post(reverse("promote_student"), {
             'user_id': 3
         }, follow=True)
-        self.assertFalse(user in course.faculty_group.user_set.all(), response)
+        self.assertFalse(user in course.faculty_group.user_set.all())
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "You must be an instructor in this course to do that")
 
@@ -123,7 +127,7 @@ class RemoveStudentTest(TestCase):
             'user_id': 3
         }, follow=True)
         user = User.objects.get(id=3)
-        self.assertFalse(user in course.group.user_set.all(), response)
+        self.assertFalse(user in course.group.user_set.all())
         self.assertEquals(course.user_set.count(), 5)
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "Successfully removed {0}".format(user.email))
@@ -136,7 +140,7 @@ class RemoveStudentTest(TestCase):
             'user_id': 4
         }, follow=True)
         user = User.objects.get(id=4)
-        self.assertTrue(user in course.group.user_set.all(), response)
+        self.assertTrue(user in course.group.user_set.all())
         self.assertEquals(course.user_set.count(), 6)
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "You must be an instructor in this course to do that")
@@ -154,7 +158,7 @@ class DemoteFacultyTest(TestCase):
             'user_id': 10
         }, follow=True)
         user = User.objects.get(id=10)
-        self.assertFalse(user in course.faculty_group.user_set.all(), response)
+        self.assertFalse(user in course.faculty_group.user_set.all())
         self.assertEquals(course.faculty_group.user_set.count(), 1)
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "Successfully demoted {0}".format(user.email))
@@ -167,7 +171,34 @@ class DemoteFacultyTest(TestCase):
             'user_id': 10
         }, follow=True)
         user = User.objects.get(id=10)
-        self.assertTrue(user in course.faculty_group.user_set.all(), response)
+        self.assertTrue(user in course.faculty_group.user_set.all())
         self.assertEquals(course.faculty_group.user_set.count(), 2)
         self.assertRedirects(response, reverse('member_list'))
         self.assertContains(response, "You must be an instructor in this course to do that")
+
+
+class NoCoursesTest(TestCase):
+    fixtures = ['unittest_sample_course.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="test_test", email="test@something.com", password="test")
+        self.client.login(username="test_test", password="test")
+
+    def test_new_user_sees_choice_screen(self):
+        """
+        New user should see the choice screen where they can choose between creating
+        their own course or joining the sample one.
+        """
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'courseaffils/no_courses.html')
+
+    @override_settings(SAMPLE_COURSE_ID=1)
+    def test_join_sample_course(self):
+        """
+        New user can join the sample course and be taken to the course homepage
+        """
+        course = Course.objects.get(id=1)
+        response = self.client.get(reverse("join_sample_course"), follow=True)
+        self.assertTrue(self.user in course.group.user_set.all())
+        self.assertTemplateUsed(response, 'homepage.html')
+        self.assertContains(response, 'Sample Course')
