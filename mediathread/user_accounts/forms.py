@@ -1,6 +1,6 @@
 import autocomplete_light
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, ButtonHolder
+from crispy_forms.layout import Submit
 from django.contrib.auth.forms import SetPasswordForm
 from django import forms
 from django.template.defaultfilters import pluralize

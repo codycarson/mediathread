@@ -3,6 +3,7 @@ import customerio
 import textwrap
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import pluralize
@@ -16,8 +17,8 @@ from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
 from allauth.account.views import LoginView as AllauthLoginView
 from courseaffils.models import Course
 from mediathread.user_accounts.models import RegistrationModel
-from .forms import InviteStudentsForm, RegistrationForm
-from .models import OrganizationModel
+from .forms import InviteStudentsForm, RegistrationForm, UserProfileForm
+from .models import OrganizationModel, UserProfile
 
 
 def login_user(request, user):
@@ -71,13 +72,6 @@ class ConfirmEmailView(AllauthConfirmEmailView):
 
 confirm_email_view = ConfirmEmailView.as_view()
 
-from .forms import UserProfileForm
-from .models import UserProfile, RegistrationModel
-from allauth.account.forms import ChangePasswordForm
-
-
-from django.contrib.auth.decorators import login_required
-
 
 class UserProfileView(FormView):
     """
@@ -112,12 +106,12 @@ class UserProfileView(FormView):
         user.first_name = form.cleaned_data['first_name']
         user.last_name = form.cleaned_data['last_name']
 
-
         if profile.organization:
             profile.organization.name = form.cleaned_data['organization']
             profile.organization.save()
         else:
-            profile.organization, created = OrganizationModel.objects.get_or_create(name=form.cleaned_data['organization'])
+            profile.organization, created = OrganizationModel.objects.get_or_create(
+                name=form.cleaned_data['organization'])
             profile.organization.save()
 
         profile.position_title = form.cleaned_data['position_title']
@@ -136,12 +130,7 @@ class UserProfileView(FormView):
         return super(UserProfileView, self).form_valid(form)
 
 
-    def form_invalid(self, form):
-        return super(UserProfileView, self).form_invalid(form)
-
-
 user_profile_view = login_required(UserProfileView.as_view())
-
 
 
 class RegistrationFormView(FormView):

@@ -1,11 +1,9 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
 import analytics
 from allauth.account.forms import SignupForm
 
-from courseaffils.models import Course
 from .utils import add_email_to_mailchimp_list
 
 HEAR_CHOICES = (
@@ -23,11 +21,13 @@ POSITION_CHOICES = (
     ('other', 'Other')
 )
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, null=True, editable=True, related_name="profile")
     organization = models.ForeignKey('OrganizationModel', null=True)
     subscribe_to_newsletter = models.BooleanField(default=False)
     position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, null=True, blank=True)
+
 
 class RegistrationModel(models.Model):
     user = models.OneToOneField(User, null=True, editable=True, related_name="registration_model")

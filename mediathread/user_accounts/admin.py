@@ -4,10 +4,10 @@ import autocomplete_light
 
 
 class RegistrationAdmin(admin.ModelAdmin):
+    form = autocomplete_light.modelform_factory(RegistrationModel)
+
     class Meta:
         model = RegistrationModel
-
-    form = autocomplete_light.modelform_factory(RegistrationModel)
 
 
 class OrganizationAdmin(admin.ModelAdmin):
