@@ -233,7 +233,8 @@ ANONYMOUS_PATHS = ('/course/create/',
                    '/accounts/',
                    '/admin/',
                    '/api/',
-                   '/help/'
+                   '/help/',
+                   '/course/join-sample-course/'
                    )
 
 NON_ANONYMOUS_PATHS = ('/user_accounts/invite_students/',
