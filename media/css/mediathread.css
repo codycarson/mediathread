@@ -4629,7 +4629,10 @@ a.btn-success {
 }
 
 .remaining-invites {
+    color: #D33;
+    font-size: 18px;
     padding-left: 30px;
+
 }
 
 .no-courses-div a {
