@@ -10,6 +10,7 @@ from mock import MagicMock, patch
 mock_analytics = MagicMock(spec=analytics)
 
 
+@patch("analytics.identify", mock_analytics)
 @patch("analytics.track", mock_analytics)
 class CourseCreateTest(TestCase):
     fixtures = ['unittest_sample_course.json']
@@ -64,6 +65,7 @@ class MemberListTest(TestCase):
 class PromoteStudentTest(TestCase):
     fixtures = ['unittest_sample_course.json']
 
+    @patch("analytics.identify", mock_analytics)
     def test_promote_student(self):
         self.client.login(username="test_instructor", password="test")
         user = User.objects.get(id=3)
