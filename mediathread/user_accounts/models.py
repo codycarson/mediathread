@@ -63,7 +63,7 @@ class RegistrationModel(models.Model):
                     'email': signup_user.email,
                     'firstName': signup_user.first_name,
                     'lastName': signup_user.last_name,
-                    'organization': organization,
+                    'organization': organization.name,
                 }
             )
             analytics.track(signup_user.email, "Registered")
