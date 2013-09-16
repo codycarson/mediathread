@@ -2,6 +2,7 @@ from uuid import uuid4
 
 from django.db import models
 from django.contrib.auth.models import Group
+from django.template.defaultfilters import slugify
 
 from mediathread.user_accounts.models import OrganizationModel
 from courseaffils.models import Course
@@ -32,11 +33,9 @@ class GroupTypeIncorrectException(Exception):
 class CourseInformation(models.Model):
     student_amount = models.IntegerField(choices=STUDENT_AMOUNT_CHOICES)
     organization = models.ForeignKey(OrganizationModel, null=True)
-    course = models.ForeignKey('courseaffils.Course', null=True)
+    course = models.OneToOneField('courseaffils.Course', null=True, related_name='course_information')
     sample_course = models.BooleanField(default=False)
-
-    # uuid length is 36
-    course_uuid = models.CharField(max_length=36, null=True)
+    invites_left = models.IntegerField(default=1)
 
     def __unicode__(self):
         if self.course:
@@ -53,19 +52,23 @@ class CourseInformation(models.Model):
         """
         Method to create a Course instance in from courseaffils.models
         """
+        course_name_slug = slugify(self.title)
+        random_uuid = uuid4()
 
-        # create both member and faculty groups with the same uuid
-        if not self.course_uuid:
-            self.course_uuid = uuid4()
-        member_group = Group.objects.create(name="member_%s" % self.course_uuid)
-        faculty_group = Group.objects.create(name="faculty_%s" % self.course_uuid)
-
-        # create course instance in courseaffils
+        # create course instance in courseaffils with temporary group names
         course = Course.objects.create(
-            group=member_group,
-            faculty_group=faculty_group,
-            title=self.title)
-        course.save()
+            title=self.title,
+            group=Group.objects.create(name="member_{0}".format(random_uuid)),
+            faculty_group=Group.objects.create(name="faculty_{0}".format(random_uuid))
+        )
+
+        # max 30 characters from the course title
+        member_group_name = "member_{0}_{1}".format(course_name_slug[:30], course.id)
+        faculty_group_name = "faculty_{0}_{1}".format(course_name_slug[:30], course.id)
+        course.group.name = member_group_name
+        course.group.save()
+        course.faculty_group.name = faculty_group_name
+        course.faculty_group.save()
 
         return course
 
@@ -82,9 +85,10 @@ class CourseInformation(models.Model):
             faculty_group.user_set.add(user)
 
     def save(self, force_insert=False, force_update=False, using=None):
-        course = self.create_course()
-        c_organization, org_created = OrganizationModel.objects.get_or_create(
-            name=self.organization_name)
-        self.course = course
-        self.organization = c_organization
+        if not self.course:
+            course = self.create_course()
+            c_organization, org_created = OrganizationModel.objects.get_or_create(
+                name=self.organization_name)
+            self.course = course
+            self.organization = c_organization
         super(CourseInformation, self).save(force_insert, force_update, using)

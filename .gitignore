@@ -22,3 +22,5 @@ libpeerconnection.log
 coverage
 collected_static
 mediathread.db
+
+/CACHE/

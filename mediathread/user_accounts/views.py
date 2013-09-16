@@ -3,7 +3,7 @@ import customerio
 import textwrap
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import pluralize
 from django.utils.html import linebreaks
@@ -13,6 +13,9 @@ from allauth.account.utils import send_email_confirmation
 from allauth.account.utils import complete_signup
 from allauth.account import app_settings
 from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
+from allauth.account.views import LoginView as AllauthLoginView
+from courseaffils.models import Course
+from mediathread.user_accounts.models import RegistrationModel
 from .forms import InviteStudentsForm, RegistrationForm
 from .models import OrganizationModel
 
@@ -33,16 +36,35 @@ def login_user(request, user):
         return login(request, user)
 
 
+class LoginView(AllauthLoginView):
+    def form_valid(self, form):
+        response = super(LoginView, self).form_valid(form)
+        # check if the user is a professor and is only in faculty group of sample course or in no course at all
+        registration_model_exists = RegistrationModel.objects.filter(user=form.user).exists()
+        sample_course_faculty_group_id = Course.objects.get(id=settings.SAMPLE_COURSE_ID).faculty_group_id
+        created_courses = Group.objects.exclude(
+            id=sample_course_faculty_group_id).filter(user=form.user, name__startswith="faculty_").exists()
+
+        # logs to the session,whether the user has created any courses, needed for call to action middleware
+        if registration_model_exists and not created_courses:
+            self.request.session['courses_created'] = False
+        else:
+            self.request.session['courses_created'] = True
+        return response
+
+login_view = LoginView.as_view()
+
+
 class ConfirmEmailView(AllauthConfirmEmailView):
     """
     View for comfirming user's email address and automatically login user
     """
     def post(self, *args, **kwargs):
         # perform login
-        email_address = self.get_object().email_address
-        user_to_login = User.objects.get(email=email_address.email)
+        email_address_object = self.get_object().email_address
+        user_to_login = User.objects.get(email=email_address_object.email)
         login_user(self.request, user_to_login)
-        analytics.track(email_address, "Activated account")
+        analytics.track(email_address_object.email, "Activated account")
         messages.success(self.request, "You've successfully activated your account.", fail_silently=True)
         return super(ConfirmEmailView, self).post(*args, **kwargs)
 
@@ -160,8 +182,11 @@ class RegistrationFormView(FormView):
 
         # subscribe in mailchimp
         if registration.subscribe_to_newsletter:
-            registration.subscribe_mailchimp_list(
-                settings.MAILCHIMP_REGISTRATION_LIST_ID)
+            try:
+                registration.subscribe_mailchimp_list(
+                    settings.MAILCHIMP_REGISTRATION_LIST_ID)
+            except Exception as e:
+                print e
 
         return complete_signup(self.request, registration.get_user(),
                                app_settings.EMAIL_VERIFICATION,
@@ -180,6 +205,13 @@ class InviteStudentsView(FormView):
     """
     form_class = InviteStudentsForm
     template_name = 'user_accounts/invite_students.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(InviteStudentsView, self).get_form_kwargs()
+        kwargs.update({
+            'course': self.request.session['ccnmtl.courseaffils.course']
+        })
+        return kwargs
 
     def form_valid(self, form):
         course = self.request.session['ccnmtl.courseaffils.course']
@@ -219,6 +251,7 @@ class InviteStudentsView(FormView):
                     user = signup_form.save(self.request)
                     course.group.user_set.add(user)
                     send_email_confirmation(self.request, user, True)
+
             if user:
                 cio.track(
                     customer_id=user.email,
@@ -229,6 +262,13 @@ class InviteStudentsView(FormView):
                     message=linebreaks(form.cleaned_data['message']),
                 )
         student_count = len(emails)
+        if student_count > 0:
+            self.request.session['no_students'] = False
+
+        # update the remaining number of invites
+        course.course_information.invites_left -= student_count
+        course.course_information.save()
+
         analytics.track(
             self.request.user.email,
             "Invited students",
@@ -245,7 +285,9 @@ class InviteStudentsView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(InviteStudentsView, self).get_context_data(**kwargs)
-        context['course_name'] = self.request.session['ccnmtl.courseaffils.course']
+        course = self.request.session['ccnmtl.courseaffils.course']
+        context['course_name'] = course
+        context['invites_left'] = course.course_information.invites_left
         return context
 
     def get_initial(self):

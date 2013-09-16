@@ -1,17 +1,20 @@
 import analytics
 from allauth.account.models import EmailAddress
+from courseaffils.models import CourseInfo
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 
+from braces.views import LoginRequiredMixin
 from mediathread.user_accounts.models import RegistrationModel
-from .models import CourseInformation
+from .models import Course, CourseInformation
 from .forms import CourseForm, MemberActionForm
 
 
@@ -51,6 +54,8 @@ class RemoveStudentFromClassView(MemberActionView):
         response = super(RemoveStudentFromClassView, self).form_valid(form)
         if self.course.faculty_group.user_set.filter(id=self.request.user.id).exists():
             self.course.group.user_set.remove(self.user)
+            if len(self.course.students) == 0:
+                self.request.session['no_students'] = True
             messages.success(
                 self.request,
                 "Successfully removed {0} from the course {1}".format(
@@ -85,6 +90,12 @@ class PromoteStudentView(MemberActionView):
         response = super(PromoteStudentView, self).form_valid(form)
         if self.course.faculty_group.user_set.filter(id=self.request.user.id).exists():
             self.course.faculty_group.user_set.add(self.user)
+            analytics.identify(
+                self.user.email,
+                {
+                    'type': "Instructor",
+                }
+            )
             messages.success(
                 self.request,
                 "Successfully promoted {0} to faculty group on course {1}".format(
@@ -135,13 +146,28 @@ class CourseCreateFormView(FormView):
 
     @method_decorator(login_required)
     def get(self, *args, **kwargs):
+        self.request.session.pop('ccnmtl.courseaffils.course', None)
         return super(CourseCreateFormView, self).get(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(CourseCreateFormView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(CourseCreateFormView, self).get_context_data(**kwargs)
+        courses_num = self.request.user.groups.filter(name__startswith='faculty').count()
+        if courses_num >= 1:
+            context['limit_reached'] = True
+        return context
 
     def form_valid(self, form):
         # preparing data
         course_title = form.cleaned_data['title']
         course_student_amount = form.cleaned_data['student_amount']
         course_organization_name = form.cleaned_data['organization']
+        term = form.cleaned_data['term']
+        year = form.cleaned_data['year']
 
         # creating course
         course = CourseInformation(
@@ -150,8 +176,22 @@ class CourseCreateFormView(FormView):
             student_amount=course_student_amount)
         course.save()
 
+        # save term and/or year data
+        if term or year:
+            CourseInfo.objects.create(
+                course=course.course,
+                term=term,
+                year=year
+            )
+
         # add user to that class as a faculty
         course.add_member(self.request.user, faculty=True)
+        analytics.identify(
+            self.request.user.email,
+            {
+                'type': "Instructor",
+            }
+        )
 
         analytics.track(
             self.request.user.email,
@@ -163,6 +203,7 @@ class CourseCreateFormView(FormView):
             }
         )
 
+        self.request.session['courses_created'] = True
         self.request.session['ccnmtl.courseaffils.course'] = course.course
         messages.success(self.request,
                          "You've successfully created a new course: {0}".format(course_title),
@@ -179,3 +220,18 @@ class CourseCreateFormView(FormView):
 
 
 course_create = CourseCreateFormView.as_view()
+
+
+class JoinSampleCourseView(LoginRequiredMixin, RedirectView):
+    url = '/'
+
+    def get(self, request, *args, **kwargs):
+        course = Course.objects.get(id=settings.SAMPLE_COURSE_ID)
+        try:
+            course.user_set.get(id=request.user.id)
+        except User.DoesNotExist:
+            course.group.user_set.add(request.user)
+        request.session['ccnmtl.courseaffils.course'] = course
+        return super(JoinSampleCourseView, self).get(request, *args, **kwargs)
+
+join_sample_course = JoinSampleCourseView.as_view()

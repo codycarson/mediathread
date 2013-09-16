@@ -13,7 +13,7 @@ import sys
 APP_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)))
 PROJECT_ROOT = os.path.join(APP_ROOT, '..')
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     ('admin', 'mediathread@example.com'),
@@ -121,6 +121,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     'courseaffils.middleware.CourseManagerMiddleware',
     'mediathread.main.middleware.AuthRequirementMiddleware',
+    'mediathread.course.middleware.CallToActionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware'
 )
 
@@ -182,11 +183,16 @@ INSTALLED_APPS = [
     'autocomplete_light',
     'mediathread.course',
     'crispy_forms',
-    'avatar',
-
+    'storages',
+    'collectfast',
+	'avatar'
 ]
 
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter'
+]
 
 THUMBNAIL_SUBDIR = "thumbs"
 EMAIL_SUBJECT_PREFIX = "[mediathread] "
@@ -222,12 +228,14 @@ JOHNNY_MIDDLEWARE_KEY_PREFIX = 'johnny'
 # users. we need to allow anonymous access to the login
 # page, and to static resources.
 
-ANONYMOUS_PATHS = ('/user_accounts/'
+ANONYMOUS_PATHS = ('/course/create/',
+                   '/user_accounts/'
                    '/site_media/',
                    '/accounts/',
                    '/admin/',
                    '/api/',
-                   '/help/'
+                   '/help/',
+                   '/course/join-sample-course/'
                    )
 
 NON_ANONYMOUS_PATHS = ('/user_accounts/invite_students/',
@@ -302,6 +310,7 @@ MESSAGE_LEVEL = message_constants.SUCCESS
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"
 HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
+
 
 # this gets around Django 1.2's stupidity for commenting
 # we're already checking that the request is from someone in the class
