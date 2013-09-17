@@ -17,7 +17,6 @@ from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
 from allauth.account.views import LoginView as AllauthLoginView
 from courseaffils.models import Course
 from .forms import InviteStudentsForm, RegistrationForm, UserProfileForm
-from mediathread.user_accounts.utils import add_email_to_mailchimp_list
 from .models import OrganizationModel, UserProfile
 
 

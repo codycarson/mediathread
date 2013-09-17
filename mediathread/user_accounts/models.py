@@ -2,9 +2,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
-import analytics
-from allauth.account.forms import SignupForm
-
 from .utils import add_email_to_mailchimp_list
 
 HEAR_CHOICES = (
