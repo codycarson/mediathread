@@ -33,6 +33,9 @@ class UserProfile(models.Model):
     position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, blank=True)
     user_type = models.CharField(max_length=15, choices=USER_TYPES, default='student')
 
+    def __unicode__(self):
+        return u"{0} ({1})".format(self.user.get_full_name(), self.user_type)
+
 
 class RegistrationModel(models.Model):
     user = models.OneToOneField(User, null=True, editable=True, related_name="registration_model")
