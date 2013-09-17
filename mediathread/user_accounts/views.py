@@ -40,14 +40,14 @@ def login_user(request, user):
 class LoginView(AllauthLoginView):
     def form_valid(self, form):
         response = super(LoginView, self).form_valid(form)
-        # check if the user is a professor and is only in faculty group of sample course or in no course at all
-        registration_model_exists = RegistrationModel.objects.filter(user=form.user).exists()
+        # check if the user is an instructor and is only in faculty group of sample course or in no course at all
+        is_instructor = form.user.profile.user_type == "instructor"
         sample_course_faculty_group_id = Course.objects.get(id=settings.SAMPLE_COURSE_ID).faculty_group_id
         created_courses = Group.objects.exclude(
             id=sample_course_faculty_group_id).filter(user=form.user, name__startswith="faculty_").exists()
 
         # logs to the session,whether the user has created any courses, needed for call to action middleware
-        if registration_model_exists and not created_courses:
+        if is_instructor and not created_courses:
             self.request.session['courses_created'] = False
         else:
             self.request.session['courses_created'] = True
