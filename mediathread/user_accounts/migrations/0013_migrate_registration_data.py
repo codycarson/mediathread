@@ -18,7 +18,7 @@ class Migration(DataMigration):
                 profile.position_title = reg_data.position_title
                 profile.save()
         # create a user profile for all users
-        for user in orm.User.objects.all():
+        for user in orm['auth.User'].objects.all():
             profile, created = orm.UserProfile.objects.get_or_create(user=user)
 
     def backwards(self, orm):
