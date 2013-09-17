@@ -14,7 +14,7 @@ class CachedStaticRootS3BotoStorage(S3BotoStorage):
     def __init__(self, *args, **kwargs):
         kwargs['bucket_name'] = 'mediathread-static'
         kwargs['reduced_redundancy'] = True
-        kwargs['gzip'] = True
+        kwargs['gzip'] = False
         super(CachedStaticRootS3BotoStorage, self).__init__(*args, **kwargs)
         self.local_storage = get_storage_class(
             "compressor.storage.CompressorFileStorage")()
