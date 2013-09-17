@@ -26,16 +26,12 @@
 
 {% block extra_js %}
     <script type="text/javascript">
-        var url = "";
-        {% if asset_id and annotation_id%}
-            url = MediaThread.urls['asset-workspace']({{ asset_id }}, {{ annotation_id }});
-        {% elif asset_id %}
-            url = MediaThread.urls['asset-workspace']({{ asset_id }});
-        {% endif %}
         jQuery(document).ready(function () {
             PanelManager.init({
                 'container': 'sliding-content-container',
-                'url': url
+                'url': MediaThread.urls['asset-workspace'](
+                    {% if asset_id %}{{asset_id}}{% endif %}
+                    {% if asset_id and annotation_id %}, {{annotation_id}}{% endif %})
             });
         });
     </script>

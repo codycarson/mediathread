@@ -31,12 +31,13 @@
             var visible = getVisibleContentHeight();
             jQuery('.ui-widget-overlay').css('height', visible + "px");
             
-            {% if msg == "upload" %}
+              {% ifequal msg "upload" %}
                 var msg = "Your media file submission is being processed.\nYou will receive an e-mail when it is ready."
                 showMessage(msg);
-            {% elif show_tour %}
+            {% else %}{% if show_tour %}
                 jQuery(window).trigger('tour.start');
             {% endif %}
+            {% endifequal %}
 
             jQuery("a.arrow").click(function(evt) {
                 jQuery(this).next("div.arrowContent").toggle();                
