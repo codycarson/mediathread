@@ -23,10 +23,10 @@ POSITION_CHOICES = (
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, null=True, editable=True, related_name="profile")
+    user = models.OneToOneField(User, null=True, related_name="profile")
     organization = models.ForeignKey('OrganizationModel', null=True)
     subscribe_to_newsletter = models.BooleanField(default=False)
-    position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, null=True, blank=True)
+    position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, blank=True)
 
 
 class RegistrationModel(models.Model):
