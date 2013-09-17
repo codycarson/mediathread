@@ -5,7 +5,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django import forms
 from django.template.defaultfilters import pluralize
 from django.utils.safestring import mark_safe
-from .models import RegistrationModel, OrganizationModel, POSITION_CHOICES
+from .models import RegistrationModel, OrganizationModel, UserProfile, POSITION_CHOICES
 
 
 class UserProfileForm(forms.Form):
@@ -32,7 +32,7 @@ class UserProfileForm(forms.Form):
 
 class RegistrationForm(forms.ModelForm):
     email = forms.EmailField()
-    agree_to_term = forms.BooleanField(
+    agree_to_terms = forms.BooleanField(
         label=mark_safe('I agree to the <a href="/terms-of-use">Terms of Service</a>')
     )
     organization = forms.CharField(
@@ -45,7 +45,7 @@ class RegistrationForm(forms.ModelForm):
     last_name = forms.CharField()
 
     class Meta:
-        model = RegistrationModel
+        model = UserProfile
         widget = autocomplete_light.get_widgets_dict(RegistrationModel)
         fields = [
             'email',
@@ -54,9 +54,8 @@ class RegistrationForm(forms.ModelForm):
             'last_name',
             'organization',
             'position_title',
-            'hear_mediathread_from',
             'subscribe_to_newsletter',
-            'agree_to_term',
+            'agree_to_terms',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -72,6 +71,7 @@ class RegistrationForm(forms.ModelForm):
         org_name = self.cleaned_data['organization']
         if org_name:
             org_name, created = OrganizationModel.objects.get_or_create(name=org_name)
+            self.organization = org_name
         return org_name
 
 

@@ -18,6 +18,7 @@ from allauth.account.views import LoginView as AllauthLoginView
 from courseaffils.models import Course
 from mediathread.user_accounts.models import RegistrationModel
 from .forms import InviteStudentsForm, RegistrationForm, UserProfileForm
+from mediathread.user_accounts.utils import add_email_to_mailchimp_list
 from .models import OrganizationModel, UserProfile
 
 
@@ -144,40 +145,45 @@ class RegistrationFormView(FormView):
     success_url = '/'
 
     def form_valid(self, form):
-        signup_params = {
+        signup_form = SignupForm({
+            'username': '',
             'email': form.cleaned_data['email'],
-            'password': form.cleaned_data['password'],
-            'organization': form.cleaned_data['organization'],
-            'first_name': form.cleaned_data['first_name'],
-            'last_name': form.cleaned_data['last_name']
-        }
-        registration = form.instance
-        success = registration.do_signup(self.request, **signup_params)
-        if not success:
-            signup_error = registration.get_form_errors()
-            if signup_error.has_key('password1'):
+            'password1': form.cleaned_data['password'],
+            'password2': form.cleaned_data['password'],
+        })
+
+        # if a new user is successfully created
+        if signup_form.is_valid():
+            signup_user = signup_form.save(self.request)
+            signup_user.first_name = form.cleaned_data['first_name']
+            signup_user.last_name = form.cleaned_data['last_name']
+            signup_user.save()
+
+            form.instance.user = signup_user
+            profile = form.save()
+
+            analytics.identify(
+                signup_user.email,
+                {
+                    'email': signup_user.email,
+                    'firstName': signup_user.first_name,
+                    'lastName': signup_user.last_name,
+                    'organization': profile.organization.name,
+                }
+            )
+            analytics.track(signup_user.email, "Registered")
+        else:
+            self.signupform_error_msg = signup_form.errors
+            signup_error = form.instance.get_form_errors()
+            if 'password1' in signup_error:
                 signup_error['password'] = signup_error['password1']
             form.errors.update(signup_error)
             return self.form_invalid(form)
-        registration.save()
 
-        # save to profile
-        profile_defaults = {
-            'organization': form.cleaned_data['organization'],
-            'position_title': form.cleaned_data['position_title'],
-            'subscribe_to_newsletter': form.cleaned_data['subscribe_to_newsletter']
-        }
-        profile, profile_created = UserProfile.objects.get_or_create(user=success, defaults=profile_defaults)
+        if profile.subscribe_to_newsletter:
+            profile.newsletter_subscribe()
 
-        # subscribe in mailchimp
-        if registration.subscribe_to_newsletter:
-            try:
-                registration.subscribe_mailchimp_list(
-                    settings.MAILCHIMP_REGISTRATION_LIST_ID)
-            except Exception as e:
-                print e
-
-        return complete_signup(self.request, registration.get_user(),
+        return complete_signup(self.request, signup_user,
                                app_settings.EMAIL_VERIFICATION,
                                self.get_success_url())
 

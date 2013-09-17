@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -34,7 +35,24 @@ class UserProfile(models.Model):
     user_type = models.CharField(max_length=15, choices=USER_TYPES, default='student')
 
     def __unicode__(self):
-        return u"{0} ({1})".format(self.user.get_full_name(), self.user_type)
+        name = self.user.get_full_name() or self.user.username
+        return u"{0} ({1})".format(name, self.user_type)
+
+    def newsletter_subscribe(self):
+        mailchimp_fields = {
+            'title': dict(POSITION_CHOICES)[self.position_title],
+            'org': self.organization.name,
+            'fname': self.user.first_name,
+            'lname': self.user.last_name
+        }
+        try:
+            add_email_to_mailchimp_list(
+                self.user.email,
+                settings.MAILCHIMP_REGISTRATION_LIST_ID,
+                **mailchimp_fields
+            )
+        except Exception as e:
+            print e
 
 
 class RegistrationModel(models.Model):
