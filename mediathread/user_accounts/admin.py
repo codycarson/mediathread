@@ -15,6 +15,5 @@ class UserProfileAdmin(admin.ModelAdmin):
         model = UserProfile
 
 
-admin.site.register(RegistrationModel, RegistrationAdmin)
 admin.site.register(OrganizationModel, OrganizationAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
