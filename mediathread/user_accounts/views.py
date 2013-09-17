@@ -16,7 +16,6 @@ from allauth.account import app_settings
 from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
 from allauth.account.views import LoginView as AllauthLoginView
 from courseaffils.models import Course
-from mediathread.user_accounts.models import RegistrationModel
 from .forms import InviteStudentsForm, RegistrationForm, UserProfileForm
 from mediathread.user_accounts.utils import add_email_to_mailchimp_list
 from .models import OrganizationModel, UserProfile
@@ -84,12 +83,11 @@ class UserProfileView(FormView):
     
     def get_initial(self):
         user_instance = User.objects.get(id=self.request.user.id)
-        user_registration_model = RegistrationModel.objects.get(user=user_instance)
         profile, profile_created = UserProfile.objects.get_or_create(user=user_instance, defaults={})
 
-        organization_value = profile.organization.name if profile.organization else user_registration_model.organization.name
-        position_title_value = profile.position_title if profile.position_title else user_registration_model.position_title
-        subscribe_to_newsletter_value = profile.subscribe_to_newsletter if profile.subscribe_to_newsletter != None else user_registration_model.subscribe_to_newsletter
+        organization_value = profile.organization.name
+        position_title_value = profile.position_title
+        subscribe_to_newsletter_value = profile.subscribe_to_newsletter
 
         return {
             'organization': organization_value,

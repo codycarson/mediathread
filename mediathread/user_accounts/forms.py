@@ -5,7 +5,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django import forms
 from django.template.defaultfilters import pluralize
 from django.utils.safestring import mark_safe
-from .models import RegistrationModel, OrganizationModel, UserProfile, POSITION_CHOICES
+from .models import OrganizationModel, UserProfile, POSITION_CHOICES
 
 
 class UserProfileForm(forms.Form):
@@ -46,7 +46,7 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        widget = autocomplete_light.get_widgets_dict(RegistrationModel)
+        widget = autocomplete_light.get_widgets_dict(UserProfile)
         fields = [
             'email',
             'password',
