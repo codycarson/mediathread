@@ -1,29 +1,22 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # move data from existing RegistrationModel
-        for reg_data in orm.RegistrationModel.objects.all():
-            user = reg_data.user
-            if user:
-                profile, created = orm.UserProfile.objects.get_or_create(user=user)
-                profile.organization = reg_data.organization
-                profile.subscribe_to_newsletter = reg_data.subscribe_to_newsletter
-                profile.position_title = reg_data.position_title
-                profile.save()
-        # create a user profile for all users
-        for user in orm.User.objects.all():
-            profile, created = orm.UserProfile.objects.get_or_create(user=user)
+        
+        # Adding field 'UserProfile.user_type'
+        db.add_column('user_accounts_userprofile', 'user_type', self.gf('django.db.models.fields.CharField')(default='student', max_length=15), keep_default=False)
+
 
     def backwards(self, orm):
-        for profile in orm.UserProfile.objects.all():
-            profile.delete()
+        
+        # Deleting field 'UserProfile.user_type'
+        db.delete_column('user_accounts_userprofile', 'user_type')
+
 
     models = {
         'auth.group': {
@@ -41,7 +34,7 @@ class Migration(DataMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 9, 17, 11, 46, 36, 405929)'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 9, 17, 12, 5, 19, 989352)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -49,7 +42,7 @@ class Migration(DataMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 9, 17, 11, 46, 36, 405797)'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 9, 17, 12, 5, 19, 989239)'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -82,7 +75,8 @@ class Migration(DataMigration):
             'organization': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['user_accounts.OrganizationModel']", 'null': 'True'}),
             'position_title': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'subscribe_to_newsletter': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'null': 'True', 'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'null': 'True', 'to': "orm['auth.User']"}),
+            'user_type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
         }
     }
 

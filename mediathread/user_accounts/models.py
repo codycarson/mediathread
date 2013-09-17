@@ -20,6 +20,10 @@ POSITION_CHOICES = (
     ('developer', 'Developer'),
     ('other', 'Other')
 )
+USER_TYPES = (
+    ('student', 'student'),
+    ('instructor', 'instructor')
+)
 
 
 class UserProfile(models.Model):
@@ -27,6 +31,7 @@ class UserProfile(models.Model):
     organization = models.ForeignKey('OrganizationModel', null=True)
     subscribe_to_newsletter = models.BooleanField(default=False)
     position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, blank=True)
+    user_type = models.CharField(max_length=15, choices=USER_TYPES, default='student')
 
 
 class RegistrationModel(models.Model):
