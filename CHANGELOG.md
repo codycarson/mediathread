@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.1.1
+
+* fixed absolute paths to static files in mediathread.css to be
+  compatible with S3
+
 ### 0.1
 
 * static files server used Amazon S3 ([#137](https://trello.com/c/03Y3xdxx/137-use-django-storages-to-send-all-static-assets-to-s3))
