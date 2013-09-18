@@ -1,11 +1,14 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags static %}
-{% load avatar_tags %}
+{% load avatar_tags crispy_forms_tags static %}
 
-{% block title %}User Profile{% endblock title %}
+{% block title %}Edit Profile{% endblock title %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
+{% endblock %}
+
+{% block extrahead %}
+    {% include "autocomplete_light/static.html" %}
 {% endblock %}
 
 {% block content %}

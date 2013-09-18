@@ -78,36 +78,33 @@ class UserProfileView(FormView):
     """
     form_class = UserProfileForm
     success_url = '/'
-    template_name = 'user_accounts/user_profile.html'
-    
-    def get_initial(self):
-        user_instance = User.objects.get(id=self.request.user.id)
-        profile, profile_created = UserProfile.objects.get_or_create(user=user_instance, defaults={})
+    template_name = 'user_accounts/edit_profile.html'
 
-        organization_value = profile.organization.name
-        position_title_value = profile.position_title
-        subscribe_to_newsletter_value = profile.subscribe_to_newsletter
+    def get_initial(self):
+        user = self.request.user
+        profile, created = UserProfile.objects.get_or_create(user=user)
+        if profile.organization:
+            organization_value = profile.organization.name
+        else:
+            organization_value = None
 
         return {
             'organization': organization_value,
-            'position_title': position_title_value,
-            'subscribe_to_newsletter': subscribe_to_newsletter_value,
-            'first_name': user_instance.first_name,
-            'last_name': user_instance.last_name
+            'position_title': profile.position_title,
+            'subscribe_to_newsletter': profile.subscribe_to_newsletter,
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }
 
     def form_valid(self, form):
-        user = User.objects.get(pk=self.request.user.pk)
-        profile_defaults = {}
-        profile, profile_created = UserProfile.objects.get_or_create(user=user, defaults=profile_defaults)
-        
+        user = self.request.user
         user.first_name = form.cleaned_data['first_name']
         user.last_name = form.cleaned_data['last_name']
+        user.save()
 
-        if profile.organization:
-            profile.organization.name = form.cleaned_data['organization']
-            profile.organization.save()
-        else:
+        profile, created = UserProfile.objects.get_or_create(user=user)
+
+        if form.cleaned_data['organization']:
             profile.organization, created = OrganizationModel.objects.get_or_create(
                 name=form.cleaned_data['organization'])
             profile.organization.save()
@@ -116,12 +113,10 @@ class UserProfileView(FormView):
         profile.subscribe_to_newsletter = form.cleaned_data['subscribe_to_newsletter']
 
         if profile.subscribe_to_newsletter:
-            pass
-            # TODO: subscribe user to the list
+            profile.newsletter_subscribe()
         else:
             pass
-            # TODO: unsubscribe user to the list
-        
+
         profile.save()
         
         messages.success(self.request, "You've successfully updated your user profile.", fail_silently=True)

@@ -15,8 +15,8 @@ class UserProfileForm(forms.Form):
     organization = forms.CharField(
         widget=autocomplete_light.TextWidget('OrganizationAutocomplete')
     )
-    subscribe_to_newsletter = forms.BooleanField(required=False)
     position_title = forms.ChoiceField(choices=POSITION_CHOICES)
+    subscribe_to_newsletter = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)

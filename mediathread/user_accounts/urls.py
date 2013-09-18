@@ -22,5 +22,5 @@ urlpatterns = patterns('',
         name='account_confirm_email'),
     url(r'^edit_profile/$',
         user_profile_view,
-        name='edit_profile_view'),
+        name='edit_profile'),
 )

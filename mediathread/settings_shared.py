@@ -185,7 +185,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'storages',
     'collectfast',
-	'avatar'
+    'avatar',
 ]
 
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
