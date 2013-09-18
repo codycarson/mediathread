@@ -38,6 +38,8 @@ def login_user(request, user):
 
 class LoginView(AllauthLoginView):
     def form_valid(self, form):
+        # checks if the user has a default (dummypass) password so it can redirect it to the set password form
+        self.default_password = form.user.check_password("dummypass")
         response = super(LoginView, self).form_valid(form)
         # check if the user is an instructor and is only in faculty group of sample course or in no course at all
         is_instructor = form.user.profile.user_type == "instructor"
@@ -51,6 +53,12 @@ class LoginView(AllauthLoginView):
         else:
             self.request.session['courses_created'] = True
         return response
+
+    def get_success_url(self):
+        url = "/"
+        if self.default_password:
+            url = reverse("set_password")
+        return url
 
 login_view = LoginView.as_view()
 
