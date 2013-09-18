@@ -7,10 +7,6 @@
     {% include "autocomplete_light/static.html" %}
 {% endblock %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
-{% endblock %}
-
 {% block call_to_action %}
     {% if request.user.is_authenticated and limit_reached %}
         <div class="call-to-action call-to-action-warning">

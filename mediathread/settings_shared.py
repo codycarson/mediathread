@@ -141,8 +141,8 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     # Put application templates before these fallback ones:
-    "/var/www/mediathread/templates/",
-    os.path.join(os.path.dirname(__file__), "deploy_specific/templates"),
+    #"/var/www/mediathread/templates/",
+    #os.path.join(os.path.dirname(__file__), "deploy_specific/templates"),
     os.path.join(os.path.dirname(__file__), "templates"),
 )
 
@@ -189,6 +189,7 @@ INSTALLED_APPS = [
 ]
 
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
+COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.CSSMinFilter'

@@ -3,10 +3,6 @@
 
 {% block title %}Invite Students{% endblock title %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
-{% endblock %}
-
 {% block call_to_action %}
     {% if request.user.is_authenticated and request.course and invites_left == 1 %}
         <div class="call-to-action">
