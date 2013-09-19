@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load smartif revision static compress %}
+{% load revision static compress %}
 
 {% block title %}
     Collection
@@ -25,6 +25,7 @@
 {% endblock %}
 
 {% block extra_js %}
+    {{ block.super }}
     <script type="text/javascript">
         jQuery(document).ready(function () {
             PanelManager.init({
