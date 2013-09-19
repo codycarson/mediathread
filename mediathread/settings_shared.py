@@ -190,7 +190,7 @@ INSTALLED_APPS = [
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_CSS_FILTERS = [
-    'compressor.filters.css_default.CssAbsoluteFilter',
+    'mediathread.s3_utils.CustomCssAbsoluteFilter',
     'compressor.filters.cssmin.CSSMinFilter'
 ]
 COMPRESS_JS_FILTERS = [
