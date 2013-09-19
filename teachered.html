@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <title>The Story - responsive landing page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Twitter bootstrap theme">
+    <meta name="author" content="prettystrap">
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet' type='text/css'>
+    <!-- Le styles -->
+    <link href="assets/less/style.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js">
+      </script>
+    <![endif]-->
+    <!-- Le fav  -->
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    if (typeof jQuery == 'undefined') {
+      document.write(unescape("%3Cscript src='assets/js/jquery-1.9.1.min.js' type='text/javascript'%3E%3C/script%3E"));
+    }
+    </script>
+
+    <!--Has to be in head, to lazy load images.
+    Minimize in production. -->
+
+    <script src="assets/js/lazyload.js"></script>
+    <script src="assets/js/jRespond.js"></script>
+    <script src="assets/js/spin.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/lightbox.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <script src="assets/js/responsive-nav.js"></script>
+
+    <!-- Main js fail. -->
+    <script src="assets/js/main.js"></script>
+
+  </head>
+
+  <!-- activate scrollspy -->
+  <body id="top" data-spy="scroll" data-target=".navbar" data-offset="50">
+       <!-- Nav button -->
+      <a id="toggle"  class="closed">
+        <i class="icon-reorder"></i>
+      </a>
+
+      <!-- Navigation -->
+      <header class="navbar navbar-fixed-top">
+        <div class="inner-page">
+          <h1 class="logo">
+              <a href="/">
+              <img src="assets/img/logo_mediathread_black_bg.png" />
+              </a>
+          </h1>
+<!--          <div id="phone">Questions? Call us +1 (855) 352-6469</div>-->
+          <div id="nav">
+            <ul class="nav">
+              <li><a title="Home page" class="scroll brand-1" href="index.html">Home</a></li>
+              <li><a title="Who's using it" href="index.html#who" class="scroll brand-4">Who's using it</a></li>
+              <li class="active"><a title="How are people using it" href="index.html#cases" class="scroll brand-1">Use cases</a></li>
+              <li><a title="How it works" href="index.html#how" class="scroll fadeto brand-4">How it works</a></li>
+              <li><a title="Log in" href="http://mediathread.appsembler.com/accounts/login/" class="scroll brand-1">Log in</a></li>
+              <li><a title="Get started" href="http://mediathread.appsembler.com/user_accounts/registration_form/" class="scroll brand-4 get-started-link">Sign up</a></li>
+            </ul>
+          </div>
+        </div> 
+      </header> <!-- /Navigation -->
+
+      <!--  Page -->
+      <div id="sample-page" class="page color-4">
+        <div class="inner-page">
+          <h2 class="page-headline">Analyzing student teaching at Teachers College</h2>
+        </div>  
+        <div class="row-fluid inner-page">
+          <div class="span5 lazy-container btn-container">
+            <img class="figurette lazy img-rounded" src="assets/img/mediathread_mathematicalthinking.jpg" data-original="assets/img/mediathread_mathematicalthinking.jpg" />
+            <a href="assets/img/mediathread_mathematicalthinking.jpg" class="lightbox btn-play" target="_blank">
+              <i class="icon-zoom-in"></i>
+            </a> 
+          </div>
+
+          <div class="span7">
+
+            <h3><b>Course:</b> The Development of Mathematical Thinking</h3>
+            <p><strong>Department:</strong> Human Development, Teachers College<br />
+               <strong>Instructor:</strong> Sarantoula Sandra Pappas Schattman<br />
+
+                <h4>Background</h4>
+                Professor Pappas Schattman uses Mediathread throughout her course on early childhood mathematics education, a course that focuses on theories of developmental psychology as well as teaching and assessment practices derived from research.</p>
+                <p>A series of assignments integrating readings with video footage prepares students to discuss and debate interpretations of learning behavior.</p>
+                <h4>Implementation</h4>
+                For the first ten weeks of the course, students are required to post short essays about clinical interviewing techniques. They also post a weekly reflection on what they learned during in-class instruction. The final project for the course is a comprehensive essay in Mediathread.</p>
+                <p>For this project, students first videotape themselves teaching and interviewing a child to assess the child's mathematical skills development.
+                <p>Then, in Mediathread, students write an analysis of their interaction with the child, using video to provide supporting evidence of class concepts.</p>
+                <p>Professor Pappas Schattman then assesses her students' mastery of theory, teaching and interviewing skills, and interpretation of the video.</p>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="inner-page row-fluid">
+          <ul class="features list-inline">
+            <li>
+              <h3><i class="icon-book"></i> Teacher Ed </h3>
+              <p>Professor Pappas Schattman uses Mediathread throughout her course on early childhood mathematics education. <a href="teachered.html">Read more</a></p>
+            </li>
+            <li>
+              <h3><i class="icon-group"></i> Social Work</h3>
+              <p>At the Columbia University School of Social Work, first-year students use Mediathread to connect class readings to videos of clinical sessions and role-play assignments. <a href="socialwork.html">Read more</a></p>
+            </li>
+            <li>
+              <h3><i class="icon-film"></i> Film Study</h3>
+              <p>"Projecting the American Empire on Film" is a course at Barnard College in which Mediathread is used for a series of close reading exercises of film footage. <a href="filmstudy.html">Read more</a></p>
+            </li>
+          </ul>
+        </div>
+
+    </div> <!-- /sample page -->
+
+
+
+    <!-- Sign up -->
+    <div class="sign-up color-2">
+      <div class="row-fluid inner-page">
+        <div class="span7">
+          <h3>It's easy to use. Get started for free!</h3>
+        </div>
+        <div class="span5 pull-left">
+          <a href="http://mediathread.appsembler.com/user_accounts/registration_form" class="scroll btn btn-success get-started-link" title="Register"> <i class="icon-play"></i>&nbsp;Get started</a>
+        </div>
+      </div>
+    </div> 
+    <!-- /Sign up -->
+
+      <!-- The footer, social media icons, and copyright -->        
+      <footer class="page color-5">
+      <div class="inner-page row-fluid">
+        <div class="span6 social">
+          <a href="#contact"><i class="icon-twitter"></i></a>
+          <a href="#contact"><i class="icon-github-sign"></i></a>    
+          <a href="#contact"><i class="icon-facebook-sign"></i></a>
+          <a href="#contact"><i class="icon-google-plus-sign"></i></a>
+        </div>
+        <div class="span6 text-right copyright">
+          &copy; 2013 <a  href="http://appsembler.com"  title="Managed hosting of Open Source software">Appsembler</a> | All Rights Reserved |  <a href="#top"   title="Go to top" class="scroll">To top <i class="icon-caret-up"></i></a>
+        </div>
+      </div>
+      </footer>
+  </body>
+
+</html>

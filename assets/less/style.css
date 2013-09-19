@@ -1243,6 +1243,17 @@
   }
 }
 @media (min-width: 768px) and (max-width: 979px) {
+  .sign-up .row-fluid .span9, .sign-up .row-fluid .span8, .sign-up .row-fluid .span5, .sign-up .row-fluid .span4, .sign-up .row-fluid .span3, .newsletter .row-fluid .span6, .newsletter .row-fluid .span4, .newsletter .row-fluid .span2 {
+	  width:100%;
+	  float:none;
+  }
+  .sign-up h3 {
+	  text-align:center;
+  }
+  .sign-up a {
+    display: block;
+    margin: 0 auto;
+  }
   .row {
     margin-left: 0px;
     *zoom: 1;
@@ -2462,6 +2473,9 @@
   .modal.fade.in {
     top: 20px;
   }
+  .pricing-stack .well ul.points li {
+    text-align: center;
+  }
 }
 @media (max-width: 480px) {
   .nav-collapse {
@@ -2663,6 +2677,23 @@
   .navbar-static .navbar-inner {
     padding-left: 10px;
     padding-right: 10px;
+  }
+  .sign-up h3 {
+	  text-align:center;
+  }
+  .sign-up a {
+    display: block;
+    margin: 0 auto;
+  }
+  .social,.newsletter h4, .subscribe, .team .span7, .copyright.text-right {
+	  text-align:center;
+  }
+  .team img {
+    margin:20px auto;
+  }
+  .copyright {
+	  font-size:12px;
+	  padding:0 !important;
   }
 }
 @media (min-width: 769px) {
@@ -10493,6 +10524,7 @@ a .icon-flip-vertical:before {
 }
 .color-4 a {
   color: #3083a7;
+  font-weight:bold;
 }
 .color-4 .btn {
   color: #ffffff;
@@ -10523,7 +10555,7 @@ footer {
 }
 .lazy-container {
   text-align: center;
-  min-height: 400px;
+  min-height: 200px;
 }
 .spinner {
   padding-top: 200px;
@@ -10884,15 +10916,15 @@ ul {
 .btn-play {
   top: 50%;
   left: 50%;
-  width: 100px;
-  height: 100px;
-  margin: -50px 0 0 -50px;
+  width: 200px;
+  height: 200px;
+  margin: -100px 0 0 -100px;
 }
 .btn-play i {
-  font-size: 100px;
+  font-size: 200px;
   opacity: 0.9;
   padding: 5px 10px;
-  color: #ffffff;
+  color: #4BAAD3;
   border-radius: 10px;
   -webkit-transition: color 0.6s;
   -moz-transition: color 0.6s;
@@ -11120,7 +11152,7 @@ strong {
   }
   .team img {
     display: block;
-    margin: 20px ;
+    margin: 20px auto;
     float: none;
   }
   .pull-left {
@@ -11721,10 +11753,13 @@ html {
                             .btn-success.active,
                             .btn-success.disabled,
                             .btn-success[disabled] {
-  color: #ffffff;
-  background-color: #51a351;
+  color: #51a351;
+  background-color: #ffffff;
   *background-color: #499249;
-  margin-top: 40px;
+  -webkit-transition: color 0.4s ease-out, background 0.7s ease-in;
+  -moz-transition: color 0.4s ease-out, background 0.7s ease-in;
+  -o-transition: color 0.4s ease-out, background 0.7s ease-in;
+  transition: color 0.4s ease-out, background 0.7s ease-in;
 }
 
 .pricing-stack .well ul li a {
