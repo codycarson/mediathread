@@ -3,11 +3,6 @@
 {% load url from future %}
 {% load static %}
 
-
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" />
-{% endblock %}
-
 {% block title %}Change your profile picture{% endblock %}
 
 {% block content %}
@@ -16,12 +11,12 @@
     {% if not avatars %}
         <p>{% trans "You haven't uploaded an avatar yet. Please upload one now." %}</p>
     {% else %}
-        <form method="POST" action="{% url 'avatar_change' %}?next=/user_accounts/edit_profile/">
+        <form method="POST" action="{% url 'avatar_change' %}?next={% url edit_profile %}">
                 {{ primary_avatar_form.as_p }}
             <p>{% csrf_token %}<input type="submit" class="btn btn-success" value="{% trans "Choose new Default" %}" /></p>
         </form>
     {% endif %}
-    <form enctype="multipart/form-data" method="POST" action="{% url 'avatar_add' %}?next=/user_accounts/edit_profile/">
+    <form enctype="multipart/form-data" method="POST" action="{% url 'avatar_add' %}?next={% url edit_profile %}">
         {{ upload_avatar_form.as_p }}
         <p>{% csrf_token %}<input type="submit" class="btn btn-success" value="{% trans "Upload New Profile Picture" %}" /></p>
     </form>
