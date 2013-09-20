@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
-from .utils import add_email_to_mailchimp_list
+from .utils import add_email_to_mailchimp_list, unsubscribe_user_from_list
 
 HEAR_CHOICES = (
     ('conference', 'Conference'),
@@ -48,8 +48,27 @@ class UserProfile(models.Model):
                 settings.MAILCHIMP_REGISTRATION_LIST_ID,
                 **mailchimp_fields
             )
+            self.subscribe_to_newsletter = True
+            self.save()
+            return True
         except Exception as e:
-            print e
+            self.subscribe_to_newsletter = False
+            self.save()
+            return False
+
+    def newsletter_unsubscribe(self):
+        try:
+            unsubscribe_user_from_list(
+                self.user.email,
+                settings.MAILCHIMP_REGISTRATION_LIST_ID
+            )
+            self.subscribe_to_newsletter = False
+            self.save()
+            return True
+        except Exception:
+            self.subscribe_to_newsletter = True
+            self.save()
+            return False
 
 
 class OrganizationModel(models.Model):

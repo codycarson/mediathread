@@ -111,6 +111,7 @@ class UserProfileView(FormView):
         user.save()
 
         profile, created = UserProfile.objects.get_or_create(user=user)
+        old_subscription_setting = profile.subscribe_to_newsletter
 
         if form.cleaned_data['organization']:
             profile.organization, created = OrganizationModel.objects.get_or_create(
@@ -119,14 +120,15 @@ class UserProfileView(FormView):
 
         profile.position_title = form.cleaned_data['position_title']
         profile.subscribe_to_newsletter = form.cleaned_data['subscribe_to_newsletter']
-
-        if profile.subscribe_to_newsletter:
-            profile.newsletter_subscribe()
-        else:
-            pass
-
         profile.save()
-        
+
+        #if the setting has changed, we'll do an API call to Mailchimp
+        if profile.subscribe_to_newsletter != old_subscription_setting:
+            if profile.subscribe_to_newsletter:
+                profile.newsletter_subscribe()
+            else:
+                profile.newsletter_unsubscribe()
+
         messages.success(self.request, "You've successfully updated your user profile.", fail_silently=True)
         return super(UserProfileView, self).form_valid(form)
 
