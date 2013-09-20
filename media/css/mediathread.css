@@ -4247,6 +4247,7 @@ div#taxonomy a.icon-link {
     margin: .5em 0;
     padding: 0;
     cursor: pointer;
+    background: none;
 }
 
 div#taxonomy a.icon-link:hover {
@@ -4349,7 +4350,7 @@ div#taxonomy div.vocabulary-display a.create-vocabulary-open {
 
 div#taxonomy div.vocabulary-display a.create-vocabulary-open img {
     float: right;
-    margin: -2px 2px 0 0;
+    margin: -17px 2px 0 0;
 }
 
 div#taxonomy div.term-container a.edit-term-close,
