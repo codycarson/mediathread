@@ -14,7 +14,8 @@
 {% block content %}
 {% if invites_left == 0 %}
 <h1>No invites left!</h1>
-<p>You have no invites left on your current plan. If you want to invite more students, <a href="{{ settings.PLANS_PAGE_URL }}">click here</a> to upgrade to a bigger plan!</p>
+<p>You have no invites left on your current plan. If you want to invite more students, click the button below to upgrade your plan!</p>
+<a href="{{ settings.PLANS_PAGE_URL }}" class="btn btn-success btn-large">Upgrade your plan</a>
 {% else %} 
     <div class="invite-students-form">
         <h2 class="title">Invite students to your course</h2>
