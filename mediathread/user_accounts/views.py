@@ -117,10 +117,23 @@ class UserProfileView(FormView):
             profile.organization, created = OrganizationModel.objects.get_or_create(
                 name=form.cleaned_data['organization'])
             profile.organization.save()
+            organization_name = profile.organization.name
+        else:
+            organization_name = ""
 
         profile.position_title = form.cleaned_data['position_title']
         profile.subscribe_to_newsletter = form.cleaned_data['subscribe_to_newsletter']
         profile.save()
+
+        analytics.identify(
+            user.email,
+            {
+                'email': user.email,
+                'firstName': user.first_name,
+                'lastName': user.last_name,
+                'organization': organization_name,
+            }
+        )
 
         #if the setting has changed, we'll do an API call to Mailchimp
         if profile.subscribe_to_newsletter != old_subscription_setting:
