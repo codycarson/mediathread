@@ -16,7 +16,7 @@ requirements/src/South-0.7.3.tar.gz
 requirements/src/django-annoying-0.7.6.tar.gz
 requirements/src/django-nose-0.1.3.tar.gz
 requirements/src/django-threadedcomments-0.9.tar.gz
-requirements/src/django_courseaffils-0.4.tar.gz 
+requirements/src/django_courseaffils-0.4a.tar.gz 
 requirements/src/django-statsd-mozilla-0.3.3.tar.gz
 requirements/src/raven-0.7.0.tar.gz
 requirements/src/django-appconf-0.4.1.tar.gz 
@@ -24,4 +24,6 @@ requirements/src/django_compressor-1.1.1.tar.gz
 requirements/src/django-jenkins-0.14.0.tar.gz
 requirements/src/django-allauth-0.12.0.tar.gz
 requirements/src/django-autocomplete-light-1.2.3.tar.gz
+requirements/src/django-stagingcontext-0.1.0.tar.gz
+requirements/src/django-smoketest-0.1.3.tar.gz
 requirements/src/django-avatar-6393d25166.tar.gz

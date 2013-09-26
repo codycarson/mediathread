@@ -17,6 +17,10 @@
         <script type="text/javascript" src="{% static 'jquery/js/jquery-1.8.3.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'jquery/js/jquery-ui-1.9.1.custom.min.js' %}"></script>
         
+        <script type="text/javascript" src="/site_media/js/mustache/mustache.min.js?version={%revision%}"></script>
+        <script type="text/javascript" src="/site_media/js/sherdjs/lib/flowplayer/flowplayer-3.1.4.min.js"></script>
+        <script type="text/javascript" src="/site_media/js/sherdjs/lib/OpenLayers-min.js"></script>
+        <script type="text/javascript" src="/jsi18n"></script>
         
         <script type="text/javascript" src="{% static 'js/mustache/mustache.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/sherdjs/lib/flowplayer/flowplayer-3.1.4.min.js' %}"></script>
@@ -212,6 +216,10 @@
             <h4 id="logo_appsembler"></h4>
         </a>
             <!-- CCNMTL title/logo -->
+            <h4 id="logo_ccnmtl">
+                <a href="http://ccnmtl.columbia.edu" target="_blank" title="Columbia Center for New Media Teaching and Learning"></a>
+            </h4> 
+    
     	   <ul id="footernav">
                <li><a href="/about/">About</a></li>
                {% if settings.PUBLIC_CONTACT_EMAIL %}     
@@ -264,6 +272,28 @@
         <!--  Project related -->
         <script type="text/javascript" src="{% static 'js/app/projects/projectpanel.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/app/projects/projectlist.js' %}"></script>
+    
+        {% if not settings.DEBUG %}
+            <script>                
+                {% if settings.GOOGLE_ANALYTICS_ID %}
+                    var _gaq = _gaq || [];
+                    _gaq.push(['_setAccount', '{{settings.GOOGLE_ANALYTICS_ID}}']);
+                    _gaq.push(['_trackPageview']);
+            
+                    (function () {
+                        var ga = document.createElement('script');
+                        ga.type = 'text/javascript';
+                        ga.async = true;
+                        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                        var s = document.getElementsByTagName('script')[0];
+                        s.parentNode.insertBefore(ga, s);
+                    })();
+                
+                    var analytics = new MediathreadAnalytics(_gaq);
+                {% endif %}
+            </script>
+        {% endif %}        
+           
     
 
 
@@ -335,6 +365,14 @@
             });
         </script>
     {% endif %}
+{% if STAGING_ENV %}
+<div class="alert alert-error"
+ style="position: fixed; bottom: 0px; background-color: #fee; border: #f00 solid 1px;">
+<h4>Warning: Staging Site</h4>
+<p>You are viewing a staging version of this site, not the production site.</p>
+<p>This site was last updated on: <b>{{STAGING_DEPLOY_TIME}}</b></p>
+</div>
+{% endif %}
 </body>
 {% endwith %}
 </html>
