@@ -83,7 +83,7 @@ urlpatterns = patterns(
     (r'^_stats/', direct_to_template,
      {'template': 'main/stats.html'}),
 
-    (r'^smoketest/', include('smoketest.urls')),
+#    (r'^smoketest/', include('smoketest.urls')),
 
     (r'^admin/', admin.site.urls),
 
