@@ -26,11 +26,15 @@ def django_settings(request):
     whitelist = ['PUBLIC_CONTACT_EMAIL',
                  'CONTACT_US_DESTINATION',
                  'FLOWPLAYER_SWF_LOCATION',
+                 'FLOWPLAYER_AUDIO_PLUGIN',
+                 'FLOWPLAYER_PSEUDOSTREAMING_PLUGIN',
+                 'FLOWPLAYER_RTMP_PLUGIN',
                  'DEBUG',
                  'REVISION',
                  'DATABASES',
                  'GOOGLE_ANALYTICS_ID',
-                 'SEGMENTIO_JS_KEY'
+                 'SEGMENTIO_JS_KEY',
+                 'PLANS_PAGE_URL'
                  ]
 
     rv = {'settings': dict([(k, getattr(settings, k, None))

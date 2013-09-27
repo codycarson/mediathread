@@ -109,6 +109,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'mediathread.main.views.django_settings',
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
+'stagingcontext.staging_processor',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -184,9 +185,13 @@ INSTALLED_APPS = [
     'mediathread.course',
     'crispy_forms',
     'storages',
-    'collectfast'
+    'collectfast',
+    'avatar',
+	'smoketest'
 ]
 
+COMPRESS_URL = "/site_media/"
+COMPRESS_ROOT = "media/"
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_CSS_FILTERS = [
@@ -232,7 +237,9 @@ JOHNNY_MIDDLEWARE_KEY_PREFIX = 'johnny'
 # users. we need to allow anonymous access to the login
 # page, and to static resources.
 
-ANONYMOUS_PATHS = ('/site_media/',
+ANONYMOUS_PATHS = ('/course/create/',
+                   '/user_accounts/'
+                   '/site_media/',
                    '/accounts/',
                    '/admin/',
                    '/api/',
@@ -274,8 +281,18 @@ FORCE_LOWERCASE_TAGS = True
 
 # if you set this to a string, then bookmarklet can import from flickr
 DJANGOSHERD_FLICKR_APIKEY = None
-FLOWPLAYER_SWF_LOCATION = \
-    "https://releases.flowplayer.org/swf/flowplayer-3.2.16.swf"
+
+# Mediathread instantiates a Flowplayer .swf to play many video flavors.
+# Update this variable with your site's Flowplayer installation
+# See README.markdown for more information
+# expected: http://<server>/<directory>/flowplayer-3.2.15.swf
+FLOWPLAYER_SWF_LOCATION = STATIC_URL + "flowplayer/flowplayer-3.2.16.swf"
+# Specify your own plugin versions here. The player looks in the same
+# http://<server>/<directory>/ specified above.
+FLOWPLAYER_AUDIO_PLUGIN = 'flowplayer.audio-3.2.10.swf'
+FLOWPLAYER_PSEUDOSTREAMING_PLUGIN = 'flowplayer.pseudostreaming-3.2.12.swf'
+FLOWPLAYER_RTMP_PLUGIN = 'flowplayer.rtmp-3.2.12.swf'
+
 
 DEFAULT_COLLABORATION_POLICY = policies.InstructorManaged()
 
@@ -312,6 +329,7 @@ MESSAGE_LEVEL = message_constants.SUCCESS
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"
 HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
+PLANS_PAGE_URL = "http://getmediathread.com/plans.html"
 
 
 # this gets around Django 1.2's stupidity for commenting

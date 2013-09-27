@@ -17,6 +17,10 @@
         <script type="text/javascript" src="{% static 'jquery/js/jquery-1.8.3.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'jquery/js/jquery-ui-1.9.1.custom.min.js' %}"></script>
         
+        <script type="text/javascript" src="/site_media/js/mustache/mustache.min.js?version={%revision%}"></script>
+        <script type="text/javascript" src="/site_media/js/sherdjs/lib/flowplayer/flowplayer-3.1.4.min.js"></script>
+        <script type="text/javascript" src="/site_media/js/sherdjs/lib/OpenLayers-min.js"></script>
+        <script type="text/javascript" src="/jsi18n"></script>
         
         <script type="text/javascript" src="{% static 'js/mustache/mustache.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/sherdjs/lib/flowplayer/flowplayer-3.1.4.min.js' %}"></script>
@@ -55,13 +59,12 @@
                 <div id="standardnav_container">
                 {% block call_to_action %}
                     {% if request.session.no_students and request.user.is_authenticated and request.course %}
-                        <div id="call-to-action">
-                            <h2>You haven't invited any students to this course. Click here to invite them: </h2><button class="btn btn-success">Invite students</button>
+                        <div class="call-to-action">
+                            <h2>You haven't invited any students to this course. Click here to invite them: </h2><a class="btn btn-success" href="{% url invite-students %}">Invite students</a>
                         </div>
-                    {% endif %}
-                    {% if not request.session.courses_created and request.user.is_authenticated %}
-                        <div id="call-to-action">
-                            <h2>Want to create your own course? Click here:</h2><a href="http://appsembler.wufoo.com/forms/z7p9k5/" class="btn btn-success" onclick="window.open(this.href,  null, 'height=1081, width=680, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false">Create course</a>
+                    {% elif not request.session.courses_created and request.user.is_authenticated %}
+                        <div class="call-to-action">
+                            <h2>Want to create your own course? Click here:</h2><a href="{% url course_create %}" class="btn btn-success">Create course</a>
                         </div>
                     {% endif %}
                 {% endblock call_to_action %}
@@ -94,7 +97,9 @@
                                     {% if user_courses > 1 or user.is_staff %}
                                         <a href="/?unset_course">Switch Course</a>
                                     {% endif %}
-                                    <a href="http://appsembler.wufoo.com/forms/z7p9k5/" onclick="window.open(this.href,  null, 'height=1081, width=680, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false">Create course</a>
+                                    <a href="{% url course_create %}" >Create course</a>
+
+                                    <a href="{% url edit_profile %}">Edit Profile</a>
                                         
                                     <a href="/accounts/logout/">Log Out</a>
                                 </div>
@@ -211,6 +216,10 @@
             <h4 id="logo_appsembler"></h4>
         </a>
             <!-- CCNMTL title/logo -->
+            <h4 id="logo_ccnmtl">
+                <a href="http://ccnmtl.columbia.edu" target="_blank" title="Columbia Center for New Media Teaching and Learning"></a>
+            </h4> 
+    
     	   <ul id="footernav">
                <li><a href="/about/">About</a></li>
                {% if settings.PUBLIC_CONTACT_EMAIL %}     
@@ -263,6 +272,28 @@
         <!--  Project related -->
         <script type="text/javascript" src="{% static 'js/app/projects/projectpanel.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/app/projects/projectlist.js' %}"></script>
+    
+        {% if not settings.DEBUG %}
+            <script>                
+                {% if settings.GOOGLE_ANALYTICS_ID %}
+                    var _gaq = _gaq || [];
+                    _gaq.push(['_setAccount', '{{settings.GOOGLE_ANALYTICS_ID}}']);
+                    _gaq.push(['_trackPageview']);
+            
+                    (function () {
+                        var ga = document.createElement('script');
+                        ga.type = 'text/javascript';
+                        ga.async = true;
+                        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                        var s = document.getElementsByTagName('script')[0];
+                        s.parentNode.insertBefore(ga, s);
+                    })();
+                
+                    var analytics = new MediathreadAnalytics(_gaq);
+                {% endif %}
+            </script>
+        {% endif %}        
+           
     
 
 
@@ -334,6 +365,14 @@
             });
         </script>
     {% endif %}
+{% if STAGING_ENV %}
+<div class="alert alert-error"
+ style="position: fixed; bottom: 0px; background-color: #fee; border: #f00 solid 1px;">
+<h4>Warning: Staging Site</h4>
+<p>You are viewing a staging version of this site, not the production site.</p>
+<p>This site was last updated on: <b>{{STAGING_DEPLOY_TIME}}</b></p>
+</div>
+{% endif %}
 </body>
 {% endwith %}
 </html>

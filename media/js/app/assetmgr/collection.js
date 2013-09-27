@@ -232,7 +232,15 @@ CollectionList.prototype.createAssetThumbs = function (assets) {
         
         if (!asset.thumbable) {
             if (jQuery(target_parent).hasClass("static-height")) {
-                jQuery(target_parent).css({ height: '240px' });
+                if (asset.sources.hasOwnProperty("thumb") &&
+                    asset.sources.thumb.hasOwnProperty("height") && 
+                        asset.sources.thumb.height > 240) {
+                    jQuery(target_parent).css({
+                        height: (asset.sources.thumb.height + 75) + 'px'
+                    });
+                } else {
+                    jQuery(target_parent).css({height: '240px'});
+                }
             }
         } else {
             var view;
@@ -330,7 +338,7 @@ CollectionList.prototype.updateSwitcher = function () {
     
     jQuery(self.el).find("select.course-tags")
         .select2({
-            placeholder: "Select tag",
+            placeholder: "Select tag"
         });    
     if ('tag' in self.current_records.active_filters &&
             self.current_records.active_filters.tag.length > 0) {
