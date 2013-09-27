@@ -9,27 +9,24 @@ Mediathread is a Django site for multimedia annotations facilitating
 collaboration on video and image analysis. Developed at the Columbia
 Center for New Media Teaching and Learning (CCNMTL)
 
-CODE: http://github.com/ccnmtl/mediathread (see wiki for some dev documentation)
-INFO: http://ccnmtl.columbia.edu/mediathread
-FORUM: http://groups.google.com/group/mediathread
+CODE: http://github.com/ccnmtl/mediathread (see wiki for some dev documentation)  
+INFO: http://ccnmtl.columbia.edu/mediathread  
+FORUM: http://groups.google.com/group/mediathread  
 
 REQUIREMENTS
 ------------
-Python 2.6 (or 2.5)
-Postgres (or MySQL)
-
-In Ubuntu (for postgres 8.4, but just change version numbers):
-
-    $ sudo aptitude install postgres-8.4 postgresql-client-8.4 postgresql-server-dev-8.4 python-psycopg2 gcc python2.6 python-dev libc6-dev 
+Python 2.7 (Python 2.6 is still supported, but we encourage you to upgrade.)  
+Postgres (or MySQL)  
+Flowplayer installation for your site (See below for detailed instructions)  
+Flickr API Key if you want to bookmark from FLICKR    
 
 
 INSTALLATION
 ------------
 
-1. Mediathread relies on several submodules.  The easiest way to download
-   it all is to run with git 1.6.5+ is:
+1. Clone Mediathread
 
-    git clone --recursive https://github.com/ccnmtl/mediathread.git
+    git clone https://github.com/ccnmtl/mediathread.git
 
 2. Build the database
    For Postgres:
@@ -45,12 +42,9 @@ INSTALLATION
 
    For Both:
      Edit the variables in `settings_shared.py` that you need to customize for your local installation.
-     At a minimum, you will need to custimze your the `DATABASES` dictionary as appropriate.
-
-     If you are not running a statsd server, you should disable the 'django_statsd' application by removing 
-     it from the INSTALLED_APPS list.
+     At a minimum, you will need to customize your `DATABASES` dictionary as appropriate.
      
-     Even better would be:
+     For more extensive customization, you can create a deploy_specific directory to house a site-specific settings.py file:
 
          $ mkdir deploy_specific
          $ touch deploy_specific/__init__.py
@@ -61,11 +55,9 @@ INSTALLATION
          be included in the open-sourced distribution
 
 
-
 3. Bootstrap uses virtualenv to build a contained library in `ve/`
 
     ./bootstrap.py
-    NOTE: if you're using python2.5 use ./bootstrap-python25.py instead
 
 The rest of the instructions work like standard Django.  See:
  http://docs.djangoproject.com/en/1.1/ for more details.
@@ -75,7 +67,7 @@ The rest of the instructions work like standard Django.  See:
     ./manage.py syncdb
     ./manage.py migrate # to complete the south migration setup
 
-5. Run locally (during development)
+5. Run locally (during development only)
     ./manage.py runserver myhost.example.com:8000
 
 6. For deployment to Apache, see our sample configuration in `apache/prod.conf`
@@ -101,6 +93,35 @@ Go to your site in a web browser.
    http://myhost.example.com:8000/save/
 
 10. For deployment, take a look at the `apache/` directory for sample apache configuration files
+
+FLOWPLAYER
+----------------
+Mediathread instantiates a Flowplayer .swf to play many video flavors.
+Flowplayer now requires you to have a local installation and will not
+allow you to serve the player off their site. Here are the basic instructions
+to install Flowplayer on your systems and point Mediathread at it.
+
+1. http://flash.flowplayer.org/download/ # Version 3.2.15 or higher
+2. Install on a public server on your site.
+3. In the same directory, install:  
+    http://flash.flowplayer.org/plugins/streaming/rtmp.html - flowplayer.rtmp-3.2.12.swf  
+    http://flash.flowplayer.org/plugins/streaming/pseudostreaming.html - flowplayer.pseudostreaming-3.2.12.swf  
+    http://flash.flowplayer.org/plugins/streaming/audio.html - flowplayer.audio-3.2.10.swf  
+    
+4. In your local_settings.py or (better) deploy_specific/settings.py set FLOWPLAYER_SWF_LOCATION, like so:  
+FLOWPLAYER_SWF_LOCATION='http://servername/directory/flowplayer-3.2.15.swf'  
+FLOWPLAYER_AUDIO_PLUGIN = 'flowplayer.audio-3.2.10.swf'  
+FLOWPLAYER_PSEUDOSTREAMING_PLUGIN = 'flowplayer.pseudostreaming-3.2.11.swf'  
+FLOWPLAYER_RTMP_PLUGIN = 'flowplayer.rtmp-3.2.11.swf'  
+
+* The plugins are picked up automatically from the same directory, so don't need the full path.  
+* These are the versions we are currently using in production here at CU.
+
+FLICKR
+----------------
+In your local_settings.py or (better) deploy_specific/settings.py specify your Flickr api key.  
+DJANGOSHERD_FLICKR_APIKEY='your key here'
+
 
 METADATA SUPPORT
 ----------------
