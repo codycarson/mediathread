@@ -187,7 +187,7 @@ INSTALLED_APPS = [
     'storages',
     'collectfast',
     'avatar',
-	'smoketest'
+    #'smoketest'
 ]
 
 COMPRESS_URL = "/site_media/"
