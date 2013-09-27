@@ -286,12 +286,12 @@ DJANGOSHERD_FLICKR_APIKEY = None
 # Update this variable with your site's Flowplayer installation
 # See README.markdown for more information
 # expected: http://<server>/<directory>/flowplayer-3.2.15.swf
-FLOWPLAYER_SWF_LOCATION = "https://releases.flowplayer.org/swf/flowplayer-3.2.16.swf"
+FLOWPLAYER_SWF_LOCATION = STATIC_URL + "flowplayer/flowplayer-3.2.16.swf"
 # Specify your own plugin versions here. The player looks in the same
 # http://<server>/<directory>/ specified above.
 FLOWPLAYER_AUDIO_PLUGIN = 'flowplayer.audio-3.2.10.swf'
-FLOWPLAYER_PSEUDOSTREAMING_PLUGIN = 'flowplayer.pseudostreaming-3.2.11.swf'
-FLOWPLAYER_RTMP_PLUGIN = 'flowplayer.rtmp-3.2.11.swf'
+FLOWPLAYER_PSEUDOSTREAMING_PLUGIN = 'flowplayer.pseudostreaming-3.2.12.swf'
+FLOWPLAYER_RTMP_PLUGIN = 'flowplayer.rtmp-3.2.12.swf'
 
 
 DEFAULT_COLLABORATION_POLICY = policies.InstructorManaged()
