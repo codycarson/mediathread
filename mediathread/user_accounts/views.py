@@ -56,7 +56,7 @@ class LoginView(AllauthLoginView):
 
     def get_success_url(self):
         url = "/"
-        if self.default_password:
+        if getattr(self, 'default_password', False):
             url = reverse("set_password")
         return url
 
