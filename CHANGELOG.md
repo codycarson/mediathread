@@ -1,5 +1,18 @@
 # Changelog
 
+### 0.2.1 - 0.2.3
+
+* bugfixes
+
+### 0.2.0
+* user profiles added
+* improved call to action bars
+* integrated upstream changes from release [v2013_Fall.3](https://github.com/ccnmtl/mediathread/releases/tag/v2013_Fall.3)
+
+### 0.1.2 - 0.1.6
+
+* bugfixes
+
 ### 0.1.1
 
 * fixed absolute paths to static files in mediathread.css to be
