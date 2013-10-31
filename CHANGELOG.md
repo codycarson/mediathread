@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.6
+
+* completely disable smoke tests so that the Travis CI build doesn't fail
+
 ### 0.2.5
 
 * increased the length of organization name field to 100
