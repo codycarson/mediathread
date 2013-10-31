@@ -261,6 +261,8 @@ class InviteStudentsView(FormView):
                     user = signup_form.save(self.request)
                     course.group.user_set.add(user)
                     send_email_confirmation(self.request, user, True)
+                    # must create a user profile for every user in the system
+                    profile = UserProfile.objects.create(user=user)
 
             if user:
                 cio.track(
