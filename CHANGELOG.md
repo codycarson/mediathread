@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.5
+
+* increased the length of organization name field to 100
+
 ### 0.2.1 - 0.2.4
 
 * bugfixes
