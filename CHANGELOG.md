@@ -3,6 +3,7 @@
 ### 0.2.5
 
 * increased the length of organization name field to 100
+* fixed the bug where user profiles weren't created for newly invited users
 
 ### 0.2.1 - 0.2.4
 
