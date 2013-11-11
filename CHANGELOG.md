@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.2.7
+
+* fixed a bug when trying to invite an existing user but using a email address with different capitalization of letters
+than the existing email
+
 ### 0.2.6
 
 * completely disable smoke tests so that the Travis CI build doesn't fail
