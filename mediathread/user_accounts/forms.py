@@ -108,7 +108,7 @@ class InviteStudentsForm(forms.Form):
         emails = []
         for email in data:
             if "@" in email:
-                emails.append(email.strip())
+                emails.append(email.strip().lower())
             else:
                 raise forms.ValidationError("Error in an email address")
         invites_left = self.course.course_information.invites_left
