@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.8
+
+* when confirming account/email, user is now correctly redirected to the set password page
+
 ### 0.2.7
 
 * fixed a bug when trying to invite an existing user but using a email address with different capitalization of letters
