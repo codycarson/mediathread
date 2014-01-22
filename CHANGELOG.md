@@ -1,6 +1,6 @@
 # Changelog
 
-### 0.2.8
+### 0.2.8 - 0.2.9
 
 * when confirming account/email, user is now correctly redirected to the set password page
 
