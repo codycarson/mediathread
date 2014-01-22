@@ -76,7 +76,7 @@ class ConfirmEmailView(AllauthConfirmEmailView):
         messages.success(self.request, "You've successfully activated your account.", fail_silently=True)
         return super(ConfirmEmailView, self).post(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_redirect_url(self):
         url = reverse("set_password")
         return url
 
