@@ -191,8 +191,7 @@ class RegistrationFormView(FormView):
             )
             analytics.track(signup_user.email, "Registered")
         else:
-            self.signupform_error_msg = signup_form.errors
-            signup_error = form.instance.get_form_errors()
+            signup_error = signup_form.errors
             if 'password1' in signup_error:
                 signup_error['password'] = signup_error['password1']
             form.errors.update(signup_error)
