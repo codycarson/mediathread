@@ -1,6 +1,10 @@
 # Changelog
 
-### 0.2.8 - 0.2.9
+### 0.2.11
+
+* changed the link to the knowledge base on the invite students template
+
+### 0.2.8 - 0.2.10
 
 * when confirming account/email, user is now correctly redirected to the set password page
 
