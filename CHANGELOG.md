@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.12
+
+* fixed the bug when trying to change the avatar
+
 ### 0.2.11
 
 * changed the link to the knowledge base on the invite students template
