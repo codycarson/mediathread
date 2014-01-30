@@ -21,6 +21,8 @@ media/CACHE
 libpeerconnection.log
 coverage
 collected_static
+.vagrant
 mediathread.db
+secret_vars.yml
 
 /CACHE/

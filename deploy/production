@@ -1,0 +1,5 @@
+[server]
+
+[server:vars]
+remote_user=root
+sendfile=on
