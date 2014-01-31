@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.13
+
+* fixed the bug where a newly registered user is redirected to the set password form
+
 ### 0.2.12
 
 * fixed the bug when trying to change the avatar

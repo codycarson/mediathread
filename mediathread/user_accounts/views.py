@@ -71,13 +71,16 @@ class ConfirmEmailView(AllauthConfirmEmailView):
         # perform login
         email_address_object = self.get_object().email_address
         user_to_login = User.objects.get(email=email_address_object.email)
+        self.default_password = user_to_login.check_password("dummypass")
         login_user(self.request, user_to_login)
         analytics.track(email_address_object.email, "Activated account")
         messages.success(self.request, "You've successfully activated your account.", fail_silently=True)
         return super(ConfirmEmailView, self).post(*args, **kwargs)
 
     def get_redirect_url(self):
-        url = reverse("set_password")
+        url = "/"
+        if getattr(self, 'default_password', False):
+            url = reverse("set_password")
         return url
 
 confirm_email_view = ConfirmEmailView.as_view()
