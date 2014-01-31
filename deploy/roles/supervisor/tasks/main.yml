@@ -5,13 +5,10 @@
 - name: Copy supervisor configuration file
   template: src=supervisord.conf dest=/etc/supervisord.conf
 
+- name: Create a log folder for supervisor
+  file: path=/var/log/supervisor state=directory
+
 - name: Copy supervisor upstart script
   copy: src=supervisord.conf dest=/etc/init/
   notify:
     - restart supervisor
-
-- name: Create a log folder for supervisor
-  file: path=/var/log/supervisor state=directory
-
-- name: Ensure supervisor is running
-  service: name=supervisord state=started
