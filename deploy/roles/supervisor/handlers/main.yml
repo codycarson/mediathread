@@ -1,6 +1,6 @@
 ---
 
-- name: start supervisord
+- name: start supervisor
   action: service name=supervisord state=started
 
 - name: restart supervisor

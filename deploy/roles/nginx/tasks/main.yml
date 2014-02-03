@@ -29,8 +29,8 @@
 
 - name: Copy the virtual host config file
   template: src=nginx_uwsgi.conf dest=/etc/nginx/sites-available/{{app_name}}.conf
+  notify:
+    - reload nginx
 
 - name: Enable the virtual host
   file: path=/etc/nginx/sites-enabled/{{app_name}}.conf src=/etc/nginx/sites-available/{{app_name}}.conf state=link
-  notify:
-    - restart nginx
