@@ -12,6 +12,8 @@
     - libxml2
     - libxml2-dev
     - libxslt1-dev
+    - htop
+    - iotop
 
 - name: Generate locales
   command: locale-gen hr_HR.UTF-8
