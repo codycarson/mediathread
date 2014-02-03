@@ -44,7 +44,7 @@ MEDIA_URL = '/media/'
 
 # Customer.io keys
 CUSTOMERIO_SITE_ID = '{{customerio_site_id}}'
-CUSTOMERIO_API_KEY = '{{customerio_site_id}}'
+CUSTOMERIO_API_KEY = '{{customerio_api_key}}'
 
 # Mailchimp arguments
 MAILCHIMP_API_KEY = '{{mailchimp_api_key}}'
@@ -52,7 +52,7 @@ MAILCHIMP_REGISTRATION_LIST_ID = '{{mailchimp_registration_list_id}}'
 
 # Segment.io key
 SEGMENTIO_API_KEY = '{{segmentio_api_key}}'
-SEGMENTIO_JS_KEY = '3ts2xu858r'
+SEGMENTIO_JS_KEY = '{{segmentio_js_key}}'
 
 # Amazon AWS keys for S3 storage
 AWS_ACCESS_KEY_ID = '{{aws_access_key_id}}'
