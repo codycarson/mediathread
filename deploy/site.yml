@@ -9,6 +9,7 @@
     - pythondev
     - postgresql
     - memcached
+    - newrelic
     - nginx
     - uwsgi
     - app_deployment

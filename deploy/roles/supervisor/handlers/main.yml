@@ -5,3 +5,6 @@
 
 - name: restart supervisor
   action: service name=supervisord state=restarted
+
+- name: reload supervisor config
+  command: supervisorctl update

@@ -11,8 +11,6 @@
 
 - name: Install nginx
   apt: pkg=nginx state=latest
-  notify:
-    - start nginx
 
 - name: Ensure main Nginx configuration file is up to date
   template: src=nginx.conf dest=/etc/nginx/nginx.conf
