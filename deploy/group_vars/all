@@ -12,21 +12,7 @@ memcached_memory: 32
 postgres_user: mediathread
 postgres_password: test
 
-# django settings
-aws_access_key_id:
-aws_secret_access_key:
-customerio_api_key:
-customerio_site_id:
+# django static files
 django_media_dir: "{{git_repo_dir}}/media"
 django_project_dir: "{{git_repo_dir}}/mediathread"
 django_static_dir: "{{git_repo_dir}}/collected_static"
-djangosherd_flickr_apikey:
-mailchimp_api_key:
-mailchimp_registration_list_id:
-mandrill_api_key:
-mandrill_username:
-newrelic_license_key:
-secret_key:
-segmentio_api_key:
-segmentio_js_key:
-sentry_dsn:
