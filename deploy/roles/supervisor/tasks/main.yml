@@ -12,3 +12,6 @@
 
 - name: Copy supervisor upstart script
   copy: src=supervisord.conf dest=/etc/init/
+
+- name: Start supervisord
+  service: name=supervisord state=started

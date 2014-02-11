@@ -28,3 +28,13 @@
       settings=mediathread.settings_digitalocean
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
+
+- name: Run offline compression of the assets
+  django_manage: >
+      command=compress
+      app_path={{git_repo_dir}}
+      settings=mediathread.settings_digitalocean
+      pythonpath={{git_repo_dir}}
+      virtualenv=/opt/venv
+  notify:
+    - reload supervisor config

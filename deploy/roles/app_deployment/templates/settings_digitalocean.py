@@ -36,16 +36,19 @@ DATABASES = {
 
 SECRET_KEY = '{{secret_key}}'
 
-STATIC_ROOT = '{{django_static_dir}}'
-STATIC_URL = '/site_media/'
+
 MEDIA_ROOT = '{{django_media_dir}}'
 MEDIA_URL = '/media/'
+STATIC_ROOT = '{{django_static_dir}}'
 
 COMPRESS_ENABLED = True
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_URL = 'https://mediathread_do.s3.amazonaws.com/'
 COMPRESS_STORAGE = 'mediathread.s3_utils.CachedStaticRootS3BotoStorage'
+STATICFILES_STORAGE = COMPRESS_STORAGE
 COMPRESS_OFFLINE = True
+
+STATIC_URL = COMPRESS_URL
 
 # Customer.io keys
 CUSTOMERIO_SITE_ID = '{{customerio_site_id}}'
