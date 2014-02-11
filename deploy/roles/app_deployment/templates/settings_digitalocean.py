@@ -12,7 +12,6 @@ def get_env_variable(var_name):
         raise ImproperlyConfigured(error_msg)
 
 DEBUG = True
-COMPRESS_ENABLED = False
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
@@ -42,6 +41,12 @@ STATIC_URL = '/site_media/'
 MEDIA_ROOT = '{{django_media_dir}}'
 MEDIA_URL = '/media/'
 
+COMPRESS_ENABLED = True
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_URL = 'https://mediathread_do.s3.amazonaws.com/'
+COMPRESS_STORAGE = 'mediathread.s3_utils.CachedStaticRootS3BotoStorage'
+COMPRESS_OFFLINE = True
+
 # Customer.io keys
 CUSTOMERIO_SITE_ID = '{{customerio_site_id}}'
 CUSTOMERIO_API_KEY = '{{customerio_api_key}}'
@@ -58,7 +63,7 @@ SEGMENTIO_JS_KEY = '{{segmentio_js_key}}'
 AWS_ACCESS_KEY_ID = '{{aws_access_key_id}}'
 AWS_SECRET_ACCESS_KEY = '{{aws_secret_access_key}}'
 AWS_PRELOAD_METADATA = True
-AWS_STORAGE_BUCKET_NAME = 'mediathread-static'
+AWS_STORAGE_BUCKET_NAME = 'mediathread_do'
 
 # Flick API key for clipping photos
 DJANGOSHERD_FLICKR_APIKEY = '{{djangosherd_flickr_apikey}}'
