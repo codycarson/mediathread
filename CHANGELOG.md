@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.15
+
+* refactoring of compress tags in base.html
+
 ### 0.2.14
 
 * moved some S3 settings from app code to settings file
