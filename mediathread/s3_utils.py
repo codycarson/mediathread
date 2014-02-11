@@ -14,9 +14,7 @@ class CachedStaticRootS3BotoStorage(S3BotoStorage):
     S3 storage backend that saves the files locally, too.
     """
     def __init__(self, *args, **kwargs):
-        kwargs['bucket_name'] = 'mediathread-static'
         kwargs['reduced_redundancy'] = True
-        kwargs['gzip'] = False
         super(CachedStaticRootS3BotoStorage, self).__init__(*args, **kwargs)
         self.local_storage = get_storage_class(
             "compressor.storage.CompressorFileStorage")()
