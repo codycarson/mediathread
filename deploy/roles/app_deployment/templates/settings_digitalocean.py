@@ -43,7 +43,7 @@ STATIC_ROOT = '{{django_static_dir}}'
 
 COMPRESS_ENABLED = True
 COMPRESS_ROOT = STATIC_ROOT
-COMPRESS_URL = 'https://mediathread_do.s3.amazonaws.com/'
+COMPRESS_URL = 'http://{{cloudfront_url}}/'
 COMPRESS_STORAGE = 'mediathread.s3_utils.CachedStaticRootS3BotoStorage'
 STATICFILES_STORAGE = COMPRESS_STORAGE
 COMPRESS_OFFLINE = True
