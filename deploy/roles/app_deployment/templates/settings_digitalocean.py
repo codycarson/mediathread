@@ -11,7 +11,7 @@ def get_env_variable(var_name):
         error_msg = "Set the %s environment variable" % var_name
         raise ImproperlyConfigured(error_msg)
 
-DEBUG = True
+DEBUG = False
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
@@ -36,6 +36,11 @@ DATABASES = {
 
 SECRET_KEY = '{{secret_key}}'
 
+ALLOWED_HOSTS = [
+    'mediathread.appsembler.com',
+    '.mediathread.appsembler.com',
+    '107.170.23.107'
+]
 
 MEDIA_ROOT = '{{django_media_dir}}'
 MEDIA_URL = '/media/'
