@@ -17,10 +17,10 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': '127.0.0.1:11211',
     },
-    'johnny' : dict(
-        BACKEND = 'johnny.backends.memcached.PyLibMCCache',
-        LOCATION = ['127.0.0.1:11211'],
-        JOHNNY_CACHE = True,
+    'johnny': dict(
+        BACKEND='johnny.backends.memcached.PyLibMCCache',
+        LOCATION=['127.0.0.1:11211'],
+        JOHNNY_CACHE=True,
     )
 }
 
@@ -54,6 +54,8 @@ COMPRESS_CSS_FILTERS = [
 ]
 AWS_IS_GZIPPED = True
 AWS_QUERYSTRING_EXPIRE = 63115200
+AWS_S3_SECURE_URLS = False
+AWS_S3_CUSTOM_DOMAIN = '{{cloudfront_url}}'
 
 STATIC_URL = COMPRESS_URL
 
