@@ -48,7 +48,7 @@ STATIC_ROOT = '{{django_static_dir}}'
 
 COMPRESS_ENABLED = True
 COMPRESS_ROOT = STATIC_ROOT
-COMPRESS_URL = 'http://{{cloudfront_url}}/'
+COMPRESS_URL = 'https://{{cloudfront_url}}/'
 COMPRESS_STORAGE = 'mediathread.s3_utils.CachedStaticRootS3BotoStorage'
 STATICFILES_STORAGE = COMPRESS_STORAGE
 COMPRESS_OFFLINE = True
@@ -59,7 +59,7 @@ COMPRESS_CSS_FILTERS = [
 ]
 AWS_IS_GZIPPED = True
 AWS_QUERYSTRING_EXPIRE = 63115200
-AWS_S3_SECURE_URLS = False
+AWS_S3_SECURE_URLS = True
 AWS_S3_CUSTOM_DOMAIN = '{{cloudfront_url}}'
 
 STATIC_URL = COMPRESS_URL
