@@ -8,10 +8,6 @@ venv_dir: /opt/venv/
 # memcached config
 memcached_memory: 32
 
-# postgres config
-postgres_user: mediathread
-postgres_password: test
-
 # django static files
 cloudfront_url: "d1s9voh9zis26j.cloudfront.net" # without the http(s) part and the trailing slash
 django_media_dir: "{{git_repo_dir}}/media"

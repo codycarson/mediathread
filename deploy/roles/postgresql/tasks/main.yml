@@ -8,7 +8,7 @@
 - name: Install PostgreSQL
   apt: pkg={{item}} state=latest
   with_items:
-    - postgresql
+    - postgresql-9.3
     - libpq-dev
   notify:
     - restart postgres
