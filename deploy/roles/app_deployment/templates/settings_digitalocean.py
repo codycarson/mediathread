@@ -24,6 +24,12 @@ CACHES = {
     )
 }
 
+MIDDLEWARE_CLASSES = ('django.middleware.cache.UpdateCacheMiddleware',) + \
+                    MIDDLEWARE_CLASSES + \
+                    ('django.middleware.cache.FetchFromCacheMiddleware',)
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
