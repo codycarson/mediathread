@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.17
+
+* serves jsi18n as a static file
+
 ### 0.2.16
 
 * removed some uncompressable assets from the compress block
