@@ -1,5 +1,6 @@
 # application config
 app_name: mediathread
+backups_dir: /opt/backups
 git_repo_branch: appsembler_master
 git_repo_dir: /opt/mediathread
 server_name: mediathread.appsembler.com
@@ -13,3 +14,6 @@ cloudfront_url: "d1s9voh9zis26j.cloudfront.net" # without the http(s) part and t
 django_media_dir: "{{git_repo_dir}}/media"
 django_project_dir: "{{git_repo_dir}}/mediathread"
 django_static_dir: "{{git_repo_dir}}/collected_static"
+
+#backups
+s3_backup_bucket: mediathreadbackups
