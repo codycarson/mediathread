@@ -155,8 +155,8 @@ class CourseCreateFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(CourseCreateFormView, self).get_context_data(**kwargs)
-        courses_num = self.request.user.groups.filter(name__startswith='faculty').count()
-        if courses_num >= 1:
+        courses_left = self.request.user.profile.courses_left
+        if courses_left == 0:
             context['limit_reached'] = True
         return context
 

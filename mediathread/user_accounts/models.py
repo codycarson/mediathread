@@ -30,6 +30,7 @@ class UserProfile(models.Model):
     subscribe_to_newsletter = models.BooleanField(default=False)
     position_title = models.CharField(max_length=30, choices=POSITION_CHOICES, blank=True)
     user_type = models.CharField(max_length=15, choices=USER_TYPES, default='student')
+    courses_left = models.IntegerField(default=1)
 
     def __unicode__(self):
         name = self.user.get_full_name() or self.user.username

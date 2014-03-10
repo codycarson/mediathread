@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.3.0
+
+* added a set of ansible scripts for automating provisioning and deployment
+* number of courses limit is now individual for a user
+
 ### 0.2.17
 
 * serves jsi18n as a static file
