@@ -109,7 +109,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'mediathread.main.views.django_settings',
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
-'stagingcontext.staging_processor',
+    'stagingcontext.staging_processor',
 )
 
 MIDDLEWARE_CLASSES = [
@@ -123,8 +123,8 @@ MIDDLEWARE_CLASSES = [
     'courseaffils.middleware.CourseManagerMiddleware',
     'mediathread.main.middleware.AuthRequirementMiddleware',
     'mediathread.course.middleware.CallToActionMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware'
-)
+    'django.contrib.messages.middleware.MessageMiddleware',
+]
 
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
