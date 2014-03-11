@@ -1,25 +1,23 @@
-<!--
-/*
-window.jQ.ajax({
-    url: window.post_url, 
-    crossDomain: true,
-    type: 'POST',
-    data: post_data,
-    contentType: 'text/html,application/xhtml+xml,application/xml})
-*/
--->
-{{ user }}
-<h1>{{ action }}, {{ asset_url }}</h1>
-asdasdas
+{% ifequal action "collection" %}
+	<script type="text/javascript">
+		window.location.replace('/asset/')
+	</script>
+{% endifequal %}
 
-<script>
-function cont(){
-	window.close();
-}
+{% ifequal action "cont" %}
+	<script type="text/javascript">
+		window.close()
+	</script>
+{% endifequal %}
 
-function goto_asset_url(){
-	window
-}
+{% ifequal action "analyze" %}
+	<script type="text/javascript">
+		window.location.replace('/asset/most_recent/')
+	</script>
+{% endifequal %}
 
-var action ={{action}}();
-</script>
+{% ifequal action None %}
+	<script type="text/javascript">
+		window.location.replace('{{ asset_url }}')
+	</script>
+{% endifequal %}

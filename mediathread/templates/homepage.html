@@ -14,8 +14,7 @@
     <script type="text/javascript" src="{% static 'jquery/js/jquery.websitetour.js' %}"></script>    
 {% endblock %}
 
-{% block extra_js %}
-    {{ block.super }}
+{% block uncompressable_js %}      
 <script type="text/javascript">
         jQuery(document).ready(function() {
             var projectList = new ProjectList({
@@ -76,7 +75,7 @@
                 });
             {% endif %}
         });
-    </script>
+    </script>    
 {% endblock %}
 
 {% block standardnav_help %}

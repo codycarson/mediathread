@@ -1,3 +1,6 @@
+#pylint: disable-msg=R0904
+#pylint: disable-msg=E1103
+#pylint: disable-msg=C0302
 from courseaffils.models import Course
 from mediathread.main import course_details
 from tastypie.test import ResourceTestCase
@@ -7,6 +10,9 @@ class SherdNoteResourceTest(ResourceTestCase):
     # Use ``fixtures`` & ``urls`` as normal. See Django's ``TestCase``
     # documentation for the gory details.
     fixtures = ['unittest_sample_course.json']
+
+    def get_credentials(self):
+        return None
 
     def assertNoteEquals(self, note, aid, title, author, is_global_annotation):
         self.assertEquals(note['asset_id'], aid)
@@ -479,8 +485,7 @@ class SherdNoteResourceTest(ResourceTestCase):
         response = self.api_client.get('/_main/api/v1/sherdnote/',
                                        format='json')
 
-        json = self.deserialize(response)
-        objects = json['objects']
+        objects = self.deserialize(response)['objects']
         self.assertEquals(len(objects), 12)
 
         self.assertNoteEquals(objects[0], '1', 'Manage Sources',

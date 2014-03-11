@@ -31,6 +31,8 @@
             <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" media="screen" />
         {% endcompress %}
         {% block css %}{% endblock %}
+{% block uncompressable_css %}            
+        {% endblock %}
         <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
         <script type="text/javascript">
             jQuery(function(){
@@ -144,7 +146,11 @@
                             </li>
                             
                             <li>
-                                <div unselectable="on"><a href="/contact/">Contact Us</a></div>
+			      {% if request.user.is_authenticated and course %}
+			          <div unselectable="on"><a href="/contact/">Contact Us</a></div>
+                              {% else %}{% if settings.PUBLIC_CONTACT_EMAIL %}
+                                  <div unselectable="on"><a href="mailto:{{settings.PUBLIC_CONTACT_EMAIL}}">Contact Us</a></div>
+                              {% endif %}{% endif %}
                             </li>
                         {% else %}
                             <li><div unselectable="on"><a href="/help/">Help</a></div></li>
@@ -162,6 +168,7 @@
                     {% endfor %}</ul>
                 {% endif %}
             {% endblock messages %}
+{% block courseinformation %}
             <div id="course_information">
                 <h1 id="course_title">
                 {% block coursetitle %}
@@ -170,6 +177,7 @@
                 </h1>
                 <div class="clear: right;"></div>
             </div>
+            {% endblock %}
             
         	</div><!-- id="header" -->
     
@@ -229,28 +237,28 @@
 		
         </div><!-- id="footer" -->
     {% endblock %}
-    
-        <script type="text/javascript">
-            var lt = String.fromCharCode(60);
-            if (window.jQuery) {
-                jQuery.noConflict();
-            }
-             
-            var MediaThread = new (function() {
-                this.templates = {};
-                {% if request.user.is_authenticated %}
-                    this.current_user = {{request.user.id}};
-                    this.current_username = "{{request.user.username}}";
-                    this.user_full_name = "{%public_name for request.user %}";
-                {% endif %}
-            })();
-        </script>
+<script type="text/javascript">
+        var lt = String.fromCharCode(60);
+        if (window.jQuery) {
+            jQuery.noConflict();
+        }
+         
+        var MediaThread = new (function() {
+            this.templates = {};
+            {% if request.user.is_authenticated %}
+                this.current_user = {{request.user.id}};
+                this.current_username = "{{request.user.username}}";
+                this.user_full_name = "{%public_name for request.user %}";
+            {% endif %}
+        })();
+    </script>
 
         {% compress js %}
             <script type="text/javascript" src="{% static 'js/app/json2.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/util.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/ajaxDelete.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/analytics.js' %}"></script>
+        }
             <script type="text/javascript" src="{% static 'js/app/browserdetect.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/mediathread_mustache.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/panel.js' %}"></script>
@@ -268,31 +276,6 @@
             <script type="text/javascript" src="{% static 'js/app/projects/projectpanel.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/projects/projectlist.js' %}"></script>
         {% endcompress %}
-
-    
-        {% if not settings.DEBUG %}
-            <script>                
-                {% if settings.GOOGLE_ANALYTICS_ID %}
-                    var _gaq = _gaq || [];
-                    _gaq.push(['_setAccount', '{{settings.GOOGLE_ANALYTICS_ID}}']);
-                    _gaq.push(['_trackPageview']);
-            
-                    (function () {
-                        var ga = document.createElement('script');
-                        ga.type = 'text/javascript';
-                        ga.async = true;
-                        ga.src = ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                        var s = document.getElementsByTagName('script')[0];
-                        s.parentNode.insertBefore(ga, s);
-                    })();
-                
-                    var analytics = new MediathreadAnalytics(_gaq);
-                {% endif %}
-            </script>
-        {% endif %}        
-           
-    
-
 
         <script type="text/javascript">
             jQuery(document).ready(function() {
@@ -324,13 +307,14 @@
                 jQuery("body").click(function() {
                    jQuery("div.settings_submenu").hide();
                    jQuery("div.settings_menu").removeClass("open").addClass("closed");
+                   jQuery("a.switcher-top.menuopen").click();
                 });      
             });
         </script>
         
         {% block js %}{% endblock %}
     {% block extra_js %}
-        {% if not settings.DEBUG %}
+    {% if not settings.DEBUG %}
             <script>
                 {% if settings.GOOGLE_ANALYTICS_ID %}
                     var _gaq = _gaq || [];
@@ -338,6 +322,7 @@
                     _gaq.push(['_trackPageview']);
 
                     (function () {
+                (function () {
                         var ga = document.createElement('script');
                         ga.type = 'text/javascript';
                         ga.async = true;
@@ -346,8 +331,9 @@
                         s.parentNode.insertBefore(ga, s);
                     })();
 
-                    var analytics = new MediathreadAnalytics(_gaq);
+var analytics = new MediathreadAnalytics(_gaq);
                 {% endif %}
+                
             </script>
         {% endif %}
 
@@ -361,12 +347,12 @@
             });
         </script>
     {% endif %}
+    
+    {% block uncompressable_js %}{% endblock %}        
+    
 {% if STAGING_ENV %}
-<div class="alert alert-error"
- style="position: fixed; bottom: 0px; background-color: #fee; border: #f00 solid 1px;">
-<h4>Warning: Staging Site</h4>
-<p>You are viewing a staging version of this site, not the production site.</p>
-<p>This site was last updated on: <b>{{STAGING_DEPLOY_TIME}}</b></p>
+<div class="alert alert-error" style="position: fixed; bottom: 0px; background-color: #fee; border: #f00 solid 1px; width: 100%;">
+<h4>&nbsp;Warning: You are viewing a staging version of this site, not the production site.&nbsp;&nbsp;&nbsp;Last Updated: <b>{{STAGING_DEPLOY_TIME}}</b></h4>
 </div>
 {% endif %}
 </body>

@@ -10,6 +10,7 @@ import errno
 import os
 import selenium.webdriver.support.ui as ui
 import time
+
 try:
     from lxml import html
     from selenium import webdriver
@@ -36,10 +37,8 @@ def reset_database(variables):
 @before.all
 def setup_browser():
     world.browser = None
-    browser = getattr(settings, 'BROWSER', None)
-    if browser is None:
-        raise Exception('Please configure a browser in settings_test.py')
-    elif browser == 'Firefox':
+    browser = getattr(settings, 'BROWSER', "Chrome")
+    if browser == 'Firefox':
         ff_profile = FirefoxProfile()
         ff_profile.set_preference("webdriver_enable_native_events", False)
         world.browser = webdriver.Firefox(ff_profile)
@@ -89,10 +88,11 @@ def access_url(step, url):
 @step(u'the ([^"]*) workspace is loaded')
 def the_name_workspace_is_loaded(step, name):
     workspace_id = None
-    if (name == "composition" or
-        name == "assignment" or
+    if (name == "composition" or name == "assignment" or
             name == "home" or name == "collection"):
         workspace_id = "loaded"
+    elif name == "asset":
+        workspace_id = "asset-loaded"
     else:
         assert False, "No selector configured for %s" % name
 
@@ -110,6 +110,13 @@ def i_am_username_in_course(step, username, coursename):
     if world.using_selenium:
         world.browser.get(django_url("/accounts/logout/"))
         world.browser.get(django_url("accounts/login/?next=/"))
+
+        elt = find_button_by_value("Guest Log In")
+        if elt is None:
+            time.sleep(1)
+            elt = find_button_by_value("Guest Log In")
+        elt.click()
+
         username_field = world.browser.find_element_by_id("id_login")
         username_field.send_keys(username)
 

@@ -1,4 +1,6 @@
+#pylint: disable-msg=W0401
 # flake8: noqa
-from test_api import *
-from test_homepage import *
-from test_views import *
+from mediathread.main.tests.test_api import *
+from mediathread.main.tests.test_homepage import *
+from mediathread.main.tests.test_views import *
+from mediathread.main.tests.test_import_course import *

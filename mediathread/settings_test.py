@@ -1,9 +1,12 @@
 # flake8: noqa
 from settings_shared import *
 
+COMPRESS_ROOT = '/Users/sdreher/workspace/mediathread/media'
+COMPRESS_ENABLED = True
+
 STATSD_HOST = '127.0.0.1'
 
-DEBUG = True
+DEBUG = False
 
 DATABASES = {
     'default': {
@@ -54,6 +57,7 @@ class ExceptionLoggingMiddleware(object):
         import traceback
         print traceback.format_exc()
 
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -64,5 +68,10 @@ MIDDLEWARE_CLASSES = (
     'mediathread.main.middleware.AuthRequirementMiddleware',
     'mediathread.course.middleware.CallToActionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'mediathread.settings_test.ExceptionLoggingMiddleware'
+    'mediathread.settings_test.ExceptionLoggingMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False
+}

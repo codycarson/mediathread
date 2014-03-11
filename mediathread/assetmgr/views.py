@@ -1,3 +1,4 @@
+#pylint: disable-msg=C0302
 from courseaffils.lib import in_course, in_course_or_404, AUTO_COURSE_SELECT
 from courseaffils.models import CourseAccess
 from django.conf import settings
@@ -7,9 +8,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, \
-    HttpResponseRedirect
+    HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.template import RequestContext, loader
 from djangohelpers.lib import allow_http
 from mediathread.api import UserResource, TagResource
 from mediathread.assetmgr.api import AssetResource, AssetSummaryResource
@@ -57,17 +58,20 @@ def archive_add_or_remove(request):
 
 @login_required
 def asset_switch_course(request, asset_id):
-    asset = Asset.objects.get(pk=asset_id)
-    in_course_or_404(request.user.username, asset.course)
+    try:
+        asset = Asset.objects.get(pk=asset_id)
+        in_course_or_404(request.user.username, asset.course)
 
-    # the user is logged into the wrong class?
-    rv = {}
-    rv['switch_to'] = asset.course
-    rv['switch_from'] = request.course
-    rv['redirect'] = reverse('asset-view', args=[asset_id])
-    return render_to_response('assetmgr/asset_not_found.html',
-                              rv,
-                              context_instance=RequestContext(request))
+        # the user is logged into the wrong class?
+        rv = {}
+        rv['switch_to'] = asset.course
+        rv['switch_from'] = request.course
+        rv['redirect'] = reverse('asset-view', args=[asset_id])
+        return render_to_response('assetmgr/asset_not_found.html',
+                                  rv,
+                                  context_instance=RequestContext(request))
+    except Asset.DoesNotExist:
+        raise Http404("This item does not exist.")
 
 
 @login_required
@@ -149,6 +153,16 @@ def _parse_user(request):
     return user
 
 
+@login_required
+@allow_http("GET", "POST")
+def most_recent(request):
+    user = request.user
+    user_id = user.id
+    asset = Asset.objects.filter(author_id=user_id).order_by('-modified')[0]
+    asset_id = str(asset.id)
+    return HttpResponseRedirect('/asset/' + asset_id + '/')
+
+
 # @login_required #no login, so server2server interface is possible
 @allow_http("POST")
 def asset_create(request):
@@ -163,7 +177,6 @@ def asset_create(request):
     req_dict = getattr(request, request.method)
     user = _parse_user(request)
     metadata = _parse_metadata(req_dict)
-
     title = req_dict.get('title', '')
     asset = Asset.objects.get_by_args(req_dict, asset__course=request.course)
 
@@ -182,8 +195,8 @@ def asset_create(request):
                     source.save()
 
             if "tag" in metadata:
-                for t in metadata["tag"]:
-                    asset.save_tag(user, t)
+                for each_tag in metadata["tag"]:
+                    asset.save_tag(user, each_tag)
 
             asset.metadata_blob = simplejson.dumps(metadata)
             asset.save()
@@ -195,21 +208,29 @@ def asset_create(request):
 
     # create a global annotation
     asset.global_annotation(user, True)
-
     asset_url = reverse('asset-view', args=[asset.id])
-
     source = request.POST.get('asset-source', "")
 
     if source == 'bookmarklet':
+        # bookmarklet create
         asset_url += "?level=item"
 
-    # for bookmarklet mass-adding
-    if request.REQUEST.get('noui', '').startswith('postMessage'):
+        template = loader.get_template('assetmgr/analyze.html')
+        context = RequestContext(request, {
+            'request': request,
+            'user': user,
+            'action': request.POST.get('button', None),
+            'asset_url': asset_url
+        })
+        return HttpResponse(template.render(context))
+    elif request.REQUEST.get('noui', '').startswith('postMessage'):
+        # for bookmarklet mass-adding
         return render_to_response('assetmgr/interface_iframe.html',
                                   {'message': ('%s|%s' %
                                    (request.build_absolute_uri(asset_url)),
                                    request.REQUEST['noui']), })
     elif request.is_ajax():
+        # unsure when asset_create is called via ajax
         return HttpResponse(serializers.serialize('json', asset),
                             mimetype="application/json")
     elif "archive" == asset.primary.label:
@@ -218,6 +239,7 @@ def asset_create(request):
         url = "%s?newsrc=%s" % (redirect_url, asset.title)
         return HttpResponseRedirect(url)
     else:
+        # server2server create
         return HttpResponseRedirect(asset_url)
 
 
@@ -270,13 +292,13 @@ def sources_from_args(request, asset=None):
             src_metadata = args.get(key + '-metadata', None)
             if src_metadata:
                 # w{width}h{height};{mimetype} (with mimetype and w+h optional)
-                m = re.match('(w(\d+)h(\d+))?(;(\w+/[\w+]+))?',
-                             src_metadata).groups()
-                if m[1]:
-                    source.width = int(m[1])
-                    source.height = int(m[2])
-                if m[4]:
-                    source.media_type = m[4]
+                the_match = re.match('(w(\d+)h(\d+))?(;(\w+/[\w+]+))?',
+                                     src_metadata).groups()
+                if the_match[1]:
+                    source.width = int(the_match[1])
+                    source.height = int(the_match[2])
+                if the_match[4]:
+                    source.media_type = the_match[4]
             sources[key] = source
 
     for lbl in Asset.primary_labels:
@@ -338,9 +360,15 @@ def annotation_create_global(request, asset_id):
 def annotation_save(request, asset_id, annot_id):
     try:
         # Verify annotation exists
-        SherdNote.objects.get(pk=annot_id,
-                              asset=asset_id,
-                              asset__course=request.course)
+        ann = SherdNote.objects.get(pk=annot_id,
+                                    asset=asset_id,
+                                    asset__course=request.course)
+
+        if (ann.is_global_annotation() and
+            'asset-title' in request.POST and
+                (request.user.is_staff or request.user == ann.asset.author)):
+            ann.asset.title = request.POST.get('asset-title')
+            ann.asset.save()
 
         form = request.GET.copy()
         form['next'] = '.'
@@ -422,12 +450,11 @@ def source_specialauth(request, url, key):
 
 
 def final_cut_pro_xml(request, asset_id):
-    user = request.user
-    if not user.is_staff:
+    if not request.user.is_staff:
         return HttpResponseForbidden()
 
-    "support for http://developer.apple.com/mac/library/documentation/ \
-    AppleApplications/Reference/FinalCutPro_XML/Topics/Topics.html"
+    '''support for http://developer.apple.com/mac/library/documentation/ \
+    AppleApplications/Reference/FinalCutPro_XML/Topics/Topics.html'''
     try:
         from xmeml import VideoSequence
         # http://github.com/ccnmtl/xmeml
@@ -438,22 +465,21 @@ def final_cut_pro_xml(request, asset_id):
             return HttpResponse("Not Found: This annotation's asset does not \
             have a Final Cut Pro source XML associated with it", status=404)
 
-        f = urllib2.urlopen(xmeml.url)
-        assert f.code == 200
-        v = VideoSequence(xml_string=f.read())
+        the_file = urllib2.urlopen(xmeml.url)
+        assert the_file.code == 200
+        the_video = VideoSequence(xml_string=the_file.read())
 
         clips = []
-
         keys = request.POST.keys()
         keys.sort(key=lambda x: int(x))
         for key in keys:
-            sherd_id = request.POST.get(key)
-            ann = asset.sherdnote_set.get(id=sherd_id, range1__isnull=False)
+            ann = asset.sherdnote_set.get(id=request.POST.get(key),
+                                          range1__isnull=False)
             if ann:
-                clip = v.clip(ann.range1, ann.range2, units='seconds')
+                clip = the_video.clip(ann.range1, ann.range2, units='seconds')
                 clips.append(clip)
 
-        xmldom, dumb_uuid = v.clips2dom(clips)
+        xmldom, dumb_uuid = the_video.clips2dom(clips)
         res = HttpResponse(xmldom.toxml(), mimetype='application/xml')
         res['Content-Disposition'] = \
             'attachment; filename="%s.xml"' % asset.title
@@ -498,13 +524,14 @@ def asset_references(request, asset_id):
         the_json['tags'] = TagResource(request.course).filter(request, filters)
 
         the_json['vocabulary'] = []
-        for v in Vocabulary.objects.get_for_object(request.course):
-            filters['vocabulary'] = v.id
+        for vocab in Vocabulary.objects.get_for_object(request.course):
+            filters['vocabulary'] = vocab.id
             concepts = TermRelationshipResource(request.course).filter(request,
                                                                        filters)
             if len(concepts):
-                the_json['vocabulary'].append({'display_name': v.display_name,
-                                               'term_set': concepts})
+                the_json['vocabulary'].append(
+                    {'display_name': vocab.display_name,
+                     'term_set': concepts})
 
         # DiscussionIndex is misleading. Objects returned are
         # projects & discussions title, object_pk, content_type, modified
@@ -600,9 +627,11 @@ def render_assets(request, record_owner, assets):
     asset_json = resource.render_list(request, assets)
 
     active_filters = {}
-    for k, val in request.GET.items():
-        if (k == 'tag' or k == 'modified' or k.startswith('vocabulary-')):
-            active_filters[k] = val
+    for key, val in request.GET.items():
+        if (key == 'tag' or
+                key == 'modified' or
+                key.startswith('vocabulary-')):
+            active_filters[key] = val
 
     user_resource = UserResource()
 
@@ -640,22 +669,22 @@ def render_assets(request, record_owner, assets):
     note_ids = [n.id for n in active_notes]
     content_type = ContentType.objects.get_for_model(SherdNote)
     term_resource = TermResource()
-    for v in Vocabulary.objects.get_for_object(request.course):
+    for vocab in Vocabulary.objects.get_for_object(request.course):
         vocabulary = {
-            'id': v.id,
-            'display_name': v.display_name,
+            'id': vocab.id,
+            'display_name': vocab.display_name,
             'term_set': []
         }
-        related = TermRelationship.objects.filter(term__vocabulary=v,
+        related = TermRelationship.objects.filter(term__vocabulary=vocab,
                                                   content_type=content_type,
                                                   object_id__in=note_ids)
 
         terms = []
-        for r in related:
-            if r.term.display_name not in terms:
-                the_term = term_resource.render_one(request, r.term)
+        for rel in related:
+            if rel.term.display_name not in terms:
+                the_term = term_resource.render_one(request, rel.term)
                 vocabulary['term_set'].append(the_term)
-                terms.append(r.term.display_name)
+                terms.append(rel.term.display_name)
 
         active_vocabulary.append(vocabulary)
 
@@ -683,8 +712,6 @@ def detail_asset_json(request, asset):
     help_setting = \
         UserSetting.get_setting(request.user, "help_item_detail_view", True)
 
-    rv = {'type': 'asset',
-          'assets': {asset.pk: the_json},
-          'user_settings': {'help_item_detail_view': help_setting}}
-
-    return rv
+    return {'type': 'asset',
+            'assets': {asset.pk: the_json},
+            'user_settings': {'help_item_detail_view': help_setting}}

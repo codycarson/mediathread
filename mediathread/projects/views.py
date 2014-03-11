@@ -1,5 +1,5 @@
 import analytics
-from courseaffils.lib import in_course, in_course_or_404
+from courseaffils.lib import in_course, in_course_or_404, get_public_name
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import get_model
@@ -24,9 +24,6 @@ import simplejson
 @login_required
 @allow_http("POST")
 def project_create(request):
-    if request.method != "POST":
-        return HttpResponseForbidden("forbidden")
-
     user = request.user
     course = request.course
     in_course_or_404(user, course)
@@ -79,10 +76,11 @@ def project_create(request):
 
 @login_required
 @allow_http("POST")
+@ajax_required
 def project_save(request, project_id):
     project = get_object_or_404(Project, pk=project_id, course=request.course)
 
-    if not project.can_edit(request) or not request.method == "POST":
+    if not project.can_edit(request):
         return HttpResponseRedirect(project.get_absolute_url())
 
     # verify user is in course
@@ -101,19 +99,18 @@ def project_save(request, project_id):
 
         projectform.instance.collaboration(request, sync_group=True)
 
-        if request.META.get('HTTP_ACCEPT', '').find('json') >= 0:
-            v_num = projectform.instance.get_latest_version()
-            return HttpResponse(simplejson.dumps({
-                'status': 'success',
-                'is_assignment': projectform.instance.is_assignment(request),
-                'title': projectform.instance.title,
-                'revision': {
-                    'id': v_num,
-                    'public_url': projectform.instance.public_url(),
-                    'visibility': project.visibility_short(),
-                    'due_date': project.get_due_date()
-                }
-            }, indent=2), mimetype='application/json')
+        v_num = projectform.instance.get_latest_version()
+        return HttpResponse(simplejson.dumps({
+            'status': 'success',
+            'is_assignment': projectform.instance.is_assignment(request),
+            'title': projectform.instance.title,
+            'revision': {
+                'id': v_num,
+                'public_url': projectform.instance.public_url(),
+                'visibility': project.visibility_short(),
+                'due_date': project.get_due_date()
+            }
+        }, indent=2), mimetype='application/json')
     else:
         ctx = {'status': 'error', 'msg': ""}
         for key, value in projectform.errors.items():
@@ -121,7 +118,7 @@ def project_save(request, project_id):
                 ctx['msg'] = ctx['msg'] + value[0] + "\n"
             else:
                 ctx['msg'] = \
-                    '%s "%s" is not valid for the %s field.\n Please %s\n' % \
+                    '%s "%s" is not valid for the %s field.\n %s\n' % \
                     (ctx['msg'], projectform.data[key],
                      projectform.fields[key].label,
                      value[0].lower())
@@ -168,6 +165,25 @@ def project_reparent(request, assignment_id, composition_id):
         parent_collab.append_child(composition)
 
     return HttpResponseRedirect('/')
+
+
+@login_required
+def project_revisions(request, project_id):
+    project = get_object_or_404(Project, pk=project_id, course=request.course)
+
+    if not project.is_participant(request.user):
+        return HttpResponseForbidden("forbidden")
+
+    data = {}
+    data['revisions'] = [{
+        'version_number': v.version_number,
+        'versioned_id': v.versioned_id,
+        'author': get_public_name(v.instance().author, request),
+        'modified': v.modified.strftime("%m/%d/%y %I:%M %p")}
+        for v in project.versions.order_by('-change_time')]
+
+    return HttpResponse(simplejson.dumps(data, indent=2),
+                        mimetype='application/json')
 
 
 @allow_http("GET")
@@ -278,12 +294,9 @@ def project_workspace(request, project_id, feedback=None):
         vocabulary = VocabularyResource().render_list(
             request, Vocabulary.objects.get_for_object(request.course))
 
-        user_resource = UserResource()
-        owners = user_resource.render_list(request, request.course.members)
+        owners = UserResource().render_list(request, request.course.members)
 
-        course = request.course
-        is_faculty = course.is_faculty(request.user)
-        is_assignment = project.is_assignment(request)
+        is_faculty = request.course.is_faculty(request.user)
         can_edit = project.can_edit(request)
         feedback_discussion = project.feedback_discussion() \
             if is_faculty or can_edit else None
@@ -298,11 +311,10 @@ def project_workspace(request, project_id, feedback=None):
 
             assignment_context['create_selection'] = True
 
-            display = "open" if (project.title == "Untitled" and
-                                 len(project.body) == 0) else "closed"
-
             panel = {'is_faculty': is_faculty,
-                     'panel_state': display,
+                     'panel_state': "open" if (project.title == "Untitled" and
+                                               len(project.body) == 0)
+                     else "closed",
                      'subpanel_state': 'closed',
                      'context': assignment_context,
                      'owners': owners,
@@ -331,7 +343,7 @@ def project_workspace(request, project_id, feedback=None):
         # Project Response -- if the requested project is an assignment
         # This is primarily a student view. The student's response should
         # pop up automatically when the parent assignment is viewed.
-        if is_assignment:
+        if project.is_assignment(request):
             responses = project.responses_by(request, request.user)
             if len(responses) > 0:
                 response = responses[0]
