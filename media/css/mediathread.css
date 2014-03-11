@@ -1077,10 +1077,10 @@ div.button-form form, div.button-form.inline form {
 
 
 /* LOGIN PAGE */
-#id_username, #id_password {
-    width: 125px;
-    border: 1px solid #333333;    
-}
+/*#id_login, #id_password {*/
+    /*width: 125px;*/
+    /*border: 1px solid #333333;    */
+/*}*/
 
 .login-wrap {
 	max-width: 960px;

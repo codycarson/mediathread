@@ -31,8 +31,7 @@
             <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css" media="screen" />
         {% endcompress %}
         {% block css %}{% endblock %}
-{% block uncompressable_css %}            
-        {% endblock %}
+        {% block uncompressable_css %}{% endblock %}
         <script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
         <script type="text/javascript">
             jQuery(function(){

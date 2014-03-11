@@ -1,11 +1,12 @@
 {% extends "base.html" %}
-{% load smartif revision static %}
+{% load smartif revision compress static %}
 
 {% block title %}
     {% if project.title %}{{project.title}}{% else %}New Composition{% endif %}
 {% endblock %}
 
 {% block css %}
+    {% compress css %}
 	<link rel="stylesheet" href="{% static 'js/select2/select2.css' %}" media="screen" />
     <link rel="stylesheet" href="{% static 'css/project.css' %}"  media="screen" />
     <link rel="stylesheet" href="{% static 'css/project.print.css' %}"  media="print" />
@@ -13,19 +14,11 @@
     
     <!--All the annotation css -->
     {% include "djangosherd/annotator_resources_css.html" %}
+    {% endcompress %}
 {% endblock %}
 
-{% block extrahead %}
+{% block uncompressable_css %}
     <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}" media="screen" />
-    
-    <!--  admin functionality for the select box -->
-    <script type="text/javascript" src="{% static 'admin/js/jquery.js' %}"></script>
-    <script type="text/javascript" src="{% static 'admin/js/jquery.init.js' %}"></script>
-    <script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
-    <script type="text/javascript" src="{% static 'admin/js/SelectFilter2.js' %}"></script>
-    <script type="text/javascript" src="{% static 'admin/js/SelectBox.js' %}"></script>    
-    
-    <script type="text/javascript" src="{% static 'js/select2/select2.min.js' %}"></script>
 {% endblock %}
 
 {% block js %}
