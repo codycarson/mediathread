@@ -63,7 +63,7 @@ COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.CSSMinFilter'
 ]
-AWS_IS_GZIPPED = True
+AWS_IS_GZIPPED = False
 AWS_QUERYSTRING_EXPIRE = 63115200
 AWS_S3_SECURE_URLS = True
 AWS_S3_CUSTOM_DOMAIN = '{{cloudfront_url}}'
