@@ -301,8 +301,8 @@ SherdBookmarklet = {
                                success:function(fpxdata,textStatus) {
                                    var f = fpxdata[0];
                                    obj.sources["fsiviewer"] = "http://viewer2.artstor.org/erez3/fsi4/fsi.swf";
-                                   obj.sources["image_fpx"] = f.imageServer+f.imageUrl;
-                                   obj.sources["image_fpx-metadata"] = "w"+f.width+"h"+f.height;
+                                   obj.sources["image_fpxid"] = obj.artstorId;
+                                   obj.sources["image_fpxid-metadata"] = "w"+f.width+"h"+f.height;
                                    if (--done==0) obj_final();
                                },
                                error:function(){
@@ -447,12 +447,17 @@ SherdBookmarklet = {
         find:function(callback) {
             SherdBookmarklet.run_with_jquery(function(jQuery) { 
                 var apikey = SherdBookmarklet.options.flickr_apikey;
-                if (!apikey) 
-                    return callback([]);
+                if (!apikey)
+                    SherdBookmarklet.options.flickr_apikey = '123';
+                    //return callback([]);
 
                 var bits = document.location.pathname.split("/");//expected:/photos/<userid>/<imageid>/
                 var imageId = bits[3];
-
+                window.imageId = imageId;
+                if(imageId == undefined){
+                  return callback([]);
+                };
+                
                 if (imageId.length < 1 || imageId.search(/\d{1,12}/) < 0)
                     return callback([]);
 
@@ -461,7 +466,7 @@ SherdBookmarklet = {
                     +apikey+"&photo_id="+imageId
                     + ((SherdBookmarklet.options.cross_origin) ? '&nojsoncallback=1' : '&jsoncallback=?');
                 jQuery.getJSON(baseUrl + "&method=flickr.photos.getInfo",function(getInfoData) {
-                        if (getInfoData.photo.media=="video") {
+                        if (getInfoData.photo == undefined || getInfoData.photo.media=="video") {
                             /*video is unsupported*/
                             return callback([]);
                         }
@@ -700,6 +705,33 @@ SherdBookmarklet = {
             });
           }
     },
+    "vimeo.com": {
+        find: function(callback) {
+            SherdBookmarklet.run_with_jquery(function _find(jQuery) {
+                var videos = document.getElementsByTagName("video");
+                if (videos.length < 1) {
+                    var message = "This Vimeo page does not contain videos accessible to the bookmarklet. Try clicking into a single video page.";
+                    alert(message);
+                    callback([]); // no items found
+                } else {
+                    // parse vimeo id out of the fallback url
+                    var video = videos[0];                
+                    var parent = jQuery(video).parents("div.player")[0];
+                    var url = jQuery(parent).attr("data-fallback-url");
+                    var vimeoId = url.split("/")[5];
+                    
+                    SherdBookmarklet.assethandler.objects_and_embeds.players
+                    .moogaloop.asset(video, 
+                                     vimeoId,
+                                     {'window':window,'document':document},
+                                     0,
+                                     function(ind,rv){ callback([rv]); });
+                }
+            }); //end run_with_jquery for vimeo.com
+        },
+        decorate:function(objs) {
+        }
+    },
     "youtube.com": {
         find:function(callback) {
             SherdBookmarklet.run_with_jquery(function _find(jQuery) {
@@ -867,7 +899,7 @@ SherdBookmarklet = {
                           c = obj.getConfig(), 
                           pcfg = obj.getPluginConfig('http');
                       if (item.type == 'rtmp') {
-                      	 // ensure that mp4 rtmp files contain the
+                         // ensure that mp4 rtmp files contain the
                          // needed mp4: prefix so that they will play
                          // properly in flowplayer;
                          // JW Player allows you to omit this prefix,
@@ -1117,58 +1149,64 @@ SherdBookmarklet = {
                   asset:function(objemb,match_rv,context,index,optional_callback) {
                       var jQ = (window.SherdBookmarkletOptions.jQuery || window.jQuery);
                       
-                      var matches = objemb.src && objemb.src.match(/clip_id=([\d]*)/);
-                      if (!matches || matches.length < 1) {
-                          var flashvars = jQ(objemb).children('param[name=flashvars],param[name=FLASHVARS]');
-                          if (!flashvars.val()) {
+                      var vimeoId;
+                      if (match_rv) {
+                          vimeoId = match_rv;
+                      } else {
+                          var matches = objemb.src && objemb.src.match(/clip_id=([\d]*)/);
+                          if (!matches || matches.length < 1) {
+                              var flashvars = jQ(objemb).children('param[name=flashvars],param[name=FLASHVARS]');
+                              if (!flashvars.val()) {
+                                  return {};
+                              }
+                              matches = flashvars.val().match(/clip_id=([\d]*)/);
+                          }
+                          if (!matches || matches.length < 2) {
                               return {};
                           }
-                          matches = flashvars.val().match(/clip_id=([\d]*)/);
+                          vimeoId = matches[1];
                       }
-                      if (!matches || matches.length < 2) {
-                          return {}
-                      } else {
-                          var rv = {
-                              html:objemb,
-                              wait:true,
-                              primary_type:"vimeo",
-                              label:"vimeo video",
-                              sources: {
-                                  "url": "http://www.vimeo.com/" + matches[1],
-                                  "vimeo":"http://www.vimeo.com/" + matches[1]
-                              }};
+                      
+                      var rv = {
+                          html:objemb,
+                          wait:true,
+                          primary_type:"vimeo",
+                          label:"vimeo video",
+                          sources: {
+                              "url": "http://www.vimeo.com/" + vimeoId,
+                              "vimeo":"http://www.vimeo.com/" + vimeoId
+                          }};
                           
-                          if (objemb.api_getCurrentTime) {
-                              if (objemb.api_getCurrentTime() > 0) {
-                                  rv["hash"]="start="+ objemb.api_getCurrentTime();
-                              }
+                      if (objemb.api_getCurrentTime) {
+                          if (objemb.api_getCurrentTime() > 0) {
+                              rv["hash"]="start="+ objemb.api_getCurrentTime();
                           }
-                          
-                          var vm_callback = 'sherd_vimeo_callback_'+ index;
-                          window[vm_callback] = function(vm_data) {
-                              if (vm_data && vm_data.length > 0) {
-                                  var info = vm_data[0];
-                                  rv.sources["title"] = info.title;
-                                  rv.sources["thumb"] = info.thumbnail_medium;
-                                  rv.sources["metadata-owner"] = info.user_name ||undefined;
-                                  rv.sources["width"] = info.width;
-                                  rv.sources["height"] = info.height;
-                              }
-                              optional_callback(index,rv);
-                          }
-                          var ajax_options = {
-                              url: "http://www.vimeo.com/api/v2/video/" + matches[1] + ".json?callback=" + vm_callback,
-                              dataType: 'script',
-                              error:function(){optional_callback(index);}
-                          }
-                          if (SherdBookmarklet.options.cross_origin) {
-                              ajax_options['dataType'] = 'json';
-                              ajax_options['success'] = window[vm_callback];
-                              ajax_options['url'] = "http://www.vimeo.com/api/v2/video/" + matches[1] + ".json";
-                          }
-                          jQ.ajax(ajax_options);
-                          return rv;
                       }
+                          
+                      var vm_callback = 'sherd_vimeo_callback_'+ index;
+                      window[vm_callback] = function(vm_data) {
+                          if (vm_data && vm_data.length > 0) {
+                              var info = vm_data[0];
+                              rv.sources["title"] = info.title;
+                              rv.sources["thumb"] = info.thumbnail_medium;
+                              rv.sources["metadata-owner"] = info.user_name ||undefined;
+                              rv.sources["width"] = info.width;
+                              rv.sources["height"] = info.height;
+                          }
+                          optional_callback(index,rv);
+                      }
+                      var ajax_options = {
+                          url: "http://www.vimeo.com/api/v2/video/" + vimeoId + ".json?callback=" + vm_callback,
+                          dataType: 'script',
+                          error:function(){optional_callback(index);}
+                      }
+                      if (SherdBookmarklet.options.cross_origin) {
+                          ajax_options['dataType'] = 'json';
+                          ajax_options['success'] = window[vm_callback];
+                          ajax_options['url'] = "http://www.vimeo.com/api/v2/video/" + vimeoId + ".json";
+                      }
+                      jQ.ajax(ajax_options);
+                      return rv;
                   }                     
               },
               "zoomify":{
@@ -1683,7 +1721,7 @@ SherdBookmarklet = {
     var destination =  host_url;
     for (a in obj.sources) {
         if (typeof obj.sources[a] =="undefined") continue;
-	destination += ( a+"="+escape(obj.sources[a]) +"&" );
+  destination += ( a+"="+escape(obj.sources[a]) +"&" );
     }
     if (obj.hash) {
         destination += "#"+obj.hash;
@@ -1702,9 +1740,7 @@ SherdBookmarklet = {
           destination += "#"+obj.hash;
       }
       var form = M.elt(doc,'form','',{},[
-          M.elt(doc,'span','',{}),
-          M.elt(doc,'div','','border:0;margin:0;float:right;',
-                ['Type: '+(obj.label||obj.primary_type||'Unknown')])
+          M.elt(doc,'div','sherd-asset-wrap',{})
       ]); 
       form.action = destination;
       form.target = target;
@@ -1713,8 +1749,6 @@ SherdBookmarklet = {
 
       var form_api = M.options.form_api || 'mediathread';
       M.forms[form_api](obj,form,ready,doc);
-
-      form.appendChild(doc.createElement("span"));
       return form;
   },/*obj2form*/
   "addField": function(name,value,form,doc) {
@@ -1723,8 +1757,6 @@ SherdBookmarklet = {
     if (name=="title") {
       item.type = "text";
       //IE7 doesn't allow setAttribute here, mysteriously
-      item.style.display = "block";
-      item.style.width = "90%";
       item.className = "sherd-form-title";
     } else {
       item.type = "hidden";
@@ -1732,7 +1764,7 @@ SherdBookmarklet = {
     item.name = name;
     ///Ffox bug: this must go after item.type=hidden or not set correctly
     item.value = value;
-    form.appendChild(span);
+    //form.appendChild(span);
     form.appendChild(item);
     return item;
   },/*addField*/
@@ -1794,26 +1826,16 @@ SherdBookmarklet = {
             return;
         }
         var jump_with_first_asset = function(assets,error) {
-            switch (assets.length) {
-            case 0: 
+            if (assets.length === 0) {
                 if (handler.also_find_general) {
                     M.run_with_jquery(grabber_func);
                     return;
                 }
                 var message = error||"This page does not contain any supported media assets. Try going to an asset page.";
                 return alert(message);
-            case 1:
-                if (assets[0].disabled)
-                    return alert("This asset cannot be embedded on external sites. Please select another asset.");
-
-                if (jump_now && !M.debug) {
-                    //document.location = M.obj2url(host_url, assets[0]);
-                    var form = M.obj2form(host_url, assets[0]);
-                    document.body.appendChild(form); //for IE7 sux
-                    form.submit();
-                }
-                break;
-            default:
+            } else if (assets.length === 1 && assets[0].disabled) {
+                return alert("This asset cannot be embedded on external sites. Please select another asset.");
+            } else {
                 M.g = new M.Interface(host_url, {'allow_save_all': handler.allow_save_all});
                 M.g.showAssets(assets);
             }
@@ -2103,7 +2125,31 @@ SherdBookmarklet = {
           } else {
               self.findGeneralAssets();
           }
-      };
+          if(self.assets_found.length == 0 && SherdBookmarklet.user_ready() ){
+            self.noAssetMessage();
+          }
+      }
+      
+      this.noAssetMessage = function(){
+        var closeBtn = jQ('<div class="no-asset-close-btn">X</div>');
+        var messageBox = jQ('<div class="no-asset-alert">Sorry, no supported assets were found on this page. Try going to an asset page if you are on a list/search page. <br/><br/> If there is a video on the page, press play and then try again.</div>');
+        var winWidth = jQ(window).width();
+        var winHeight = jQ(window).height();
+        jQ('.import-header').remove();
+        jQ('.sherd-analyzer').append(messageBox);
+        messageBox.prepend(closeBtn);
+
+        
+        messageBox.css({
+          left: (winWidth / 2) - 262 + 'px',
+          top : (winHeight / 2) - 100 + 'px'
+        })
+
+        closeBtn.click(function(){
+          jQ('.sherd-analyzer').remove();
+        })
+      }
+
       this.findGeneralAssets = function() {
           self.no_assets_yet = true;
           self.asset_keys = {};
@@ -2196,7 +2242,8 @@ SherdBookmarklet = {
               var after_merge = self.mergeRedundant(assets[i]);
               if (after_merge) {
                   after_merge.html_id = self.assetHtmlID(after_merge); 
-                  self.ASYNC.display(after_merge, /*index*/assets.length-1); 
+                  self.ASYNC.display(after_merge, /*index*/assets.length-1);
+                  window.SherdBookmarklet.assetBucket = assets; 
                   if (window.console) {
                       window.console.log(assets);
                   }
@@ -2273,9 +2320,19 @@ SherdBookmarklet = {
       this.visibleY = function(target) {
           return target.ownerDocument.body.scrollTop;
       }
+      this.loadStyles = function(){
+        var jQ = window.SherdBookmarkletOptions.jQuery || window.jQuery;
+        var root_url =  SherdBookmarkletOptions.host_url.split('/save/?').shift()
+        jQ('head').append('<link rel="stylesheet" type="text/css"\
+         href="'+ root_url +'/site_media/js/sherdjs/src/bookmarklets/sherd_styles.css">');
+        jQ('head').append('<link rel="stylesheet" type="text/css"\
+         href="'+ root_url +'/site_media/css/mediathread.css">');
+
+      }
       this.showWindow = function() {
           self.windowStatus = true;
           if (comp.window) {
+              self.loadStyles();
               comp.window.style.top = self.visibleY(comp.window)+'px';
               comp.window.style.display = "block";
               comp.tab.style.display = "none";
@@ -2296,14 +2353,42 @@ SherdBookmarklet = {
                                 ', and then click the '+o.widget_name+' again to import items.'
                                ])
                   );
+                  jQ('.sherd-asset').css({
+                    display: 'none'
+                  })
+                  jQ('button').remove();
+                  var messageDiv = jQ('<div class="message-div"></div>');
+                  var messageClose = jQ('<div class="message-close">X<div/>');
+                  var winHeight = jQ(window).height();
+                  var winWidth = jQ(window).width();
+                  messageClose.appendTo(messageDiv);             
+                  messageDiv.css({
+                    'top': winHeight/2 - 125 +'px',
+                    'left': winWidth/2- 267 +'px',
+                    'display': 'none'
+                  }).appendTo('.sherd-analyzer');
+
+                  jQ('.sherd-window-inner h2').addClass('not-logged-in');
+
+                  jQ('.sherd-window-inner a').addClass('not-logged-in');
+
+                  jQ('.sherd-window').appendTo(messageDiv);
+                  messageDiv.fadeIn(1000);
+
+                  messageDiv.click(function(){
+                    jQ('.sherd-analyzer').remove();
+                  })
               } else {
-                  jQ(comp.h2).empty().get(0).appendChild(document.createTextNode('Choose an item to import for analysis'));
+                  var importHeader = jQ('<h2 class="import-header"/>');
+                  var importHeaderWrap = jQ('<div id="import-header-wrap"/>');
+                  importHeader.text('Choose item(s) to add to collection');
+                  importHeaderWrap.append(importHeader);
+                  jQ(comp.h2).empty().append(importHeaderWrap);
                   if (comp.message.tagName) {
                       jQ(comp.message).empty();
                   }
               }
           }
-
       };
       this.elt = function(doc,tag,className,style,children) {
           ///we use this to be even more careful than jquery for contexts like doc.contentType='video/m4v' in firefox
@@ -2320,20 +2405,22 @@ SherdBookmarklet = {
               target.appendChild(comp.top);
           }
           var pageYOffset = self.visibleY(target)+o.top;
+          var pageLength = jQ(document).height();
+          jQ(comp.top).css('height', pageLength);
+          jQ(document).scrollTop(0);//if page is long make sure the user is placed at top
           var doc = target.ownerDocument;
           comp.top.appendChild(
-              self.elt(doc,'div','sherd-tab',
-                       "display:block;position:absolute;"+o.side+":0px;z-index:999998;height:2.5em;top:"+pageYOffset+"px;color:black;font-weight:bold;margin:0;padding:5px;border:3px solid black;text-align:center;background-color:#cccccc;text-decoration:underline;cursor:pointer;text-align:left;",
-                       [o.tab_label]));
+              self.elt(doc,'div','sherd-tab','',[o.tab_label]));
           comp.top.appendChild(
-              self.elt(doc,'div','sherd-window',"display:none;left:0;position:absolute;z-index:999999;top:0;margin:0;padding:0;width:400px;height:400px;overflow:hidden;border:3px solid black;text-align:left;background-color:#cccccc",
+              self.elt(doc,'div','sherd-window','',
                        [
-                           self.elt(doc,'div','sherd-window-inner',"overflow-y:auto;width:384px;height:390px;margin:1px;padding:0 6px 6px 6px;border:1px solid black;",[
-                               self.elt(doc,'button','sherd-close',"float:right;",['close']),
-                               self.elt(doc,'button','sherd-move',"float:right;",['move']),
-                               self.elt(doc,'h2','','',['Choose an item to import for analysis']),
+                           self.elt(doc,'div','sherd-window-inner','',[
+                               self.elt(doc,'button','sherd-close btn-primary',"",['Cancel']),
+                               //self.elt(doc,'button','sherd-move',"float:right;",['Move']),
+                               self.elt(doc,'button','sherd-collection btn-primary',"",['Go to Collection']),
+                               self.elt(doc,'h2','','',['Select "Analyze Now" to edit one item immediately, or "Send to Collection" to send an item and keep collecting on this page.']),
                                self.elt(doc,'p','sherd-message',"",['Searching for items....']),
-                               self.elt(doc,'ul','',"")
+                               self.elt(doc,'ul','sherd-asset',"")
                            ])
                        ])
           );
@@ -2343,18 +2430,16 @@ SherdBookmarklet = {
           comp.ul = comp.top.getElementsByTagName("ul")[0];
           comp.h2 = comp.top.getElementsByTagName("h2")[0];
           comp.close = comp.top.getElementsByTagName("button")[0];
-          comp.move = comp.top.getElementsByTagName("button")[1];
+          comp.collection = comp.top.getElementsByTagName("button")[1];
           comp.message = comp.top.getElementsByTagName("p")[0];
 
           M.connect(comp.tab, "click", this.onclick);
-          M.connect(comp.move, "click", function(evt) {
-              var s = comp.window.style;
-              var dir = ((s.left=='0px')? 'right' : 'left');
-              s.left = s.right = null;
-              s[dir] = '0px';
+          M.connect(comp.collection, "click", function(evt) {
+              var url = window.host_url.split('/save/?')[0]
+              window.location.replace(url + '/asset/');
           });
           M.connect(comp.close, "click", function(evt) {
-              jQ(comp.ul).empty();
+              jQ('.sherd-analyzer').remove();
               comp.window.style.display = "none";
               if (SherdBookmarklet.options.decorate) {
                   comp.tab.style.display = 'block';
@@ -2369,12 +2454,10 @@ SherdBookmarklet = {
       this.findAssets = function() {
           self.showWindow();
           self.finder = new M.Finder();
-
           self.finder.ASYNC.display = self.displayAsset;
           self.finder.ASYNC.remove = self.removeAsset;
           self.finder.ASYNC.best_frame = self.maybeShowInFrame;
           self.finder.ASYNC.finish = self.finishedCollecting;
-
           self.finder.findAssets();
       };
 
@@ -2392,7 +2475,6 @@ SherdBookmarklet = {
       this.removeAsset = function(asset) {
           jQ('#'+asset.html_id).remove();
       };
-
       this.displayAsset = function(asset,index) {
           if (!asset) return;
           var doc = comp.ul.ownerDocument;
@@ -2401,23 +2483,162 @@ SherdBookmarklet = {
           var form = M.obj2form(host_url, asset, doc, o.postTarget, index);
           li.id = asset.html_id;
           li.appendChild(form);
-          li.style.listStyleType = 'none';
-          li.style.padding = '4px';
-          li.style.margin = '4px';
-          li.style.border = '1px solid black';
-          jQ('input.sherd-form-title',form).prev().empty().append(self.elt(null,'div','','margin:0;border:0;padding:3px 0;',[self.elt(null,'label','',{label:'title'},['Title:'])]));
 
           var img = asset.sources.thumb || asset.sources.image;
           if (img) {
-              jQ(form.firstChild).empty().append(self.elt(null,'img','',{src:img,style:'width:20%;max-width:120px;max-height:120px;',height:null}));
+              var newAsset = self.elt(null,'img','sherd-image',{src:img,style:'max-width:215px;max-height:150px',height:null});
+              jQ(form.firstChild).empty().append(newAsset);
           }
           if (asset.disabled) {
               form.lastChild.innerHTML = o.message_disabled_asset;
           } else if (SherdBookmarklet.user_ready()){
-              form.submitButton = self.elt(null,'input','',{type:'submit',style:'display:block;padding:4px;margin:4px;',value:'analyze'});
-              jQ(form.lastChild).empty().append(form.submitButton);
-          }
+              form.submitButton = self.elt(null,'input','analyze btn-primary',{type:'button',value:'Open in Mediathread'});
+              form.submitButton2 = self.elt(null,'input','cont btn-primary',{type:'button',value:'Collect'});
+              jQ(form).append(form.submitButton2);
+              jQ(form).append(form.submitButton);              
+              jQ(form.submitButton).click(function(){
+                jQ(this).parent().submit()
+              })
+              jQ(form.submitButton2).click(function(){
+                window.button_asset = jQ(this);
+               /* A pop up window solution... */
+                var bucketWrap = jQ('<div id="bucket-wrap"/>');
+                var bucket = jQ(form).clone();
+                jQ('input.analyze', bucket).remove()
+                jQ('input.cont', bucket).remove()
+                var bucket_window = window.open(
+                   "",
+                   "Mediathread",
+                   "resizable,scrollbars=no,status=1,href=no,location=no,menubar=no,width=650,height=350,top=200,left=300"
+                );
+                if(jQ('.sherd-image',bucket_window.document).length > 0){
+                  // make sure the bucket dies not already exists, if so 
+                  // remove it.
+                  jQ('#bucket-wrap',bucket_window.document).remove();
+                }
+                bucket.appendTo(bucketWrap);
+                jQ(bucket).append('<input type="hidden" value="cont" name="button" />');
+                jQ(bucket).append('<br/><input id="submit-input" class="btn-primary" type="button" value="Save" />');
+                jQ(bucket).append('<input id="submit-cancel" class="btn-primary" type="button" value="Cancel" />');
+                jQ(bucket).append('<br/><span class ="help-text">Clicking "Save" will add this item to your Mediathread collection and return you to collecting.<span/>');
+                jQ(bucketWrap).prepend('<h2>Add this item to your Mediathread collection</h2>')
+                jQ('body',bucket_window.document).append(bucketWrap);
+                jQ('#submit-cancel',bucket_window.document).click(function(){
+                  bucket_window.close();
+                });
+                jQ('#submit-input',bucket_window.document).click(function(){
+                  jQ(this).parent().submit();
+                  var sherdOverlay = jQ('.sherd-window-inner',document);
+                  var alertSavedMarginLeft = (jQ('.sherd-window-inner',document).width()/2) - (535*.5);
+                  var alertSavedMarginTop = (jQ(window).height()/2) -100;
+                  var collectionUrl = host_url.split('save')[0] + 'asset/'
+                  var alertSaved = jQ('<div class="alert-saved"><span style="font-weight:bold">Success.</span> Your item has been sucessfully added to your <a href="'+ collectionUrl +'">Mediathread collection</a>.</div>');
+                  var alertClose = jQ('<div class="alert-close">X</div>');
 
+                  alertSaved.css({
+                    'top': alertSavedMarginTop + 'px',
+                    'left': alertSavedMarginLeft + 'px'
+
+                  });
+                  alertClose.click(function(){
+                    jQ(this).parent().remove();
+                  })
+                  alertSaved.prepend(alertClose);
+                  sherdOverlay.append(alertSaved);
+                  alertSaved.fadeIn(500, function(){
+                    var btn = window.button_asset;
+                    btn.attr('value', 'Collected');
+                    btn.off()
+                    btn.css({
+                      background:'#999',
+                      color:'#333'
+                    })
+                  });
+                });// end #submit-input' click
+  
+                // style and add listeners onto the popup window 
+                bucket_window.document.title = "Mediathread";//force the title of the popup
+                var body = jQ('body',bucket_window.document);
+                var title = body.find('.sherd-form-title');
+                var submitBtn = body.find('.btn-primary');
+                var header = body.find('#bucket-wrap h2');
+                var helpText = body.find('.help-text');
+                
+                bucket.css({
+                   'background':"#fff",
+                   'text-align': 'center'
+                })
+                header.css({
+                  'font-family':'arial',
+                  'font-weight': '100',
+                  'font-size': '18px',
+                  'color': '#323232',
+                  'text-align':'center'
+                })
+
+                title.focus();
+                title.css({
+                  color:'#999',
+                  width:'350px',
+                  height:'35px',
+                  fontSize:'14px',
+                  margin:'10px 0',
+                  '-moz-appearance':'none',
+                  '-webkit-appearance':'none'
+                })
+                submitBtn.css({
+                  'font-size':'14px',
+                  'font-weight':'normal',
+                  'color':'#2f2f2f',
+                  'padding':'5px 15px',
+                  'margin':'0px 12px 12px',
+                  'border':'solid 1px',
+                  'border-radius':'4px',
+                  '-moz-border-radius':'4px',
+                  '-webkit-border-radius':'4px',
+                  'background-color':'#efefef',
+                  '*background-color':'#efefef',
+                  'background-image':'-moz-linear-gradient(top, #fcfcfc, #efefef)',
+                  'background-image':'-webkit-gradient(linear, 0 0, 0 100%, from(#fcfcfc), to(#efefef))',
+                  'background-image':'-webkit-linear-gradient(top, #fcfcfc, #efefef)',
+                  'background-image':'-o-linear-gradient(top, #fcfcfc, #efefef)',
+                  'background-image':'linear-gradient(to bottom, #fcfcfc, #efefef)',
+                  'background-repeat':'repeat-x',
+                  'border-color':'#0044cc #0044cc #002a80',
+                  'border-color':'rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25)',
+                  'filter':'progid:DXImageTransform.Microsoft.gradient(startColorstr="#ff0088cc", endColorstr="#ff0044cc", GradientType=0)',
+                  'filter':'progid:DXImageTransform.Microsoft.gradient(enabled=false)',
+                  'cursor':'pointer',
+                  'display':'inline-block'
+                })
+                submitBtn.hover(function(){
+                    jQ(this).css({
+                    'background-image':'-moz-linear-gradient(top, #efefef, #fcfcfc)',
+                    'background-image':'-webkit-gradient(linear, 0 0, 0 100%, from(#efefef), to(#fcfcfc))',
+                    'background-image':'-webkit-linear-gradient(top, #efefef, #fcfcfc)',
+                    'background-image':'-o-linear-gradient(top, #efefef, #fcfcfc)',
+                    'background-image':'linear-gradient(to bottom, #efefef, #fcfcfc)'
+                    
+                  })
+                }, function(){
+                    jQ(this).css({
+                      'background-image':'-moz-linear-gradient(top, #fcfcfc, #efefef)',
+                      'background-image':'-webkit-gradient(linear, 0 0, 0 100%, from(#fcfcfc), to(#efefef))',
+                      'background-image':'-webkit-linear-gradient(top, #fcfcfc, #efefef)',
+                      'background-image':'-o-linear-gradient(top, #fcfcfc, #efefef)',
+                      'background-image':'linear-gradient(to bottom, #fcfcfc, #efefef)'
+                    })
+                  })
+                
+                helpText.css({
+                  'color':'#666',
+                  'font-size': '12px',
+                  'font-family': 'arial',
+                })
+              })//End SubmitButton2 click
+
+                 
+          }
           if (comp.ul) {
               if (comp.ul.firstChild != null 
                   && comp.ul.firstChild.innerHTML == o.message_no_assets) {
