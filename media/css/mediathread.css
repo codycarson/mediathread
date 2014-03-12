@@ -3621,7 +3621,7 @@ div.collection_table {
     padding:0 0 0 7px;
     margin:0;
     position:absolute;
-    background:url('/img/bookendleft.gif') top left no-repeat ;
+    background:url('/site_media/img/bookendleft.gif') top left no-repeat ;
     z-index:0;
 }
 
@@ -3642,7 +3642,7 @@ div.collection_table {
     width:0px;
     height:7px;
     padding:0 6px 0 0;
-    background:url('/img/bookendright.gif') top right no-repeat;
+    background:url('/site_media/img/bookendright.gif') top right no-repeat;
     position:absolute;
     z-index:0;
 }
