@@ -7,13 +7,13 @@
 
 {% block css %}
     {% compress css %}
-	<link rel="stylesheet" href="{% static 'js/select2/select2.css' %}" media="screen" />
-    <link rel="stylesheet" href="{% static 'css/project.css' %}"  media="screen" />
-    <link rel="stylesheet" href="{% static 'css/project.print.css' %}"  media="print" />
-    <link rel="stylesheet" href="{% static 'js/sherdjs/lib/mcePlugin_citation/skins/minimalist/citation.css' %}" />
-    
-    <!--All the annotation css -->
-    {% include "djangosherd/annotator_resources_css.html" %}
+        <link rel="stylesheet" href="{% static 'js/select2/select2.css' %}" media="screen" />
+        <link rel="stylesheet" href="{% static 'css/project.css' %}"  media="screen" />
+        <link rel="stylesheet" href="{% static 'css/project.print.css' %}"  media="print" />
+        <link rel="stylesheet" href="{% static 'js/sherdjs/lib/mcePlugin_citation/skins/minimalist/citation.css' %}" />
+
+        <!--All the annotation css -->
+        {% include "djangosherd/annotator_resources_css.html" %}
     {% endcompress %}
 {% endblock %}
 

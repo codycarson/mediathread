@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% load smartif revision static %}
+{% load smartif revision static compress %}
 
 {% block title %}
     {% if discussion.title %}{{discussion.title}}{% else %}New Discussion{% endif %}
 {% endblock %}
 
 {% block css %}
-    {{ block.super }}
-    <link rel="stylesheet" href="{% static 'js/select2/select2.css' %}" media="screen" />
-    <link rel="stylesheet" href="{% static 'css/project.css' %}" />
-    <link rel="stylesheet" href="{% static 'js/sherdjs/lib/mcePlugin_citation/skins/minimalist/citation.css' %}" />
+    {% compress css %}
+        <link rel="stylesheet" href="{% static 'js/select2/select2.css' %}" media="screen" />
+        <link rel="stylesheet" href="{% static 'css/project.css' %}" />
+        <link rel="stylesheet" href="{% static 'js/sherdjs/lib/mcePlugin_citation/skins/minimalist/citation.css' %}" />
     
-    <!--All the annotation css -->
-    {% include "djangosherd/annotator_resources_css.html" %}
+        <!--All the annotation css -->
+        {% include "djangosherd/annotator_resources_css.html" %}
+    {% endcompress %}
 {% endblock %}
 
 {% block uncompressable_css %}    
