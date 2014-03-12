@@ -7,6 +7,7 @@ from courseaffils.models import Course
 from django.test.utils import override_settings
 from mock import MagicMock, patch
 from mediathread.course.models import CourseInformation
+from mediathread.user_accounts.models import UserProfile
 
 mock_analytics = MagicMock(spec=analytics)
 
@@ -53,6 +54,8 @@ class CourseCreateTest(TestCase):
         """
         ci = CourseInformation.objects.create(title="test", organization_name="test_org", student_amount=10)
         ci.add_member(self.user, faculty=True)
+        self.user.profile.courses_left = 0
+        self.user.profile.save()
         response = self.client.get(reverse("course_create"))
         self.assertContains(response, "You've used your available courses on this plan")
         self.assertContains(response, "<h1>Courses limit reached!</h1>")
