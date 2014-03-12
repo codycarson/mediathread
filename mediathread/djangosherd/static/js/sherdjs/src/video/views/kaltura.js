@@ -2,6 +2,7 @@
   Support for the Kaltura js-enabled player.  documentation at:
   http://Kaltura.com/api/docs/oembed
  */
+
 if (!Sherd) { Sherd = {}; }
 if (!Sherd.Video) { Sherd.Video = {}; }
 if (!Sherd.Video.Kaltura && Sherd.Video.Base) {
