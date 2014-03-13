@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.3.1
+
+* fix for checking how many courses can a user create on the creation form
+
 ### 0.3.0
 
 * added a set of ansible scripts for automating provisioning and deployment
