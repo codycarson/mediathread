@@ -54,7 +54,7 @@ class CourseForm(forms.Form):
         self.helper.add_input(submit_button)
 
     def clean(self):
-        courses_num = self.user.groups.filter(name__startswith='faculty').count()
-        if courses_num >= 1:
+        courses_left = self.user.profile.courses_left
+        if courses_left == 0:
             raise forms.ValidationError("Courses limit reached")
         return self.cleaned_data

@@ -202,7 +202,7 @@ class CourseCreateFormView(FormView):
             }
         )
 
-        # reduce the number of available courses to create
+        # reduce the remaining number of courses
         self.request.user.profile.courses_left -= 1
         self.request.user.profile.save()
 
