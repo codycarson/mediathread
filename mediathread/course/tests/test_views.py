@@ -7,7 +7,6 @@ from courseaffils.models import Course
 from django.test.utils import override_settings
 from mock import MagicMock, patch
 from mediathread.course.models import CourseInformation
-from mediathread.user_accounts.models import UserProfile
 
 mock_analytics = MagicMock(spec=analytics)
 
@@ -28,14 +27,14 @@ class CourseCreateTest(TestCase):
             'organization': "Test organization",
             'student_amount': '10',
             'term': 1,
-            'year': 2013
+            'year': 2015
         })
         self.assertRedirects(response, '/')
         self.assertTrue(Course.objects.filter(title="Sample course #1").exists())
         course = Course.objects.get(title="Sample course #1")
         self.assertTrue("test_instructor" in course.faculty_group.user_set.values_list('username', flat=True))
         self.assertTrue("test_instructor" in course.user_set.values_list('username', flat=True))
-        self.assertEquals(2013, course.info.year)
+        self.assertEquals(2015, course.info.year)
         self.assertEquals(1, course.info.term)
 
     def test_missing_form_fields(self):
