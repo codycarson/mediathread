@@ -234,9 +234,9 @@
     {% endblock %}
 <script type="text/javascript">
         var lt = String.fromCharCode(60);
-        if (window.jQuery) {
+        /*if (window.jQuery) {
             jQuery.noConflict();
-        }
+        }*/
          
         var MediaThread = new (function() {
             this.templates = {};
@@ -253,7 +253,6 @@
             <script type="text/javascript" src="{% static 'js/app/util.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/ajaxDelete.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/analytics.js' %}"></script>
-        }
             <script type="text/javascript" src="{% static 'js/app/browserdetect.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/mediathread_mustache.js' %}"></script>
             <script type="text/javascript" src="{% static 'js/app/panel.js' %}"></script>
@@ -310,13 +309,12 @@
         {% block js %}{% endblock %}
     {% block extra_js %}
     {% if not settings.DEBUG %}
-            <script>
+            <script type="text/javascript">
                 {% if settings.GOOGLE_ANALYTICS_ID %}
                     var _gaq = _gaq || [];
                     _gaq.push(['_setAccount', '{{settings.GOOGLE_ANALYTICS_ID}}']);
                     _gaq.push(['_trackPageview']);
 
-                    (function () {
                 (function () {
                         var ga = document.createElement('script');
                         ga.type = 'text/javascript';
