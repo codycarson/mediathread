@@ -6,7 +6,7 @@ install:
   - ./bootstrap.py
   - pip install coveralls
 script:
-  - ./manage.py test
+  - ./manage.py test --settings=mediathread.settings_test
 branches:
     except:
         - /feature\/*/
