@@ -149,7 +149,7 @@ a:hover {
 /* ---- Primary Button Style ----- */
 
 a.btn-primary,
-.btn-primary {
+.btn-primary, input.btn-primary {
   font-size: 1em;
   font-weight: normal;
   color: #2f2f2f;
@@ -175,7 +175,7 @@ a.btn-primary,
   display: inline-block;
 }
 
-a.btn-primary:hover, .btn-primary:hover, 
+a.btn-primary:hover, input.btn-primary:hover, .btn-primary:hover,
 a.btn-primary:active, .btn-primary:active, 
 a.btn-primary.active, .btn-primary.active,
 a.btn-primary.disabled, .btn-primary.disabled,
