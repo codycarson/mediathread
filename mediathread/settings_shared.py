@@ -328,7 +328,7 @@ MESSAGE_LEVEL = message_constants.SUCCESS
 
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"
-HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
+HELP_URL = "http://appsembler.uservoice.com/knowledgebase/topics/39118-mediathread"
 PLANS_PAGE_URL = "http://getmediathread.com/plans.html"
 
 
