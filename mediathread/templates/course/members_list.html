@@ -9,7 +9,7 @@
 
     <div class="dashboard-module-header">
         <h2>Class members list</h2>
-        <a class="btn invite-students-btn" href="{% url invite-students %}"><i class="icon-user"></i>Invite students</a>
+        <a class="btn invite-students-btn" href="{% url "invite-students" %}"><i class="icon-user"></i>Invite students</a>
     </div>
 
     <div id="dashboard-module-body">
@@ -32,11 +32,11 @@
                     <td><a href="mailto:{{ instructor.email }}">{{ instructor.email }}</a></td>
                     <td>
                     {% if instructor.status == "Invited" %}
-                        <form action="{% url resend_invite %}" id="resend_invite_{{ instructor.id }}" method="post">
+                        <form action="{% url "resend_invite" %}" id="resend_invite_{{ instructor.id }}" method="post">
                             <input type="hidden" name="user_id" value="{{ instructor.id }}" />
                         </form>
                     {% endif %}
-                    <form action="{% url demote_faculty %}" id="demote_faculty_{{ instructor.id }}" method="post">
+                    <form action="{% url "demote_faculty" %}" id="demote_faculty_{{ instructor.id }}" method="post">
                         <input type="hidden" name="user_id" value="{{ instructor.id }}"/>
                     </form>
                     <div class="btn-group">
@@ -60,15 +60,15 @@
                     <td class="student_status">{{ student.status }}</td>
                     <td><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
                     <td>
-                    <form action="{% url promote_student %}" id="promote_student_{{ student.id }}" method="post">
+                    <form action="{% url "promote_student" %}" id="promote_student_{{ student.id }}" method="post">
                         <input type="hidden" name="user_id" value="{{ student.id }}"/>
                     </form>
                     {% if student.status == "Invited" %}
-                        <form action="{% url resend_invite %}" id="resend_invite_{{ student.id }}" method="post">
+                        <form action="{% url "resend_invite" %}" id="resend_invite_{{ student.id }}" method="post">
                             <input type="hidden" name="user_id" value="{{ student.id }}"/>
                         </form>
                     {% endif %}
-                    <form action="{% url remove_student %}" id="remove_student_{{ student.id }}" method="post">
+                    <form action="{% url "remove_student" %}" id="remove_student_{{ student.id }}" method="post">
                         <input type="hidden" name="user_id" value="{{ student.id }}"/>
                     </form>
                     <div class="btn-group">
@@ -90,7 +90,7 @@
         <p class="students_count">Invited students: <span id="invited_count"></span><br>
         Activated students: <span id="activated_count"></span><br>
         Total students: <span id="members_count"></span><br>
-        <a href="{% url invite-students %}">Invite more students</a></p>
+        <a href="{% url "invite-students" %}">Invite more students</a></p>
     </div>
     <script type="text/javascript">
         var invited = $(".student_status").filter(":contains(Invited)").length;
