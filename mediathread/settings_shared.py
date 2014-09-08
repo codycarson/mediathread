@@ -82,7 +82,7 @@ MEDIA_ROOT = "uploads/"
 MEDIA_URL = '/uploads/'
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'collected_static')
-STATIC_URL = '/site_media/'
+STATIC_URL = '/media/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -209,7 +209,7 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.logger.LoggingPanel',
 )
 
-COMPRESS_URL = "/site_media/"
+COMPRESS_URL = "/media/"
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_CSS_FILTERS = [
