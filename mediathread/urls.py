@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
-from django.views.generic.base import TemplateView
+from django.views.generic.base import RedirectView, TemplateView
 from mediathread.assetmgr.views import AssetCollectionView, AssetDetailView, \
     TagCollectionView
 from mediathread.main.views import MigrateCourseView, MigrateMaterialsView, \
@@ -45,8 +45,8 @@ urlpatterns = patterns(
     '',
     (r'^$', 'mediathread.main.views.triple_homepage'),  # Homepage
     (r'^avatar/', include('avatar.urls')),
-    (r'^about/$', 'django.views.generic.simple.redirect_to', {'url': settings.ABOUT_URL}),
-    (r'^help/$', 'django.views.generic.simple.redirect_to', {'url': settings.HELP_URL}),
+    (r'^about/$', RedirectView.as_view(url=settings.ABOUT_URL)),
+    (r'^help/$', RedirectView.as_view(url=settings.HELP_URL)),
     (r'^terms-of-use/$', TemplateView.as_view(template_name='main/terms-of-use.html')),
     (r'^privacy-policy/$', TemplateView.as_view(template_name='main/privacy-policy.html')),
 
