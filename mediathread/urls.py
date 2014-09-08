@@ -47,10 +47,8 @@ urlpatterns = patterns(
     (r'^avatar/', include('avatar.urls')),
     (r'^about/$', 'django.views.generic.simple.redirect_to', {'url': settings.ABOUT_URL}),
     (r'^help/$', 'django.views.generic.simple.redirect_to', {'url': settings.HELP_URL}),
-    (r'^terms-of-use/$', direct_to_template,
-     {'template': 'main/terms-of-use.html'}),
-    (r'^privacy-policy/$', direct_to_template,
-     {'template': 'main/privacy-policy.html'}),
+    (r'^terms-of-use/$', TemplateView.as_view(template_name='main/terms-of-use.html')),
+    (r'^privacy-policy/$', TemplateView.as_view(template_name='main/privacy-policy.html')),
 
     (r'^admin/', admin.site.urls),
 
