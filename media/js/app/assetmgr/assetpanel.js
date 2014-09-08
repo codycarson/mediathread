@@ -1,5 +1,6 @@
 /**
  * Listens For:
+ * assets.refresh > trigger a resize/masonry event
  * asset.edit > open asset edit dialog
  * asset.on_delete > update annotation view if required
  *
@@ -7,6 +8,7 @@
  * annotation.create > open create annotation dialog
  * annotation.on_cancel > close create/save dialog
  * annotation.on_save > close create/save dialog
+ *
  *
  * Signals:
  * Nothing
@@ -28,9 +30,21 @@ var AssetPanelHandler = function (el, parent, panel, space_owner) {
         self.resize();
     });
     
+    jQuery(self.el).delegate("a.asset-title-link", "click", {self: self}, self.onClickAssetTitle);
+    jQuery(self.el).delegate("a.edit-asset-inplace", "click", {self: self}, self.editItem);
+    jQuery(self.el).delegate("a.filterbyclasstag", "click", {self: self}, self.onFilterByClassTag);
+    jQuery(self.el).delegate("a.filterbyvocabulary", "click", {self: self}, self.onFilterByVocabulary);            
+    
     // Fired by CollectionList & AnnotationList
+    jQuery(window).bind('assets.refresh', { 'self': self }, function(event, html) {
+        var self = event.data.self;
+        var container = jQuery(self.el).find('div.asset-table')[0];
+        jQuery(container).masonry('appended', html, true);
+        jQuery(window).trigger("resize");   
+    });
+    
     jQuery(window).bind('asset.on_delete', { 'self': self },
-        function (event, asset_id) { event.data.self.onDeleteItem(asset_id); });
+        function (event, asset_id) {event.data.self.onDeleteItem(asset_id); });
 
     jQuery(window).bind('asset.edit', { 'self': self }, self.dialog);
     jQuery(window).bind('annotation.create', { 'self': self }, self.dialog);
@@ -38,7 +52,7 @@ var AssetPanelHandler = function (el, parent, panel, space_owner) {
     
     jQuery(window).bind('annotation.on_cancel', { 'self': self }, self.closeDialog);
     jQuery(window).bind('annotation.on_save', { 'self': self }, self.closeDialog);
-    jQuery(window).bind('annotation.on_create', { 'self': self }, self.closeDialog);
+    jQuery(window).bind('annotation.on_create', { 'self': self }, self.closeDialog);    
     
     // Setup the media display window.
     self.citationView = new CitationView();
@@ -66,9 +80,9 @@ var AssetPanelHandler = function (el, parent, panel, space_owner) {
             'create_asset_thumbs': true,
             'space_owner': self.space_owner,
             'owners': self.panel.owners,
+            'current_asset': self.panel.current_asset,
             'view_callback': function (assetCount) {
-                jQuery(self.el).find("a.asset-title-link").bind("click", { self: self }, self.onClickAssetTitle);
-                jQuery(self.el).find("a.edit-asset-inplace").bind("click", { self: self }, self.editItem);
+                var self = this;
                 
                 if (assetCount > 0) {
                     var container = jQuery(self.el).find('div.asset-table')[0];
@@ -76,11 +90,10 @@ var AssetPanelHandler = function (el, parent, panel, space_owner) {
                         itemSelector : '.gallery-item',
                         columnWidth: 25
                     });
+                    jQuery(container).masonry('bindResize');
                 } else {
                     jQuery('div.asset-table').css('height', '500px');
                 }
-                
-                jQuery(window).trigger("resize");
             }
         });
     }
@@ -167,9 +180,6 @@ AssetPanelHandler.prototype.showAsset = function (asset_id, annotation_id, displ
         self.citationView.openCitationById(null, asset_id, annotation_id);
     }
     
-    jQuery(self.el).find("a.filterbyclasstag").unbind();
-    jQuery(self.el).find("a.filterbyvocabulary").unbind();
-    
     // Setup the edit view
     AnnotationList.init({
         "asset_id": asset_id,
@@ -177,10 +187,6 @@ AssetPanelHandler.prototype.showAsset = function (asset_id, annotation_id, displ
         "update_history": self.panel.update_history,
         "vocabulary": self.panel.vocabulary,
         "view_callback": function () {
-            jQuery(self.el).find("a.filterbyclasstag").bind("click",
-                    { self: self }, self.onFilterByClassTag);
-            jQuery(self.el).find("a.filterbyvocabulary").bind("click",
-                    { self: self }, self.onFilterByVocabulary);            
             jQuery(self.el).find("div.tabs").fadeIn("fast", function () {
                 PanelManager.verifyLayout(self.el);
                 jQuery(window).trigger("resize");
@@ -245,6 +251,10 @@ AssetPanelHandler.prototype.resize = function () {
             jQuery("div#annotations-organized div.ui-widget-header").outerHeight() + 36;
         jQuery(self.el).find('ul#asset-details-annotations-list').css('height', (visible) + "px");
         jQuery("div.accordion").accordion("resize");
+        
+        var container = jQuery(self.el).find('div.asset-table')[0];
+        jQuery(container).masonry();
+        
     }
 };
 

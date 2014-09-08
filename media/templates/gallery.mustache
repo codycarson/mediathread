@@ -5,7 +5,7 @@
         
         <div id="collection-help-tab" class="ui-widget-content collection-help-tab" style="display: none">
                 <input class="dismiss-help" type="image" title="Dismiss help" 
-                    alt="Dismiss Help" src="/site_media/img/icons/meth_help.png" />
+                    alt="Dismiss Help" src="/media/img/icons/meth_help.png" />
         </div>
         
         
@@ -62,7 +62,7 @@
         
             {{#>>switcher_collection_chooser}}
             <div class="switcher_collection_chooser switcher collection-chooser">                
-                <a class="switcher-top menuclosed" onclick="switcher(this);">
+                <a class="switcher-top menuclosed" onclick="return switcher(event, this);">
                     <span class="switcher-prefix">Owner </span>
                     <span class="down-arrow"></span>
                     <span class="title">{{{selected_label?ellipses(18)}}}</span>
@@ -95,7 +95,7 @@
             {{/>>switcher_collection_chooser}}
             
             <div class="switcher collection-date-filter">
-                <a class="switcher-top menuclosed" onclick="switcher(this);">
+                <a class="switcher-top menuclosed" onclick="return switcher(event, this);">
                     <span class="switcher-prefix">Date </span>
                     <span class="down-arrow"></span>
                     
@@ -129,7 +129,7 @@
             
             {{#active_vocabulary}}
             <div>
-                <span class="concept-prefix">{{display_name}}</span>
+                <span class="concept-prefix" title="{{display_name}}">{{display_name}}</span>                
                 <select class="vocabulary" name="vocabulary-{{id}}"
                     data-placeholder="Select {{display_name?lower()}}" multiple="multiple">
                     {{#term_set}}
@@ -226,7 +226,7 @@
                         <div class="asset-thumb">
                             {{^thumbable}}
                                 {{^thumb}}
-                                    <img class="gallery-item-thumb" src="/site_media/img/nothumb_{{media_type_label}}.png" alt="Item Thumbnail" />
+                                    <img class="gallery-item-thumb" src="/media/img/nothumb_{{media_type_label}}.png" alt="Item Thumbnail" />
                                 {{/thumb}}
                                 {{#thumb?}}
                                     <img class="gallery-item-thumb" src="{{thumb}}" alt="Item Thumbnail" />
@@ -238,12 +238,12 @@
                             <div class="actions">
                                 {{#editable?}}
                                     <a class="collection-choice delete-asset" href="{{id}}" title="Remove item from your collection">
-                                        <img src="/site_media/img/icons/meth_delete.png"  class="delete_icon" alt="Remove item from your collection"  />
+                                        <img src="/media/img/icons/meth_delete.png"  class="delete_icon" alt="Remove item from your collection"  />
                                     </a>
                                 {{/editable?}}
                                 
                                 <a class="collection-choice edit-asset-inplace" href="{{local_url}}" title="Edit item attributes">
-                                    <img src="/site_media/img/icons/meth_edit.png" class="edit_icon" alt="Edit item attributes"  />
+                                    <img src="/media/img/icons/meth_edit.png" class="edit_icon" alt="Edit item attributes"  />
                                 </a>
                             </div>
                         

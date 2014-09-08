@@ -109,6 +109,7 @@ Feature: Direct Asset Access
         Given I am not logged in
         When I access the url "/"
         Then I am at the Login page
+        When I click the Guest Log In button
         When I type "test_student_three" for username
         When I type "test" for password
         When I click the Log In button
@@ -147,6 +148,7 @@ Feature: Direct Asset Access
         Given I am not logged in
         When I access the url "/"
         Then I am at the Login page
+        When I click the Guest Log In button
         When I type "test_student_three" for username
         When I type "test" for password
         When I click the Log In button
@@ -155,7 +157,7 @@ Feature: Direct Asset Access
         When I click the "Sample Course" link
         Then I am in the Sample Course class
         
-        # Try to access an asset from the Alternate Course
+        # Try to access an asset from the Sample Course
         When I access the url "/asset/4/"
         Then I see "Oops!"
         Then there is a "Go to Alternate Course" link

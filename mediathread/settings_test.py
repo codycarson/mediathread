@@ -1,23 +1,25 @@
 # flake8: noqa
 from settings_shared import *
-
-STATSD_HOST = '127.0.0.1'
+import os
 
 DEBUG = True
+
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'lettuce.db',
+        'NAME': os.path.join(PROJECT_PATH, '../lettuce.db'),
         'OPTIONS': {
             'timeout': 30,
         }
     }
 }
 
-
 LETTUCE_SERVER_PORT = 8002
-BROWSER = 'Headless' # ["Chrome", "Firefox", "Headless"]
+#BROWSER = 'Firefox'
+BROWSER = 'Headless'
+#BROWSER = 'Chrome'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -35,10 +37,8 @@ LETTUCE_APPS = (
 LETTUCE_DJANGO_APP = ['lettuce.django']
 INSTALLED_APPS = INSTALLED_APPS + LETTUCE_DJANGO_APP
 
-CUSTOMERIO_SITE_ID = ''
-CUSTOMERIO_API_KEY = ''
-ACCOUNT_LOGOUT_ON_GET = True
-SOUTH_TESTS_MIGRATE = True
+COMPRESS_ROOT = "/Users/sdreher/workspace/mediathread/media/"
+
 
 # Full run
 # time(./manage.py harvest --settings=mediathread.settings_test \
@@ -54,15 +54,11 @@ class ExceptionLoggingMiddleware(object):
         import traceback
         print traceback.format_exc()
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
-    'courseaffils.middleware.CourseManagerMiddleware',
+MIDDLEWARE_CLASSES.append(
+    'mediathread.local_settings.ExceptionLoggingMiddleware',
     'mediathread.main.middleware.AuthRequirementMiddleware',
-    'mediathread.course.middleware.CallToActionMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'mediathread.settings_test.ExceptionLoggingMiddleware'
-)
+    'mediathread.course.middleware.CallToActionMiddleware',)
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False
+}

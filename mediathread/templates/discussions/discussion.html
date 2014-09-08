@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load smartif revision static %}
+{% load static %}
 
 {% block title %}
     {% if discussion.title %}{{discussion.title}}{% else %}New Discussion{% endif %}
@@ -22,7 +22,9 @@
 {% block js %}
     <!--All the annotation javascript -->
     {% include "djangosherd/annotator_resources.html" %}
-    
+{% endblock %}
+
+{% block uncompressable_js %}    
     <!--  TinyMCE -->
     <script type="text/javascript">
         var tinyMCEPreInit = { query: '', suffix: '', base:'{% static "js/sherdjs/lib/tiny_mce3/jscripts/tiny_mce" %}' };

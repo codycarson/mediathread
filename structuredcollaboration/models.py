@@ -15,6 +15,16 @@ class CollaborationManager(models.Manager):
     def inc_order(self):
         return 1 + (self.aggregate(Max('_order')).get('_order__max', 0) or 0)
 
+    def get_for_object_list(self, object_list):
+        ctype = ContentType.objects.get_for_model(object_list[0])
+        ids = [str(o.id) for o in object_list]
+        lst = self.filter(content_type__pk=ctype.pk, object_pk__in=ids)
+        return lst
+
+    def get_for_object(self, obj):
+        ctype = ContentType.objects.get_for_model(obj)
+        return self.get(content_type__pk=ctype.pk, object_pk=str(obj.pk))
+
 
 class CollaborationPolicyRecord(models.Model):
     policy_name = models.CharField(max_length=512,
@@ -44,10 +54,9 @@ class Collaboration(models.Model):
     slug = models.SlugField(max_length=50, null=True, default=None, blank=True)
 
     # Content-object field
-    content_type = models.ForeignKey(ContentType,
-                                     related_name=
-                                     "collaboration_set_for_%(class)s",
-                                     null=True, blank=True)
+    content_type = models.ForeignKey(
+        ContentType, related_name="collaboration_set_for_%(class)s",
+        null=True, blank=True)
 
     object_pk = models.CharField(_('object ID'),
                                  max_length=255,
@@ -157,9 +166,9 @@ class Collaboration(models.Model):
         collaboration, if any, associated with this object:
         Collaboration.get_associated_collabs(my_course)
         """
-        ct = ContentType.objects.get_for_model(type(obj))
+        content_type = ContentType.objects.get_for_model(type(obj))
         return Collaboration.objects.get(
-            content_type=ct,
+            content_type=content_type,
             object_pk=str(obj.pk)
         )
 

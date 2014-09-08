@@ -32,7 +32,9 @@ function getVisibleContentHeight() {
     return viewportheight - (20 + document.getElementById("header").clientHeight);
 }
 
-function switcher(a) {
+function switcher(event, a) {
+    event.preventDefault();
+    event.stopPropagation();
     if (jQuery(a).hasClass("menuclosed")) {
         // we're going to open. make sure everyone else is CLOSED
         jQuery(".menuopen").toggleClass("menuopen menuclosed");
@@ -40,10 +42,11 @@ function switcher(a) {
     }
     jQuery(a).toggleClass('menuclosed menuopen');
     jQuery(a).parent().children('.switcher-options').toggle();
+    return false;
 }
 
-function updateHelpSetting(user, help_content_id, value) {
-    jQuery.post('/yourspace/' + user + '/setting/', { name: help_content_id, value: value });
+function updateUserSetting(user, setting, value) {
+    jQuery.post('/setting/' + user + '/', { name: setting, value: value });
 }
 
 function toggleHelp(a, user, parent, help_content_id, callback) {
@@ -53,7 +56,7 @@ function toggleHelp(a, user, parent, help_content_id, callback) {
 
     var user_setting = jQuery(parent).hasClass('on') ? 'True' : 'False';
 
-    jQuery.post('/yourspace/' + user + '/setting/', { name: help_content_id, value: user_setting });
+    jQuery.post('/setting/' + user + '/', { name: help_content_id, value: user_setting });
 
     if (callback) {
         callback();
@@ -80,7 +83,7 @@ function toggleHelpOverlay(btn, user, help_content_id) {
     var elts = jQuery(checked_id);
     if (elts.length) {
         var checked = jQuery(elts[0]).is(":checked");
-        updateHelpSetting(MediaThread.current_username, help_content_id, !checked);
+        updateUserSetting(MediaThread.current_username, help_content_id, !checked);
     }
     
     return false;

@@ -2,7 +2,6 @@
 from django.conf import settings
 from django.test import client
 from lettuce import before, after, world, step
-from lettuce.django import django_url
 from mediathread.projects.models import Project
 from selenium.common.exceptions import NoSuchElementException, \
     StaleElementReferenceException
@@ -10,6 +9,8 @@ import errno
 import os
 import selenium.webdriver.support.ui as ui
 import time
+from lettuce import django
+
 try:
     from lxml import html
     from selenium import webdriver
@@ -36,10 +37,8 @@ def reset_database(variables):
 @before.all
 def setup_browser():
     world.browser = None
-    browser = getattr(settings, 'BROWSER', None)
-    if browser is None:
-        raise Exception('Please configure a browser in settings_test.py')
-    elif browser == 'Firefox':
+    browser = getattr(settings, 'BROWSER', "Chrome")
+    if browser == 'Firefox':
         ff_profile = FirefoxProfile()
         ff_profile.set_preference("webdriver_enable_native_events", False)
         world.browser = webdriver.Firefox(ff_profile)
@@ -80,19 +79,20 @@ def finished_selenium(step):
 @step(r'I access the url "(.*)"')
 def access_url(step, url):
     if world.using_selenium:
-        world.browser.get(django_url(url))
+        world.browser.get(django.django_url(url))
     else:
-        response = world.client.get(django_url(url))
+        response = world.client.get(django.django_url(url))
         world.dom = html.fromstring(response.content)
 
 
 @step(u'the ([^"]*) workspace is loaded')
 def the_name_workspace_is_loaded(step, name):
     workspace_id = None
-    if (name == "composition" or
-        name == "assignment" or
+    if (name == "composition" or name == "assignment" or
             name == "home" or name == "collection"):
         workspace_id = "loaded"
+    elif name == "asset":
+        workspace_id = "asset-loaded"
     else:
         assert False, "No selector configured for %s" % name
 
@@ -108,9 +108,16 @@ def my_browser_resolution_is_width_x_height(step, width, height):
 @step(u'I am ([^"]*) in ([^"]*)')
 def i_am_username_in_course(step, username, coursename):
     if world.using_selenium:
-        world.browser.get(django_url("/accounts/logout/"))
-        world.browser.get(django_url("accounts/login/?next=/"))
-        username_field = world.browser.find_element_by_id("id_login")
+        world.browser.get(django.django_url("/accounts/logout/?next=/"))
+        world.browser.get(django.django_url("accounts/login/?next=/"))
+
+        elt = find_button_by_value("Guest Log In")
+        if elt is None:
+            time.sleep(1)
+            elt = find_button_by_value("Guest Log In")
+        elt.click()
+
+        username_field = world.browser.find_element_by_id("id_username")
         username_field.send_keys(username)
 
         password_field = world.browser.find_element_by_id("id_password")
@@ -137,7 +144,8 @@ def i_am_username_in_course(step, username, coursename):
 @step(u'I am not logged in')
 def i_am_not_logged_in(step):
     if world.using_selenium:
-        world.browser.get(django_url("/accounts/logout/"))
+        from lettuce.django import django_url
+        world.browser.get(django.django_url("/accounts/logout/?next=/"))
     else:
         world.client.logout()
 
@@ -145,9 +153,9 @@ def i_am_not_logged_in(step):
 @step(u'I log out')
 def i_log_out(step):
     if world.using_selenium:
-        world.browser.get(django_url("/accounts/logout/"))
+        world.browser.get(django.django_url("/accounts/logout/?next=/"))
     else:
-        response = world.client.get(django_url("/accounts/logout/"),
+        response = world.client.get(django.django_url("/accounts/logout/?next=/"),
                                     follow=True)
         world.response = response
         world.dom = html.fromstring(response.content)
@@ -179,8 +187,6 @@ def there_is_a_sample_response(step):
 @step(u'I type "([^"]*)" for ([^"]*)')
 def i_type_value_for_field(step, value, field):
     if world.using_selenium:
-        if field == "username":
-            field = "login"
         selector = "input[name=%s]" % field
         elt = world.browser.find_element_by_css_selector(selector)
         assert elt is not None, "Cannot locate input field named %s" % field
@@ -208,7 +214,7 @@ def there_is_not_a_text_link(step, text):
             if a.text:
                 if text.strip().lower() in a.text.strip().lower():
                     href = a.attrib['href']
-                    response = world.client.get(django_url(href))
+                    response = world.client.get(django.django_url(href))
                     world.dom = html.fromstring(response.content)
                     assert False, "found the '%s' link" % text
     else:
@@ -226,7 +232,7 @@ def there_is_a_text_link(step, text):
             if a.text:
                 if text.strip().lower() in a.text.strip().lower():
                     href = a.attrib['href']
-                    response = world.client.get(django_url(href))
+                    response = world.client.get(django.django_url(href))
                     world.dom = html.fromstring(response.content)
                     return
         assert False, "could not find the '%s' link" % text
@@ -246,7 +252,7 @@ def i_click_the_link(step, text):
             if a.text:
                 if text.strip().lower() in a.text.strip().lower():
                     href = a.attrib['href']
-                    response = world.client.get(django_url(href))
+                    response = world.client.get(django.django_url(href))
                     world.dom = html.fromstring(response.content)
                     return
         assert False, "could not find the '%s' link" % text
@@ -859,7 +865,7 @@ def i_clear_all_tags(step):
 @step(u'Given publish to world is ([^"]*)')
 def given_publish_to_world_is_value(step, value):
     if world.using_selenium:
-        world.browser.get(django_url("/dashboard/settings/"))
+        world.browser.get(django.django_url("/dashboard/settings/"))
 
         if value == "enabled":
             elt = world.browser.find_element_by_id(
@@ -875,7 +881,7 @@ def given_publish_to_world_is_value(step, value):
 
         if elt:
             elt.click()
-            world.browser.get(django_url("/"))
+            world.browser.get(django.django_url("/"))
 
 
 @step(u'Then publish to world is ([^"]*)')
@@ -1132,7 +1138,7 @@ def i_save_the_changes(step):
 @step(u'Given the selection visibility is set to "([^"]*)"')
 def given_the_selection_visibility_is_value(step, value):
     if world.using_selenium:
-        world.browser.get(django_url("/dashboard/settings/"))
+        world.browser.get(django.django_url("/dashboard/settings/"))
 
         if value == "Yes":
             elt = world.browser.find_element_by_id("selection_visibility_yes")
@@ -1144,7 +1150,7 @@ def given_the_selection_visibility_is_value(step, value):
         elt = world.browser.find_element_by_id("selection_visibility_submit")
         if elt:
             elt.click()
-            world.browser.get(django_url("/"))
+            world.browser.get(django.django_url("/"))
 
 
 # Local utility functions

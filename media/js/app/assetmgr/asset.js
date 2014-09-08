@@ -433,7 +433,7 @@
         this.dismissHelp = function () {
             jQuery("#asset-view-overlay, #asset-view-help, #asset-view-help-tab").hide();
             var checked = jQuery("#asset-view-show-help").is(":checked");
-            updateHelpSetting(MediaThread.current_username, 'help_item_detail_view', !checked);
+            updateUserSetting(MediaThread.current_username, 'help_item_detail_view', !checked);
             return false;
         };
         
@@ -483,6 +483,21 @@
         ///Item Save -- global annotation
         this.saveItem = function (saveButton) {
             var frm = jQuery(saveButton).parents('form')[0];
+            
+            // Validate the title, if it is editable
+            var newTitle = null;
+            if ('asset-title' in frm.elements) {
+                newTitle = frm.elements['asset-title'].value;
+                if (newTitle.length < 1) {
+                    showMessage('Please specify an item title',
+                                undefined,
+                                'Error',
+                                {my: "center",
+                                 at: "center",
+                                 of: jQuery("div.asset-view-tabs")});
+                    return false;
+                }
+            }                    
             
             // Validate the tag fields...should be in djangosherd?
             var tag_field = frm.elements['annotation-tags'];
@@ -537,6 +552,8 @@
                             'asset-current': self.active_asset,
                             'vocabulary': self.vocabulary
                         };
+                        
+                        Mustache.update("asset-view-header", context);
                          
                         Mustache.update("asset-global-annotation", context, {
                             pre: function (elt) { jQuery(elt).hide(); },
@@ -870,8 +887,8 @@
                 error: function () {},
                 success: function (json, textStatus, xhr) {
                     var tags = [];
-                    for (i=0; i < json.objects.length; i++) {
-                        tags.push(json.objects[i].name);
+                    for (i=0; i < json.tags.length; i++) {
+                        tags.push(json.tags[i].name);
                     }
                     jQuery("input[name='annotation-tags']").select2({
                         tags: tags,

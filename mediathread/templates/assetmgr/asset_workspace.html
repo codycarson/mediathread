@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load revision static compress %}
+{% load static compress %}
 
 {% block title %}
     Collection
@@ -16,27 +16,31 @@
     {% include "djangosherd/annotator_resources_css.html" %}
 {% endblock %}
 
-{% block js %}
-    <!--All the annotation javascript -->
-    {% include "djangosherd/annotator_resources.html" %}
-            
-    <!--  Generic Functionality -->
-    <script type="text/javascript" src="{% static 'jquery/js/jquery.masonry.min.js' %}"></script>
+{% block uncompressable_css %}
+    <script type="text/javascript" src="{{STATIC_URL}}js/select2/select2.min.js"></script>
 {% endblock %}
 
-{% block extra_js %}
-    {{ block.super }}
+{% block js %}
+    <!--All the annotation javascript -->
+    {% include "djangosherd/annotator_resources.html" %}            
+{% endblock %}
+
+{% block uncompressable_js %}
+    <!--  Generic Functionality -->
+    <script type="text/javascript" src="{% static 'jquery/js/jquery.masonry.min.js' %}"></script>
+    
+    <!--  Panel Manage initialization -->
     <script type="text/javascript">
         jQuery(document).ready(function () {
             PanelManager.init({
                 'container': 'sliding-content-container',
                 'url': MediaThread.urls['asset-workspace'](
-                    {% if asset_id %}{{asset_id}}{% endif %}
-                    {% if asset_id and annotation_id %}, {{annotation_id}}{% endif %})
+                     {% if asset_id %}{{asset_id}}{% endif %}
+                     {% if asset_id and annotation_id %}, {{annotation_id}}{% endif %})
             });
         });
     </script>
-{% endblock extra_js %}
+{% endblock %}
 
 {% block content %}
     {{ block.super }}

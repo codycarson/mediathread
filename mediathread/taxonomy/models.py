@@ -7,12 +7,13 @@ from django.template.defaultfilters import slugify
 
 class GenericRelationshipManager(models.Manager):
     def get_for_object(self, obj):
-        """
-          Get a generic foreign key based on passed object
-        """
         ctype = ContentType.objects.get_for_model(obj)
-        return self.filter(content_type__pk=ctype.pk,
-                           object_id=obj.pk)
+        return self.filter(content_type__pk=ctype.pk, object_id=obj.pk)
+
+    def get_for_object_list(self, object_list):
+        ctype = ContentType.objects.get_for_model(object_list[0])
+        ids = object_list.values_list('id', flat=True)
+        return self.filter(content_type__pk=ctype.pk, object_id__in=ids)
 
 
 class Vocabulary(models.Model):
@@ -27,6 +28,9 @@ class Vocabulary(models.Model):
     content_object = generic.GenericForeignKey('content_type', 'object_id')
 
     objects = GenericRelationshipManager()
+
+    class Meta:
+        ordering = ['display_name', 'id']
 
     def save(self, force_insert=False, force_update=False):
         self.name = slugify(self.display_name)
@@ -50,6 +54,7 @@ class Term(models.Model):
 
     class Meta:
         unique_together = ('name', 'vocabulary')
+        ordering = ['display_name', 'id']
 
     def __unicode__(self):
         return "%s, %s" % (self.vocabulary, self.display_name)
@@ -81,3 +86,4 @@ class TermRelationship(models.Model):
 
     class Meta:
         unique_together = ('term', 'content_type', 'object_id')
+        ordering = ['term__display_name', 'id']

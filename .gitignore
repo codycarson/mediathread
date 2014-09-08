@@ -23,6 +23,7 @@ coverage
 collected_static
 .vagrant
 mediathread.db
+reports
 secret_vars.yml
 
 /CACHE/
