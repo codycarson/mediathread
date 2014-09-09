@@ -52,7 +52,7 @@ class AssetViewTest(TestCase):
 
     def test_archive_add(self):
         data = {
-            'thumb': '/site_media/img/thumbs/youtube.png',
+            'thumb': '/media/img/thumbs/youtube.png',
             'title': 'YouTube',
             'url': 'http://www.youtube.com/',
             'archive': 'http://www.youtube.com/'}
