@@ -86,13 +86,13 @@ if (!Sherd.Video.Kaltura && Sherd.Video.Base) {
                 mediaUrl: url, // Used by _seek seeking behavior
                 text: '<div id="' + wrapperID + '" class="sherd-kaltura-wrapper">' +
                       '  <object width="' + obj.options.width + '" height="' + obj.options.height + '" ' + objectID +
-                          ' type="application/x-shockwave-flash" data="' + url + '" ' + classID + '>' +
+                        ' type="application/x-shockwave-flash" data="' + url+ '" ' + classID + ' name="' + playerID +
+                        '" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" resource="' + url + '" >' +
                         '  <param name="movie" value="' + url + '"></param>' +
                         '  <param name="allowscriptaccess" value="always"/></param>' +
                         '  <param name="width" value="' + obj.options.width + '"></param>' +
                         '  <param name="height" value="' + obj.options.height + '"></param>' +
                         '  <param name="allowfullscreen" value="true"></param>' +
-                        '  <param name="flashVars" value="autoPlay=' + autoplay + '&streamerType=hdnetwork&akamaiHD.loadingPolicy=preInitialize&akamaiHD.asyncInit=true&kml=local&kmlPath=http://mediathread.ccnmtl.columbia.edu/media/js/sherdjs/lib/kaltura/config.xml"/>' +
                         '</object>' +
                       '</div>'
             };

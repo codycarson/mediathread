@@ -749,7 +749,7 @@ SherdBookmarklet = {
                     var video = videos[0];                
                     var parent = jQuery(video).parents("div.player")[0];
                     var url = jQuery(parent).attr("data-fallback-url");
-                    var vimeoId = url.split("/")[5];
+                    var vimeoId = url.split("/")[4];
                     
                     SherdBookmarklet.assethandler.objects_and_embeds.players
                     .moogaloop.asset(video, 
@@ -1047,7 +1047,7 @@ SherdBookmarklet = {
                       var primary_type = type+get_provider(clip);
                       sources[primary_type] = clip.completeUrl || clip.originalUrl || clip.resolvedUrl || clip.url || clip;
                       if (provider && provider.netConnectionUrl) {
-                          sources[primary_type] = provider.netConnectionUrl+sources[primary_type]
+                          sources[primary_type] = provider.netConnectionUrl + '//' + sources[primary_type]
                       } 
                       ///TODO:is context.document the right relative URL instead of the SWF?
                       sources[primary_type] = abs(sources[primary_type],context.document);
