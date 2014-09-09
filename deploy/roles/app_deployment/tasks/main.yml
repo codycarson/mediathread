@@ -11,7 +11,7 @@
     - code
 
 - name: Create a virtual env and install app requirements
-  pip: requirements='requirements/local.txt' virtualenv=/opt/venv chdir={{git_repo_dir}}
+  pip: requirements='requirements.txt' virtualenv=/opt/venv chdir={{git_repo_dir}}
   tags:
     - code
 
@@ -30,7 +30,7 @@
     - code
 
 - name: Copy the django settings file
-  template: src=settings_digitalocean.py dest={{django_project_dir}}
+  template: src={{ settings_module }}.py dest={{django_project_dir}}
   tags:
     - code
 
@@ -38,7 +38,7 @@
   django_manage: >
       command=syncdb
       app_path={{git_repo_dir}}
-      settings=mediathread.settings_digitalocean
+      settings=mediathread.{{ settings_module }}
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
   tags:
@@ -48,7 +48,7 @@
   django_manage: >
       command=migrate
       app_path={{git_repo_dir}}
-      settings=mediathread.settings_digitalocean
+      settings=mediathread.{{ settings_module }}
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
   tags:
@@ -58,7 +58,7 @@
   django_manage: >
       command=collectstatic
       app_path={{git_repo_dir}}
-      settings=mediathread.settings_digitalocean
+      settings=mediathread.{{ settings_module }}
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
   tags:
@@ -68,10 +68,11 @@
   django_manage: >
       command=compress
       app_path={{git_repo_dir}}
-      settings=mediathread.settings_digitalocean
+      settings=mediathread.{{ settings_module }}
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
   notify:
     - reload supervisor config
   tags:
     - code
+  when: settings_module == "settings_digitalocean"

@@ -4,3 +4,5 @@
 [server:vars]
 remote_user=root
 sendfile=on
+settings_module=settings_digitalocean
+server_name=mediathread.appsembler.com

@@ -45,11 +45,12 @@ SECRET_KEY = '{{secret_key}}'
 ALLOWED_HOSTS = [
     'mediathread.appsembler.com',
     '.mediathread.appsembler.com',
-    '107.170.23.107'
+    '107.170.23.107',
+    '192.168.33.10'
 ]
 
 MEDIA_ROOT = '{{django_media_dir}}'
-MEDIA_URL = '/media/'
+MEDIA_URL = '/uploads/'
 STATIC_ROOT = '{{django_static_dir}}'
 
 COMPRESS_ENABLED = True

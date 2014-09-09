@@ -1,7 +1,7 @@
 import os, sys, site
 
 # paths we might need to pick up the project's settings
-os.environ['DJANGO_SETTINGS_MODULE'] = 'mediathread.settings_digitalocean'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mediathread.{{ settings_module }}'
 
 import django.core.handlers.wsgi
 
