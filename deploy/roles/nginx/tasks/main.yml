@@ -27,11 +27,26 @@
     - sites-available
     - sites-enabled
 
+- name: Check if SSL cert is present
+  stat: path="{{ item }}"
+  with_items:
+    - server.key
+    - server.crt
+  register: certificate_present
+
+- name: Copy the real SSL certificate
+  copy: src={{inventory_dir}}/../{{item}} dest=/etc/nginx/
+  with_items:
+   - server.crt
+   - server.key
+  when: certificate_present
+
 - name: Copy the self signed SSL certificate
   copy: src={{item}} dest=/etc/nginx/
   with_items:
    - server.crt
    - server.key
+  when: not certificate_present
 
 - name: Copy the virtual host config file
   template: src=nginx_uwsgi.conf dest=/etc/nginx/sites-available/{{app_name}}.conf

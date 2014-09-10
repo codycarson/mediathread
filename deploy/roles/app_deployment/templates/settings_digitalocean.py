@@ -87,7 +87,8 @@ SEGMENTIO_JS_KEY = '{{segmentio_js_key}}'
 AWS_ACCESS_KEY_ID = '{{aws_access_key_id}}'
 AWS_SECRET_ACCESS_KEY = '{{aws_secret_access_key}}'
 AWS_PRELOAD_METADATA = True
-AWS_STORAGE_BUCKET_NAME = 'mediathread_do'
+AWS_STATIC_BUCKET_NAME = '{{aws_static_bucket_name}}'
+AWS_MEDIA_BUCKET_NAME = '{{aws_media_bucket_name}}'
 
 # Flick API key for clipping photos
 DJANGOSHERD_FLICKR_APIKEY = '{{djangosherd_flickr_apikey}}'
