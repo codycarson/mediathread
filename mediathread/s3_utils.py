@@ -2,11 +2,11 @@ from compressor.filters.css_default import CssAbsoluteFilter
 from compressor.utils import staticfiles
 from storages.backends.s3boto import S3BotoStorage
 from django.core.files.storage import get_storage_class
-from django.conf import settings
+from django.conf import settings as django_settings
 
 
 MediaRootS3BotoStorage = lambda: S3BotoStorage(
-    bucket_name=settings.AWS_MEDIA_BUCKET_NAME
+    bucket_name=django_settings.AWS_MEDIA_BUCKET_NAME
 )
 
 
@@ -16,7 +16,7 @@ class CachedStaticRootS3BotoStorage(S3BotoStorage):
     """
     def __init__(self, acl=None, bucket=None, **settings):
         settings['reduced_redundancy'] = True
-        bucket = settings.AWS_STATIC_BUCKET_NAME
+        bucket = django_settings.AWS_STATIC_BUCKET_NAME
         super(CachedStaticRootS3BotoStorage, self).__init__(acl, bucket, **settings)
         self.local_storage = get_storage_class(
             "compressor.storage.CompressorFileStorage")()
