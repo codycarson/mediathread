@@ -43,6 +43,7 @@ DATABASES = {
 SECRET_KEY = '{{secret_key}}'
 
 ALLOWED_HOSTS = [
+    'mediathread-test.appsembler.com',
     'mediathread.dev',
     '192.168.33.10'
 ]

@@ -1,0 +1,8 @@
+[server]
+104.131.56.224
+
+
+[server:vars]
+remote_user=root
+settings_module=settings_vagrant
+server_name=mediathread-test.appsembler.com
