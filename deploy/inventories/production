@@ -1,8 +1,0 @@
-[server]
-107.170.23.107
-
-[server:vars]
-remote_user=root
-sendfile=on
-settings_module=settings_digitalocean
-server_name=mediathread.appsembler.com

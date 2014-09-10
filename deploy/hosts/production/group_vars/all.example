@@ -24,3 +24,9 @@ postgres_password: test
 s3_gpg_passphrase:
 s3_backup_access_key:
 s3_backup_secret_key:
+
+# host specific extras
+remote_user:
+sendfile:
+settings_module:
+server_name:

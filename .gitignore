@@ -24,6 +24,8 @@ collected_static
 .vagrant
 mediathread.db
 reports
-secret_vars.yml
+deploy/hosts/*/group_vars/all
+deploy/hosts/*/*.crt
+deploy/hosts/*/*.key
 
 /CACHE/

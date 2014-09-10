@@ -45,6 +45,8 @@ SECRET_KEY = '{{secret_key}}'
 ALLOWED_HOSTS = [
     'mediathread.appsembler.com',
     '.mediathread.appsembler.com',
+    'mediathread-test.appsembler.com',
+    '.mediathread-test.appsembler.com',
     '107.170.23.107',
     '192.168.33.10'
 ]

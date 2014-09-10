@@ -2,8 +2,8 @@
 
 1. Install ansible: `pip install ansible`
 2. Clone the git repo: `git clone https://github.com/appsembler/mediathread.git`
-3. Switch to the ansible branch: `git checkout feature/ansible`
-4. Enter the deploy folder: `cd deploy`
-5. Enter the IP address of the server under `[server]` in the file production in the current folder
-6. Copy the secret keys template and fill in secret keys in the `secret_vars.yml` file: `cp secret_vars.yml.example secret_vars.yml`
-7. Run the ansible scripts: `ansible-playbook -i production site.yml`
+3. Enter the deploy folder: `cd deploy`
+4. Enter the IP address of the server under `[server]` in the inventory file under `hosts/<server_type>/inventory`
+5. Copy the example settings file: `cp hosts/<server_type>/all.example hosts/<server_type>/all`
+6. Fill the required values in the `hosts/<server_type>/all` file
+7. Run the ansible scripts: `ansible-playbook -i hosts/<server_type>/inventory site.yml`
