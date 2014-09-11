@@ -11,7 +11,7 @@ def get_env_variable(var_name):
         error_msg = "Set the %s environment variable" % var_name
         raise ImproperlyConfigured(error_msg)
 
-DEBUG = False
+DEBUG = True
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
@@ -24,9 +24,9 @@ CACHES = {
     )
 }
 
-MIDDLEWARE_CLASSES = ('django.middleware.cache.UpdateCacheMiddleware',) + \
-                    MIDDLEWARE_CLASSES + \
-                    ('django.middleware.cache.FetchFromCacheMiddleware',)
+#MIDDLEWARE_CLASSES = ('django.middleware.cache.UpdateCacheMiddleware',) + \
+#                    MIDDLEWARE_CLASSES + \
+#                    ('django.middleware.cache.FetchFromCacheMiddleware',)
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
