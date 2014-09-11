@@ -62,7 +62,7 @@
                         </div>
                     {% elif not request.session.courses_created and request.user.is_authenticated %}
                         <div class="call-to-action">
-                            <h2>Want to create your own course? Click here:</h2><a href="{% url "course_create" %}" class="btn btn-success">Create course</a>
+                            <h2>Want to create your own course? Click here:</h2><a href="http://appsembler.wufoo.com/forms/z7p9k5/" onclick="window.open(this.href,  null, 'height=1081, width=680, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false" class="btn btn-success">Create course</a>
                         </div>
                     {% endif %}
                 {% endblock call_to_action %}
@@ -95,7 +95,7 @@
                                     {% if user_courses > 1 or user.is_staff %}
                                         <a href="/?unset_course">Switch Course</a>
                                     {% endif %}
-                                    <a href="{% url "course_create" %}" >Create course</a>
+                                    <a href="http://appsembler.wufoo.com/forms/z7p9k5/" onclick="window.open(this.href,  null, 'height=1081, width=680, toolbar=0, location=0, status=1, scrollbars=1, resizable=1'); return false"" >Create course</a>
 
                                     <a href="{% url "edit_profile" %}">Edit Profile</a>
                                         
