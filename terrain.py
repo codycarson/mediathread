@@ -23,6 +23,9 @@ except:
 @before.each_scenario
 def reset_database(variables):
     world.using_selenium = False
+    from django.db import connection
+    connection.close()
+    connection.connection = None
     try:
         os.remove('lettuce.db')
     except OSError, e:
