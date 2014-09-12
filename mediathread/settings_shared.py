@@ -116,7 +116,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'stagingcontext.staging_processor',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'johnny.middleware.LocalStoreClearMiddleware',
     'johnny.middleware.QueryCacheMiddleware',
     'django_statsd.middleware.GraphiteRequestTimingMiddleware',
@@ -131,7 +131,7 @@ MIDDLEWARE_CLASSES = (
     'mediathread.main.middleware.AuthRequirementMiddleware',
     'mediathread.course.middleware.CallToActionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware'
-)
+]
 
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`

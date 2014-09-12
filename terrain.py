@@ -8,6 +8,7 @@ from selenium.common.exceptions import NoSuchElementException, \
 import errno
 import os
 import selenium.webdriver.support.ui as ui
+import shutil
 import time
 from lettuce import django
 
@@ -22,7 +23,6 @@ except:
 @before.each_scenario
 def reset_database(variables):
     world.using_selenium = False
-
     try:
         os.remove('lettuce.db')
     except OSError, e:
@@ -31,7 +31,7 @@ def reset_database(variables):
         else:
             pass  # database doesn't exist yet. that's okay.
 
-    os.system('cp scripts/lettuce_base.db lettuce.db')
+    shutil.copy2('scripts/lettuce_base.db', 'lettuce.db')
 
 
 @before.all
@@ -111,14 +111,8 @@ def i_am_username_in_course(step, username, coursename):
         world.browser.get(django.django_url("/accounts/logout/?next=/"))
         world.browser.get(django.django_url("accounts/login/?next=/"))
 
-        elt = find_button_by_value("Guest Log In")
-        if elt is None:
-            time.sleep(1)
-            elt = find_button_by_value("Guest Log In")
-        elt.click()
-
-        username_field = world.browser.find_element_by_id("id_username")
-        username_field.send_keys(username)
+        username_field = world.browser.find_element_by_id("id_login")
+        username_field.send_keys(username + "@example.com")
 
         password_field = world.browser.find_element_by_id("id_password")
         password_field.send_keys("test")
@@ -451,11 +445,12 @@ def the_owner_is_name_in_the_title_column(step, name, title):
     assert column, "Unable to find a column entitled %s" % title
 
     s = "div.switcher_collection_chooser"
+    time.sleep(2)
     m = column.find_element_by_css_selector(s)
     owner = m.find_element_by_css_selector("a.switcher-top span.title")
     msg = "Expected owner title to be %s. Actually %s" % (name, owner.text)
     if owner.text != name:
-        time.sleep(1)
+        time.sleep(2)
         m = column.find_element_by_css_selector(s)
         owner = m.find_element_by_css_selector("a.switcher-top span.title")
 
