@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.1
+
+* fix for the Digital Ocean settings file (using list instead of tuples)
+
 ### 1.0.0
 
 * updated Mediathread to version [v2014_Fall](https://github.com/ccnmtl/mediathread/releases/tag/v2014_Fall)
