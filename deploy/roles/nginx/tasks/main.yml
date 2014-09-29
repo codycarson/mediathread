@@ -11,9 +11,13 @@
 
 - name: Install nginx
   apt: pkg=nginx state=latest
+  notify:
+    - restart nginx
 
 - name: Ensure main Nginx configuration file is up to date
   template: src=nginx.conf dest=/etc/nginx/nginx.conf
+  notify:
+    - restart nginx
 
 - name: Remove default virtual hosts
   file: path=/etc/nginx/conf.d/{{item}}.conf state=absent
@@ -44,11 +48,13 @@
   copy: src={{item.item}} dest=/etc/nginx/
   with_items: certs.results
   when: not item.stat.exists
+  notify:
+    - restart nginx
 
 - name: Copy the virtual host config file
   template: src=nginx_uwsgi.conf dest=/etc/nginx/sites-available/{{app_name}}.conf
   notify:
-    - reload nginx
+    - restart nginx
 
 - name: Enable the virtual host
   file: path=/etc/nginx/sites-enabled/{{app_name}}.conf src=/etc/nginx/sites-available/{{app_name}}.conf state=link

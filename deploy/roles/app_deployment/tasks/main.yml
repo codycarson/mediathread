@@ -37,6 +37,7 @@
   template: src={{ settings_module }}.py dest={{django_project_dir}}
   notify:
     - restart supervisor
+    - restart nginx
   tags:
     - code
 
