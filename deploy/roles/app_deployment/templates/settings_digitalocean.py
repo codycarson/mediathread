@@ -24,9 +24,9 @@ CACHES = {
     )
 }
 
-MIDDLEWARE_CLASSES = ('django.middleware.cache.UpdateCacheMiddleware',) + \
+MIDDLEWARE_CLASSES = ['django.middleware.cache.UpdateCacheMiddleware'] + \
                     MIDDLEWARE_CLASSES + \
-                    ('django.middleware.cache.FetchFromCacheMiddleware',)
+                    ['django.middleware.cache.FetchFromCacheMiddleware']
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
@@ -105,9 +105,9 @@ SERVER_EMAIL = "support@appsembler.com"
 PUBLIC_CONTACT_EMAIL = "support@appsembler.com"
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Mediathread] '
 
-INSTALLED_APPS += (
+INSTALLED_APPS += [
     'raven.contrib.django.raven_compat',
-)
+]
 
 RAVEN_CONFIG = {
     'dsn': '{{sentry_dsn}}',
