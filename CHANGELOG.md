@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.0.0
+
+* updated Mediathread to version [v2014_Fall](https://github.com/ccnmtl/mediathread/releases/tag/v2014_Fall)
+* Ansible scripts improved, separated hosts to testing/staging/production
+* SSL support added to Ansible scripts
+* Fixed the functional testing (Lettuce) database to work with Appsembler code changes
+
 ### 0.3.1
 
 * fix for checking how many courses can a user create on the creation form
