@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.2
+
+* restart nginx during deployment
+
 ### 1.0.1
 
 * fix for the Digital Ocean settings file (using list instead of tuples)
