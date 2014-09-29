@@ -1,24 +1,33 @@
 from courseaffils.lib import in_course, in_course_or_404
+from courseaffils.models import Course
 from courseaffils.views import available_courses_query
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
+from django.template import loader
+from django.template.context import Context
+from django.views.generic.base import TemplateView, View
+from django.views.generic.edit import FormView
 from djangohelpers.lib import rendered_with, allow_http
-from mediathread.api import UserResource
+from mediathread.api import UserResource, CourseInfoResource
+from mediathread.assetmgr.api import AssetResource
 from mediathread.assetmgr.models import Asset, SupportedSource
 from mediathread.discussions.utils import get_course_discussions
+from mediathread.djangosherd.models import SherdNote
 from mediathread.main import course_details
-from mediathread.main.api import CourseSummaryResource
-from mediathread.main.decorators import ajax_required, faculty_only
+from mediathread.main.course_details import cached_course_is_faculty
+from mediathread.main.forms import RequestCourseForm
 from mediathread.main.models import UserSetting
-from mediathread.projects.lib import homepage_project_json, \
-    homepage_assignment_json
+from mediathread.mixins import ajax_required, faculty_only, \
+    AjaxRequiredMixin, JSONResponseMixin, LoggedInFacultyMixin
+from mediathread.projects.api import ProjectResource
 from mediathread.projects.models import Project
+from restclient import POST
 from structuredcollaboration.models import Collaboration
+import json
 import operator
-import simplejson
 
 
 # returns important setting information for all web pages.
@@ -37,40 +46,14 @@ def django_settings(request):
                  'PLANS_PAGE_URL'
                  ]
 
-    rv = {'settings': dict([(k, getattr(settings, k, None))
-                            for k in whitelist]),
-          'EXPERIMENTAL': 'experimental' in request.COOKIES, }
+    context = {'settings': dict([(k, getattr(settings, k, None))
+                                 for k in whitelist]),
+               'EXPERIMENTAL': 'experimental' in request.COOKIES}
 
     if request.course:
-        rv['is_course_faculty'] = request.course.is_faculty(request.user)
+        context['is_course_faculty'] = request.course.is_faculty(request.user)
 
-    return rv
-
-
-def get_prof_feed(course, request):
-    projects = []
-    prof_projects = Project.objects.filter(
-        course.faculty_filter).order_by('ordinality', 'title')
-    for project in prof_projects:
-        if (project.class_visible() and
-                not project.is_assignment(request)):
-            projects.append(project)
-
-    return projects
-
-
-def should_show_tour(request, course, user):
-    assets = Asset.objects.annotated_by(course,
-                                        user,
-                                        include_archives=False)
-
-    projects = Project.objects.visible_by_course_and_user(request,
-                                                          user,
-                                                          course)
-
-    return UserSetting.get_setting(user,
-                                   "help_show_homepage_tour",
-                                   len(assets) < 1 and len(projects) < 1)
+    return context
 
 
 @rendered_with('homepage.html')
@@ -85,19 +68,19 @@ def triple_homepage(request):
         in_course_or_404(user_name, request.course)
         classwork_owner = get_object_or_404(User, username=user_name)
 
-    c = request.course
+    course = request.course
 
     archives = []
     upload_archive = None
-    for a in c.asset_set.archives().order_by('title'):
-        archive = a.sources['archive']
-        thumb = a.sources.get('thumb', None)
-        description = a.metadata().get('description', '')
-        uploader = a.metadata().get('upload', 0)
+    for item in course.asset_set.archives().order_by('title'):
+        archive = item.sources['archive']
+        thumb = item.sources.get('thumb', None)
+        description = item.metadata().get('description', '')
+        uploader = item.metadata().get('upload', 0)
 
         archive_context = {
-            "id": a.id,
-            "title": a.title,
+            "id": item.id,
+            "title": item.title,
             "thumb": (None if not thumb else {"id": thumb.id,
                                               "url": thumb.url}),
             "archive": {"id": archive.id, "url": archive.url},
@@ -112,29 +95,26 @@ def triple_homepage(request):
 
     archives.sort(key=operator.itemgetter('title'))
 
-    show_tour = should_show_tour(request, c, logged_in_user)
-
     owners = []
     if (in_course(logged_in_user.username, request.course) and
         (logged_in_user.is_staff or
          logged_in_user.has_perm('assetmgr.can_upload_for'))):
         owners = UserResource().render_list(request, request.course.members)
 
-    discussions = get_course_discussions(c)
-
     context = {
         'classwork_owner': classwork_owner,
         'help_homepage_instructor_column': False,
         'help_homepage_classwork_column': False,
-        'faculty_feed': get_prof_feed(c, request),
-        'is_faculty': c.is_faculty(logged_in_user),
-        'discussions': discussions,
+        'upgrade_bookmarklet': UserSetting.get_setting(
+            logged_in_user, "upgrade_bookmarklet", True),
+        'faculty_feed': Project.objects.faculty_compositions(request, course),
+        'is_faculty': course.is_faculty(logged_in_user),
+        'discussions': get_course_discussions(course),
         'msg': request.GET.get('msg', ''),
         'view': request.GET.get('view', ''),
         'archives': archives,
         'upload_archive': upload_archive,
         'can_upload': course_details.can_upload(request.user, request.course),
-        'show_tour': show_tour,
         'owners': owners
     }
 
@@ -148,90 +128,18 @@ def triple_homepage(request):
     return context
 
 
-@allow_http("GET")
-@ajax_required
-def your_projects(request, record_owner_name):
-    """
-    An ajax-only request to retrieve a specified user's projects,
-    assignment responses and selections
-    """
-    course = request.course
-    in_course_or_404(record_owner_name, course)
-
-    logged_in_user = request.user
-    is_faculty = course.is_faculty(logged_in_user)
-    record_owner = get_object_or_404(User, username=record_owner_name)
-    viewing_own_work = record_owner == logged_in_user
-
-    # Record Owner's Visible Work,
-    # sorted by modified date & feedback (if applicable)
-    projects = Project.objects.visible_by_course_and_user(request,
-                                                          course,
-                                                          record_owner)
-
-    # Show unresponded assignments if viewing self & self is a student
-    assignments = []
-    if not is_faculty and viewing_own_work:
-        assignments = Project.objects.unresponded_assignments(request,
-                                                              logged_in_user)
-
-    # Assemble the context
-    user_rez = UserResource()
-    course_rez = CourseSummaryResource()
-    data = {
-        'assignments': homepage_assignment_json(assignments, is_faculty),
-        'projects': homepage_project_json(request, projects, viewing_own_work),
-        'space_viewer': user_rez.render_one(request, logged_in_user),
-        'space_owner': user_rez.render_one(request, record_owner),
-        'editable': viewing_own_work,
-        'course': course_rez.render_one(request, course),
-        'compositions': len(projects) > 0 or len(assignments) > 0,
-        'is_faculty': is_faculty}
-
-    json_stream = simplejson.dumps(data, indent=2)
-    return HttpResponse(json_stream, mimetype='application/json')
-
-
-@allow_http("GET")
-@ajax_required
-def all_projects(request):
-    """
-    An ajax-only request to retrieve a course's projects,
-    assignment responses and selections
-    """
-    if not request.user.is_staff:
-        in_course_or_404(request.user.username, request.course)
-
-    course = request.course
-    logged_in_user = request.user
-
-    projects = Project.objects.visible_by_course(request, course)
-
-    # Assemble the context
-    user_rez = UserResource()
-    course_rez = CourseSummaryResource()
-    data = {'projects': homepage_project_json(request, projects, False),
-            'space_viewer': user_rez.render_one(request, logged_in_user),
-            'course': course_rez.render_one(request, course),
-            'compositions': len(projects) > 0,
-            'is_faculty': course.is_faculty(logged_in_user)}
-
-    json_stream = simplejson.dumps(data, indent=2)
-    return HttpResponse(json_stream, mimetype='application/json')
-
-
 @allow_http("GET", "POST")
 @rendered_with('dashboard/class_manage_sources.html')
 @faculty_only
 def class_manage_sources(request):
     key = course_details.UPLOAD_PERMISSION_KEY
 
-    c = request.course
+    course = request.course
     user = request.user
 
     upload_enabled = False
-    for a in c.asset_set.archives().order_by('title'):
-        attribute = a.metadata().get('upload', 0)
+    for item in course.asset_set.archives().order_by('title'):
+        attribute = item.metadata().get('upload', 0)
         value = attribute[0] if hasattr(attribute, 'append') else attribute
         if value and int(value) == 1:
             upload_enabled = True
@@ -239,7 +147,7 @@ def class_manage_sources(request):
 
     context = {
         'asset_request': request.GET,
-        'course': c,
+        'course': course,
         'supported_archives': SupportedSource.objects.all().order_by("title"),
         'space_viewer': request.user,
         'is_staff': request.user.is_staff,
@@ -258,7 +166,7 @@ def class_manage_sources(request):
     }
 
     if request.method == "GET":
-        context[key] = int(c.get_detail(
+        context[key] = int(course.get_detail(
             key, course_details.UPLOAD_PERMISSION_DEFAULT))
     else:
         upload_permission = request.POST.get(key)
@@ -274,12 +182,12 @@ def class_manage_sources(request):
 @rendered_with('dashboard/class_settings.html')
 @faculty_only
 def class_settings(request):
-    c = request.course
+    course = request.course
     user = request.user
 
     context = {
         'asset_request': request.GET,
-        'course': c,
+        'course': course,
         'space_viewer': request.user,
         'is_staff': request.user.is_staff,
         'help_public_compositions': UserSetting.get_setting(
@@ -289,14 +197,14 @@ def class_settings(request):
     }
 
     public_composition_key = course_details.ALLOW_PUBLIC_COMPOSITIONS_KEY
-    context[course_details.ALLOW_PUBLIC_COMPOSITIONS_KEY] = \
-        int(c.get_detail(public_composition_key,
-                         course_details.ALLOW_PUBLIC_COMPOSITIONS_DEFAULT))
+    context[course_details.ALLOW_PUBLIC_COMPOSITIONS_KEY] = int(
+        course.get_detail(public_composition_key,
+                          course_details.ALLOW_PUBLIC_COMPOSITIONS_DEFAULT))
 
     selection_visibility_key = course_details.SELECTION_VISIBILITY_KEY
-    context[course_details.SELECTION_VISIBILITY_KEY] = \
-        int(c.get_detail(selection_visibility_key,
-                         course_details.SELECTION_VISIBILITY_DEFAULT))
+    context[course_details.SELECTION_VISIBILITY_KEY] = int(
+        course.get_detail(selection_visibility_key,
+                          course_details.SELECTION_VISIBILITY_DEFAULT))
 
     if request.method == "POST":
         if selection_visibility_key in request.POST:
@@ -316,10 +224,10 @@ def class_settings(request):
             if public_composition_value == 0:
                 # Check any existing projects -- if they are
                 # world publishable, turn this feature OFF
-                projects = Project.objects.filter(course=c)
-                for p in projects:
+                projects = Project.objects.filter(course=course)
+                for project in projects:
                     try:
-                        col = Collaboration.get_associated_collab(p)
+                        col = Collaboration.objects.get_for_object(project)
                         if col._policy.policy_name == 'PublicEditorsAreOwners':
                             col.policy = 'CourseProtected'
                             col.save()
@@ -332,51 +240,54 @@ def class_settings(request):
 
 
 @allow_http("POST")
-@rendered_with('dashboard/class_settings.html')
 @ajax_required
 def set_user_setting(request, user_name):
     user = get_object_or_404(User, username=user_name)
-    name = request.POST.get("name")
-    value = request.POST.get("value")
+    name = request.POST.get("name", None)
+    value = request.POST.get("value", None)
+
+    if name is None:
+        return Http404("Key value not specified")
 
     UserSetting.set_setting(user, name, value)
 
-    json_stream = simplejson.dumps({'success': True})
+    json_stream = json.dumps({'success': True})
     return HttpResponse(json_stream, mimetype='application/json')
 
 
-@allow_http("GET", "POST")
-@rendered_with('dashboard/class_migrate.html')
-@login_required
-@faculty_only
-def migrate(request):
-    if request.method == "GET":
+class MigrateCourseView(LoggedInFacultyMixin, TemplateView):
+
+    template_name = 'dashboard/class_migrate.html'
+
+    def get_context_data(self, **kwargs):
         # Only show courses for which the user is an instructor
-        available_courses = available_courses_query(request.user)
+        available_courses = available_courses_query(self.request.user)
         courses = []
-        if request.user.is_superuser:
+        if self.request.user.is_superuser:
             courses = available_courses
         else:
-            for c in available_courses:
-                if c.is_faculty(request.user):
-                    courses.append(c)
+            for course in available_courses:
+                if cached_course_is_faculty(course, self.request.user):
+                    courses.append(course)
 
         # Only send down the real faculty. Not all us staff members
         faculty = []
-        for u in request.course.faculty.all():
-            if u in request.course.members:
-                faculty.append(u)
+        for user in self.request.course.faculty.all():
+            faculty.append(user)
 
         return {
             "current_course_faculty": faculty,
-            "available_courses": courses,
-            "help_migrate_materials": False
+            "available_courses": courses
         }
-    elif request.method == "POST":
+
+    def post(self, request):
+        from_course_id = request.POST.get('fromCourse', None)
+        from_course = get_object_or_404(Course, id=from_course_id)
+        faculty = [user.id for user in from_course.faculty.all()]
+
         # maps old ids to new objects
         object_map = {'assets': {},
                       'notes': {},
-                      'note_count': 0,
                       'projects': {}}
 
         owner = request.user
@@ -385,28 +296,102 @@ def migrate(request):
 
         if (not in_course(owner.username, request.course) or
                 not request.course.is_faculty(owner)):
-            json_stream = simplejson.dumps({
+            json_stream = json.dumps({
                 'success': False,
                 'message': '%s is not a course member or faculty member'})
             return HttpResponse(json_stream, mimetype='application/json')
 
-        if 'asset_set' in request.POST:
-            asset_set = simplejson.loads(request.POST.get('asset_set'))
-            object_map = Asset.objects.migrate(asset_set,
-                                               request.course,
-                                               owner,
-                                               object_map)
+        if 'asset_ids[]' in request.POST:
+            asset_ids = request.POST.getlist('asset_ids[]')
+            assets = Asset.objects.filter(id__in=asset_ids)
+            object_map = Asset.objects.migrate(
+                assets, request.course, owner, faculty, object_map)
 
-        if 'project_set' in request.POST:
-            project_set = simplejson.loads(request.POST.get('project_set'))
-            object_map = Project.objects.migrate(project_set,
-                                                 request.course,
-                                                 owner,
-                                                 object_map)
+        if 'project_ids[]' in request.POST:
+            project_ids = request.POST.getlist('project_ids[]')
+            projects = Project.objects.filter(id__in=project_ids)
+            object_map = Project.objects.migrate(
+                projects, request.course, owner, object_map)
 
-        json_stream = simplejson.dumps({
+        json_stream = json.dumps({
             'success': True,
             'asset_count': len(object_map['assets']),
             'project_count': len(object_map['projects']),
-            'note_count': object_map['note_count']})
+            'note_count': len(object_map['notes'])})
+
         return HttpResponse(json_stream, mimetype='application/json')
+
+
+class MigrateMaterialsView(LoggedInFacultyMixin, AjaxRequiredMixin,
+                           JSONResponseMixin, View):
+    """
+    An ajax-only request to retrieve course information & materials
+    from the perspective of the course faculty members.
+
+    Returns:
+    * Projects authored by faculty
+    * Assets collected or annotated by faculty
+    Example:
+        /api/course/
+    """
+
+    def get(self, request, *args, **kwargs):
+        course = get_object_or_404(Course, id=kwargs.pop('course_id', None))
+        faculty = [user.id for user in course.faculty.all()]
+        faculty_ctx = UserResource().render_list(request, course.faculty.all())
+
+        # filter assets & notes by the faculty set
+        assets = Asset.objects.by_course(course)
+        assets = assets.filter(sherdnote_set__author__id__in=faculty)
+        notes = SherdNote.objects.get_related_notes(assets, None, faculty)
+
+        ares = AssetResource(include_annotations=False)
+        asset_ctx = ares.render_list(request, None, assets, notes)
+
+        projects = Project.objects.by_course_and_users(course, faculty)
+
+        # filter private projects
+        collabs = Collaboration.objects.get_for_object_list(projects)
+        collabs = collabs.exclude(
+            _policy__policy_name='PrivateEditorsAreOwners')
+        ids = [int(c.object_pk) for c in collabs]
+        projects = projects.filter(id__in=ids)
+
+        info_ctx = CourseInfoResource().render_one(request, course)
+
+        ctx = {
+            'course': {'id': course.id,
+                       'title': course.title,
+                       'faculty': faculty_ctx,
+                       'info': info_ctx},
+            'assets': asset_ctx,
+            'projects': ProjectResource().render_list(request, projects)
+        }
+
+        return self.render_to_json_response(ctx)
+
+
+class RequestCourseView(FormView):
+    template_name = 'main/course_request.html'
+    form_class = RequestCourseForm
+    success_url = "/course/request/success/"
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        form_data.pop('captcha')
+
+        form_data['title'] = 'Mediathread Course Request'
+        form_data['pid'] = "514"
+        form_data['mid'] = "3596"
+        form_data['type'] = 'action item'
+        form_data['owner'] = 'ellenm'
+        form_data['assigned_to'] = 'ellenm'
+        form_data['assigned_to'] = 'ellenm'
+
+        template = loader.get_template('main/course_request_description.txt')
+        form_data['description'] = template.render(Context(form_data))
+
+        POST("http://pmt.ccnmtl.columbia.edu/external_add_item.pl",
+             params=form_data, async=True)
+
+        return super(RequestCourseView, self).form_valid(form)

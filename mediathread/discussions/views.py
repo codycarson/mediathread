@@ -14,7 +14,7 @@ from mediathread.api import UserResource
 from mediathread.assetmgr.api import AssetResource
 from mediathread.discussions.utils import pretty_date
 from mediathread.djangosherd.api import SherdNoteResource
-from mediathread.main.decorators import faculty_only
+from mediathread.mixins import faculty_only
 from mediathread.taxonomy.api import VocabularyResource
 from mediathread.taxonomy.models import Vocabulary
 from random import choice
@@ -23,7 +23,7 @@ from structuredcollaboration.models import Collaboration
 from structuredcollaboration.views import delete_collaboration
 from threadedcomments import ThreadedComment
 from threadedcomments.util import annotate_tree_properties, fill_tree
-import simplejson
+import json
 
 
 @allow_http("POST")
@@ -31,16 +31,15 @@ import simplejson
 def discussion_create(request):
 
     """Start a discussion of an arbitrary model instance."""
-    rp = request.POST
-
-    title = rp['comment_html']
+    title = request.POST['comment_html']
 
     # Find the object we're discussing.
-    the_content_type = ContentType.objects.get(app_label=rp['app_label'],
-                                               model=rp['model'])
+    the_content_type = ContentType.objects.get(
+        app_label=request.POST['app_label'], model=request.POST['model'])
     assert the_content_type is not None
 
-    the_object = the_content_type.get_object_for_this_type(pk=rp['obj_pk'])
+    the_object = the_content_type.get_object_for_this_type(
+        pk=request.POST['obj_pk'])
     assert the_object is not None
 
     try:
@@ -71,8 +70,8 @@ def discussion_create(request):
                             # content_object=None,
                             context=request.collaboration_context,
                             )
-    disc_sc.policy = rp.get('publish', None)
-    if rp.get('inherit', None) == 'true':
+    disc_sc.policy = request.POST.get('publish', None)
+    if request.POST.get('inherit', None) == 'true':
         disc_sc.group_id = obj_sc.group_id
         disc_sc.user_id = obj_sc.user_id
     disc_sc.save()
@@ -117,7 +116,7 @@ def discussion_create(request):
                 'context': threaded_comment_json(request,
                                                  new_threaded_comment)}
 
-        return HttpResponse(simplejson.dumps(data, indent=2),
+        return HttpResponse(json.dumps(data, indent=2),
                             mimetype='application/json')
 
 
@@ -188,7 +187,7 @@ def discussion_view(request, discussion_id):
 
         data['panels'].append(panel)
 
-        return HttpResponse(simplejson.dumps(data, indent=2),
+        return HttpResponse(json.dumps(data, indent=2),
                             mimetype='application/json')
 
 
@@ -226,12 +225,12 @@ def threaded_comment_citations(all_comments, viewer):
     """
     citation references to sherdnotes
     """
-    a = []
-    m = models.get_model('djangosherd', 'SherdNote')
+    citations = []
+    the_model = models.get_model('djangosherd', 'SherdNote')
     for obj in all_comments:
-        refs = m.objects.references_in_string(obj.comment, viewer)
-        a.extend(refs)
-    return a
+        refs = the_model.objects.references_in_string(obj.comment, viewer)
+        citations.extend(refs)
+    return citations
 
 
 def threaded_comment_json(request, comment):

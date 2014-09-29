@@ -5,7 +5,7 @@ Feature: Login
         Given I am not logged in
         When I access the url "/"
         Then I am at the Login page
-        When I type "foo" for username
+        When I type "foo@example.com" for login
         When I type "foo" for password
         When I click the Log In button
         Then I am at the Login page
@@ -16,7 +16,7 @@ Feature: Login
         Given I am not logged in
         When I access the url "/"
         Then I am at the Login page
-        When I type "test_student_one" for username
+        When I type "test_student_one@example.com" for login
         When I type "test" for password
         When I click the Log In button
         Then I am at the Home page
@@ -29,7 +29,7 @@ Feature: Login
         Given I am not logged in
         When I access the url "/"
         Then I am at the Login page
-        When I type "test_instructor" for username
+        When I type "test_instructor@example.com" for login
         When I type "test" for password
         When I click the Log In button
         Then I am at the Home page
@@ -42,7 +42,7 @@ Feature: Login
         Given I am not logged in
         When I access the url "/"
         Then I am at the Login page
-        When I type "test_student_three" for username
+        When I type "test_student_three@example.com" for login
         When I type "test" for password
         When I click the Log In button
         

@@ -2,6 +2,7 @@
   Support for the Kaltura js-enabled player.  documentation at:
   http://Kaltura.com/api/docs/oembed
  */
+
 if (!Sherd) { Sherd = {}; }
 if (!Sherd.Video) { Sherd.Video = {}; }
 if (!Sherd.Video.Kaltura && Sherd.Video.Base) {
@@ -85,7 +86,7 @@ if (!Sherd.Video.Kaltura && Sherd.Video.Base) {
                 mediaUrl: url, // Used by _seek seeking behavior
                 text: '<div id="' + wrapperID + '" class="sherd-kaltura-wrapper">' +
                       '  <object width="' + obj.options.width + '" height="' + obj.options.height + '" ' + objectID +
-                          ' type="application/x-shockwave-flash" data="' + url+ '" ' + classID + ' name="' + playerID +
+                        ' type="application/x-shockwave-flash" data="' + url+ '" ' + classID + ' name="' + playerID +
                         '" allowFullScreen="true" allowNetworking="all" allowScriptAccess="always" resource="' + url + '" >' +
                         '  <param name="movie" value="' + url + '"></param>' +
                         '  <param name="allowscriptaccess" value="always"/></param>' +

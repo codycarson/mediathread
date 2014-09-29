@@ -4,6 +4,9 @@
    Please Login
 {% endblock %}
 
+{% block courseinformation %}
+{% endblock %}
+
 {% block content %}
 
 <div style="padding: 20px; margin: 0 auto; width: 385px; border: black solid 1px;">
@@ -41,8 +44,8 @@
     <div class="form-actions">
         <input type="submit" value="Log In" class="btn btn-large btn-success" />
     </div>
-    <p>Are you a professor looking to create your own course? <a href="{% url registration-form %}">Sign up here</a></p>
-    <p>Forgot your password? <a href="{% url account_reset_password %}">Click here</a> to reset it.</p>
+    <p>Are you a professor looking to create your own course? <a href="{% url "registration-form" %}">Sign up here</a></p>
+    <p>Forgot your password? <a href="{% url "account_reset_password" %}">Click here</a> to reset it.</p>
     <p><i>Note: students will get an invite email from their professors containing the link to create their account</i></p>
 
     <input type="hidden" name="next" value="{{ next|urlencode }}" />

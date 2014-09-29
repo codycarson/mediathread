@@ -78,6 +78,22 @@
                 10
             ]
         }
+    },
+    {
+        "pk": 6,
+        "model": "projects.project", 
+        "fields": {
+            "body": "<p>Class Information</p>", 
+            "feedback": null, 
+            "author": 6, 
+            "title": "Alternate Course Information", 
+            "modified": "2012-12-18 12:17:08", 
+            "submitted": true, 
+            "course": 2, 
+            "participants": [
+                10
+            ]
+        }
     }, 
     {
         "pk": 1, 
@@ -108,22 +124,6 @@
         }
     }, 
     {
-        "pk": 2, 
-        "model": "structuredcollaboration.collaboration", 
-        "fields": {
-            "_order": 2, 
-            "group": 3, 
-            "context": null, 
-            "title": "Alternate Course", 
-            "_policy": null, 
-            "object_pk": "2", 
-            "_parent": null, 
-            "user": null, 
-            "content_type": 7, 
-            "slug": "Alternate_Course"
-        }
-    }, 
-    {
         "pk": 4, 
         "model": "structuredcollaboration.collaboration", 
         "fields": {
@@ -132,10 +132,13 @@
             "context": 1, 
             "title": "Instructor Shared ", 
             "_policy": 2, 
-            "object_pk": "2", 
+            "object_pk": "2",
             "_parent": null, 
             "user": 3, 
-            "content_type": 20, 
+            "content_type": [
+                "projects", 
+                "project"
+            ], 
             "slug": null
         }
     }, 
@@ -151,7 +154,10 @@
             "object_pk": "1", 
             "_parent": null, 
             "user": 3, 
-            "content_type": 20, 
+            "content_type": [
+                "projects", 
+                "project"
+            ],  
             "slug": null
         }
     }, 
@@ -167,7 +173,10 @@
             "object_pk": "4", 
             "_parent": null, 
             "user": 5, 
-            "content_type": 20, 
+            "content_type": [
+                "projects", 
+                "project"
+            ], 
             "slug": null
         }
     }, 
@@ -183,26 +192,13 @@
             "object_pk": "3", 
             "_parent": null, 
             "user": 3, 
-            "content_type": 20, 
+            "content_type": [
+                "projects", 
+                "project"
+            ], 
             "slug": null
         }
-    }, 
-    {
-        "pk": 1, 
-        "model": "structuredcollaboration.collaboration", 
-        "fields": {
-            "_order": 1, 
-            "group": 2, 
-            "context": null, 
-            "title": "Sample Course", 
-            "_policy": null, 
-            "object_pk": "1", 
-            "_parent": null, 
-            "user": null, 
-            "content_type": 7, 
-            "slug": "Sample_Course"
-        }
-    }, 
+    },
     {
         "pk": 7, 
         "model": "structuredcollaboration.collaboration", 
@@ -215,8 +211,30 @@
             "object_pk": "5", 
             "_parent": null, 
             "user": 10, 
-            "content_type": 20,
+            "content_type": [
+                "projects", 
+                "project"
+            ], 
             "slug": null
         }
-    }
+    },
+    {
+        "pk": 8, 
+        "model": "structuredcollaboration.collaboration", 
+        "fields": {
+            "_order": 8, 
+            "group": null, 
+            "context": 1, 
+            "title": "Alternate Course Information", 
+            "_policy": 3,
+            "object_pk": "6", 
+            "_parent": null, 
+            "user": 6, 
+            "content_type": [
+                "projects", 
+                "project"
+            ], 
+            "slug": null
+        }
+    }    
 ]

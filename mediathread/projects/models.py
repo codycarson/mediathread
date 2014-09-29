@@ -52,14 +52,13 @@ PUBLISH_OPTIONS_PUBLIC = ('PublicEditorsAreOwners',
 class ProjectManager(models.Manager):
 
     def migrate(self, project_set, course, user, object_map):
-        SherdNote = models.get_model('djangosherd', 'SherdNote')
-        Asset = models.get_model('assetmgr', 'Asset')
+        note_model = models.get_model('djangosherd', 'sherdnote')
+        asset_model = models.get_model('assetmgr', 'asset')
 
-        for project_json in project_set:
-            old_project = Project.objects.get(id=project_json['id'])
+        for old_project in project_set:
             project_body = old_project.body
-            citations = SherdNote.objects.references_in_string(project_body,
-                                                               user)
+            citations = note_model.objects.references_in_string(project_body,
+                                                                user)
 
             new_project = Project.objects.migrate_one(old_project,
                                                       course,
@@ -76,14 +75,14 @@ class ProjectManager(models.Manager):
                             new_asset = object_map['assets'][old_note.asset.id]
                         else:
                             # migrate the asset
-                            new_asset = Asset.objects.migrate_one(
+                            new_asset = asset_model.objects.migrate_one(
                                 old_note.asset, course, user)
                             object_map['assets'][old_note.asset.id] = new_asset
 
                         # migrate the note
-                        new_note = SherdNote.objects.migrate_one(old_note,
-                                                                 new_asset,
-                                                                 user)
+                        new_note = note_model.objects.migrate_one(old_note,
+                                                                  new_asset,
+                                                                  user)
 
                         object_map['notes'][old_note.id] = new_note
 
@@ -95,7 +94,7 @@ class ProjectManager(models.Manager):
                     project_body = \
                         new_note.asset.update_references_in_string(
                             project_body, old_note.asset)
-                except Asset.DoesNotExist:
+                except asset_model.DoesNotExist:
                     # todo: The asset was deleted, but is still referenced.
                     pass
 
@@ -106,10 +105,10 @@ class ProjectManager(models.Manager):
         return object_map
 
     def migrate_one(self, project, course, user):
-        x = Project(title=project.title,
-                    course=course,
-                    author=user)
-        x.save()
+        new_project = Project(title=project.title,
+                              course=course,
+                              author=user)
+        new_project.save()
 
         collaboration_context = Collaboration.objects.get(
             content_type=ContentType.objects.get_for_model(Course),
@@ -118,10 +117,11 @@ class ProjectManager(models.Manager):
         policy = project.collaboration()._policy
 
         Collaboration.objects.create(
-            user=x.author, title=x.title, content_object=x,
-            context=collaboration_context, policy=policy.policy_name,)
+            user=new_project.author, title=new_project.title,
+            content_object=new_project,
+            context=collaboration_context, policy=policy.policy_name)
 
-        return x
+        return new_project
 
     def visible_by_course(self, request, course):
         projects = Project.objects.filter(course=course)
@@ -136,20 +136,38 @@ class ProjectManager(models.Manager):
         projects = projects.order_by('-modified', 'title')
         return [p for p in projects if p.visible(request)]
 
+    def by_course_and_users(self, course, user_ids):
+        projects = Project.objects.filter(
+            Q(author__id__in=user_ids, course=course) |
+            Q(participants__id__in=user_ids, course=course)).distinct()
+
+        return projects.order_by('-modified', 'title')
+
+    def faculty_compositions(self, request, course):
+        projects = []
+        prof_projects = Project.objects.filter(
+            course.faculty_filter).order_by('ordinality', 'title')
+        for project in prof_projects:
+            if (project.class_visible() and
+                    not project.is_assignment(request)):
+                projects.append(project)
+
+        return projects
+
     def unresponded_assignments(self, request, user):
         course = request.course
-        a = list(Project.objects.filter(course.faculty_filter,
-                                        due_date__isnull=False).
-                 order_by("due_date", "-modified", "title"))
+        projects = list(Project.objects.filter(course.faculty_filter,
+                                               due_date__isnull=False).
+                        order_by("due_date", "-modified", "title"))
 
-        a.extend(Project.objects.filter(course.faculty_filter,
-                                        due_date__isnull=True).
-                 order_by("-modified", "title"))
+        projects.extend(Project.objects.filter(course.faculty_filter,
+                                               due_date__isnull=True).
+                        order_by("-modified", "title"))
 
         assignments = []
         project_type = ContentType.objects.get_for_model(Project)
 
-        for assignment in a:
+        for assignment in projects:
             if (assignment.visible(request) and
                 assignment.is_unanswered_assignment(request,
                                                     user,
@@ -203,8 +221,8 @@ class Project(models.Model):
     def clean(self):
         from django.core.exceptions import ValidationError
 
-        dt = datetime.today()
-        this_day = datetime(dt.year, dt.month, dt.day, 0, 0)
+        today = datetime.today()
+        this_day = datetime(today.year, today.month, today.day, 0, 0)
         if self.due_date is not None and self.due_date < this_day:
             msg = "%s is not valid for the Due Date field.\n" % \
                 self.get_due_date()
@@ -332,11 +350,11 @@ class Project(models.Model):
         """
         The project's status, one of "draft submitted complete".split()
         """
-        o = dict(PUBLISH_OPTIONS)
+        opts = dict(PUBLISH_OPTIONS)
 
         col = self.collaboration()
         if col:
-            return o.get(col._policy.policy_name, col._policy.policy_name)
+            return opts.get(col._policy.policy_name, col._policy.policy_name)
         elif self.submitted:
             return u"Submitted"
         else:
@@ -378,8 +396,8 @@ class Project(models.Model):
         """
         citation references to sherdnotes
         """
-        SherdNote = models.get_model('djangosherd', 'SherdNote')
-        return SherdNote.objects.references_in_string(self.body, self.author)
+        note_model = models.get_model('djangosherd', 'SherdNote')
+        return note_model.objects.references_in_string(self.body, self.author)
 
     @property
     def content_object(self):
@@ -450,17 +468,18 @@ class Project(models.Model):
             return
 
         if sync_group:
-            part = self.participants.all()
-            if (len(part) > 1 or
+            participants = self.participants.all()
+            if (len(participants) > 1 or
                 (col.group_id and col.group.user_set.count() > 1)
-                    or (self.author not in part and len(part) > 0)):
+                    or (self.author not in participants and
+                        len(participants) > 0)):
                 colgrp = col.have_group()
                 already_grp = set(colgrp.user_set.all())
-                for p in part:
-                    if p in already_grp:
-                        already_grp.discard(p)
+                for user in participants:
+                    if user in already_grp:
+                        already_grp.discard(user)
                     else:
-                        colgrp.user_set.add(p)
+                        colgrp.user_set.add(user)
                 for oldp in already_grp:
                     colgrp.user_set.remove(oldp)
             if request and request.method == "POST" and \
@@ -470,20 +489,6 @@ class Project(models.Model):
                 col.save()
 
         return col
-
-    def content_metrics(self):
-        "Do some rough heuristics on how much each author contributed"
-        last_content = ''
-        author_contributions = {}
-        for v in self.versions:
-            change = len(v.body) - len(last_content)
-            author_contributions.setdefault(v.author, [0, 0])
-            if change > 0:  # track adds
-                author_contributions[v.author][0] += change
-            elif change < 0:  # track deletes
-                author_contributions[v.author][1] -= change
-            last_content = v.body
-        return author_contributions
 
 
 @receiver(post_save, sender=ThreadedComment)

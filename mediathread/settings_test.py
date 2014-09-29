@@ -1,23 +1,25 @@
 # flake8: noqa
 from settings_shared import *
-
-STATSD_HOST = '127.0.0.1'
+import os
 
 DEBUG = True
+
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'lettuce.db',
+        'NAME': os.path.join(PROJECT_PATH, '../lettuce.db'),
         'OPTIONS': {
             'timeout': 30,
         }
     }
 }
 
-
 LETTUCE_SERVER_PORT = 8002
-BROWSER = 'Headless' # ["Chrome", "Firefox", "Headless"]
+#BROWSER = 'Firefox'
+BROWSER = 'Headless'
+#BROWSER = 'Chrome'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
@@ -28,17 +30,25 @@ LETTUCE_APPS = (
     'mediathread.djangosherd'
 )
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'test',
+    },
+}
+
+# Remove Johnny cache middleware
+MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES[2:]
+
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+
 #ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-#ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 
 LETTUCE_DJANGO_APP = ['lettuce.django']
 INSTALLED_APPS = INSTALLED_APPS + LETTUCE_DJANGO_APP
 
-CUSTOMERIO_SITE_ID = ''
-CUSTOMERIO_API_KEY = ''
-ACCOUNT_LOGOUT_ON_GET = True
-SOUTH_TESTS_MIGRATE = True
 
 # Full run
 # time(./manage.py harvest --settings=mediathread.settings_test \
@@ -54,15 +64,27 @@ class ExceptionLoggingMiddleware(object):
         import traceback
         print traceback.format_exc()
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
-    'courseaffils.middleware.CourseManagerMiddleware',
-    'mediathread.main.middleware.AuthRequirementMiddleware',
-    'mediathread.course.middleware.CallToActionMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'mediathread.settings_test.ExceptionLoggingMiddleware'
-)
+#MIDDLEWARE_CLASSES.append(
+#    'mediathread.settings_test.ExceptionLoggingMiddleware'
+#)
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False
+}
+
+USTOMERIO_SITE_ID = '3af7cd0031ac680ac8c8'
+CUSTOMERIO_API_KEY = 'de75f487148abf4f01f3'
+
+SEGMENTIO_API_KEY = 'llrwwp6uvr'
+SEGMENTIO_JS_KEY = 'llrwwp6uvr'
+
+SOUTH_TESTS_MIGRATE = False
+ACCOUNT_LOGOUT_ON_GET = True
+
+CRISPY_TEMPLATE_PACK = 'bootstrap'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+DJANGOSHERD_FLICKR_APIKEY = '5ae43f2ccf372996beeb9d1d33121857'
+SAMPLE_COURSE_ID = 1
+SECRET_KEY = 'sadasdasd'

@@ -107,7 +107,7 @@ if (!Sherd.Image.FSIViewer) {
             'default': {
                 height: function (obj, presenter) { return Sherd.winHeight() + 'px'; },
                 width: function (obj, presenter) { return '100%'; },
-                extra: 'CustomButton_buttons=&amp;NoNav=undefined&amp;MenuAlign=TL',
+                extra: 'CustomButton_buttons=&amp;NoNav=undefined&amp;MenuAlign=TL&amp;HideUI=false',
                 resize: function () {
                     var top = self.components.top;
                     top.setAttribute('height', Sherd.winHeight() + 'px');
@@ -120,7 +120,7 @@ if (!Sherd.Image.FSIViewer) {
                     return height + 'px';
                 },
                 width: function (obj, presenter) { return '100%'; },
-                extra: 'CustomButton_buttons=&amp;NoNav=undefined&amp;MenuAlign=TL',
+                extra: 'CustomButton_buttons=&amp;NoNav=undefined&amp;MenuAlign=TL&amp;HideUI=false',
                 resize: function () {
                     var top = self.components.top;
                     var height = self.components.winHeight ? self.components.winHeight() : Sherd.winHeight();
@@ -131,7 +131,7 @@ if (!Sherd.Image.FSIViewer) {
             'small': {
                 height: function () { return '240px'; },
                 width: function () { return '320px'; },
-                extra: 'CustomButton_buttons=&amp;NoNav=undefined&amp;MenuAlign=BL',
+                extra: 'CustomButton_buttons=&amp;NoNav=undefined&amp;MenuAlign=BL&amp;HideUI=false',
                 resize: function () {/*noop*/}
             }
         };
@@ -216,11 +216,20 @@ if (!Sherd.Image.FSIViewer) {
         this.microformat.create = function (obj, doc, options) {
             ///NOTE: we need underscores because this will become a javascript function name
             var fsi_object_id = Sherd.Base.newID('fsiviewer_wrapper');
-            var broken_url = obj.image_fpx.split('/');
+            
+            var broken_url;
+            var fpx;
+            if (obj.hasOwnProperty('image_fpx')) {
+                broken_url = obj.image_fpx.split('/');
+                fpx = obj["image_fpx-metadata"];
+            } else {
+                broken_url = obj.image_fpxid.split('/');
+                fpx = obj["image_fpxid-metadata"]
+            }
             var presentation = self.presentations[obj.presentation || 'default'];
             obj.image_fpx_base = broken_url.slice(0, 3).join('/') + '/';
             obj.image_fpx_src = broken_url.slice(3).join('/');
-            var fpx = obj["image_fpx-metadata"];
+            
             var full_fpx_url = obj.fsiviewer +
                 '?FPXBase=' + obj.image_fpx_base +
                 '&amp;FPXSrc=' + obj.image_fpx_src +

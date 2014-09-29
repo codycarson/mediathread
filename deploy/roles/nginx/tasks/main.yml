@@ -27,6 +27,24 @@
     - sites-available
     - sites-enabled
 
+- name: Check if SSL cert is present
+  local_action: stat path="{{inventory_dir}}/{{ item }}"
+  sudo: False
+  with_items:
+    - server.key
+    - server.crt
+  register: certs
+
+- name: Copy the real SSL certificate
+  copy: src={{inventory_dir}}/{{item.item}} dest=/etc/nginx/
+  with_items: certs.results
+  when: item.stat.exists
+
+- name: Copy the self signed SSL certificate
+  copy: src={{item.item}} dest=/etc/nginx/
+  with_items: certs.results
+  when: not item.stat.exists
+
 - name: Copy the virtual host config file
   template: src=nginx_uwsgi.conf dest=/etc/nginx/sites-available/{{app_name}}.conf
   notify:

@@ -2,12 +2,13 @@ from courseaffils.models import Course
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.query_utils import Q
 from tagging.models import Tag
+import json
 import re
-import simplejson
 
 
-def default_url_processor(source, request):
+def default_url_processor(source, request, obj=None):
     return source.url
 
 # Override in deploy_specific/settings.py
@@ -23,100 +24,103 @@ class AssetManager(models.Manager):
         if not criteria:
             return False
 
-        q = reduce(lambda x, y: x | y,  # composable Q's
-                   [models.Q(label=k, url=args[k], primary=True)
-                    for k in criteria])
-        sources = Source.objects.filter(q, **constraints)
+        qry = reduce(lambda x, y: x | y,  # composable Q's
+                     [models.Q(label=k, url=args[k], primary=True)
+                      for k in criteria])
+        sources = Source.objects.filter(qry, **constraints)
         if sources:
             return sources[0].asset
         else:
             return None
 
     def archives(self):
-        return self.filter(source__primary=True, source__label='archive')
+        return self.filter(Q(source__primary=True) &
+                           Q(source__label='archive'))
 
-    def annotated_by(self, course, user, include_archives=False):
-        assets = Asset.objects.filter(course=course)
-        fassets = assets.filter(
-            sherdnote_set__author=user, sherdnote_set__range1=None).distinct()\
-            .order_by('-sherdnote_set__modified').select_related()
-        if include_archives:
-            return fassets
-        else:
-            to_return = []
-            for asset in fassets:
-                if asset.primary.label != 'archive':
-                    to_return.append(asset)
-            return to_return
+    def by_course_and_user(self, course, user):
+        # returns the assets in a user's "collection"
+        assets = Asset.objects.filter(course=course,
+                                      sherdnote_set__author=user,
+                                      sherdnote_set__range1=None).distinct()
 
-    def migrate(self, asset_set, course, user, object_map):
-        SherdNote = models.get_model('djangosherd', 'sherdnote')
-        for asset_json in asset_set:
-            if asset_json['id'] not in object_map['assets']:
-                old_asset = Asset.objects.get(id=asset_json['id'])
+        # Exclude archives from these lists
+        assets = assets.exclude(Q(source__primary=True) &
+                                Q(source__label='archive'))
+        return assets.order_by('-sherdnote_set__modified').select_related()
+
+    def by_course(self, course):
+        assets = Asset.objects.filter(course=course) \
+            .extra(select={'lower_title': 'lower(assetmgr_asset.title)'}) \
+            .distinct().select_related().order_by('lower_title')
+
+        # Exclude archives from these lists
+        assets = assets.exclude(Q(source__primary=True) &
+                                Q(source__label='archive'))
+        return assets.order_by('-sherdnote_set__modified')
+
+    def migrate(self, assets, course, user, faculty, object_map):
+        note_model = models.get_model('djangosherd', 'sherdnote')
+        for old_asset in assets:
+            if old_asset.id not in object_map['assets']:
                 new_asset = Asset.objects.migrate_one(old_asset,
                                                       course,
                                                       user)
                 object_map['assets'][old_asset.id] = new_asset
 
-                annotations = []
+                notes = note_model.objects.get_related_notes(
+                    [old_asset], None, faculty)
 
-                if "annotations" in asset_json:
-                    annotations = annotations + asset_json["annotations"]
-
-                for note_json in annotations:
-                    if note_json["id"] not in object_map['notes']:
-                        old_note = SherdNote.objects.get(
-                            id=note_json["id"])
-                        new_note = SherdNote.objects.migrate_one(old_note,
-                                                                 new_asset,
-                                                                 user)
-                        # Don't count global annotations
+                for old_note in notes:
+                    if (not old_note.is_global_annotation() and
+                            old_note.id not in object_map['notes']):
+                        new_note = note_model.objects.migrate_one(old_note,
+                                                                  new_asset,
+                                                                  user)
                         object_map['notes'][old_note.id] = new_note
 
                 # migrate the requesting user's global annotation
                 # on this asset, if it exists
-                ga = old_asset.global_annotation(user, False)
-                if ga:
-                    SherdNote.objects.migrate_one(ga, new_asset, user)
+                gann = old_asset.global_annotation(user, False)
+                if gann:
+                    note_model.objects.migrate_one(gann, new_asset, user)
 
         return object_map
 
     def migrate_one(self, asset, course, user):
         # Check to see if an asset exists with this mo already
-        x = None
+        new_asset = None
         try:
-            x = Asset.objects.get(title=asset.title,
-                                  course=course,
-                                  author=user,
-                                  metadata_blob=asset.metadata_blob)
-            if (x.primary.label != asset.primary.label or
-                    x.primary.url != asset.primary.url):
-                x = None
+            new_asset = Asset.objects.get(title=asset.title,
+                                          course=course,
+                                          author=user,
+                                          metadata_blob=asset.metadata_blob)
+            if (new_asset.primary.label != asset.primary.label or
+                    new_asset.primary.url != asset.primary.url):
+                new_asset = None
         except Asset.DoesNotExist:
             pass
 
-        if not x:
-            x = Asset(title=asset.title,
-                      course=course,
-                      author=user,
-                      metadata_blob=asset.metadata_blob)
-            x.save()
+        if not new_asset:
+            new_asset = Asset(title=asset.title,
+                              course=course,
+                              author=user,
+                              metadata_blob=asset.metadata_blob)
+            new_asset.save()
 
             for source in asset.source_set.all():
-                s = Source(asset=x,
-                           label=source.label,
-                           url=source.url,
-                           primary=source.primary,
-                           media_type=source.media_type,
-                           size=source.size,
-                           height=source.height,
-                           width=source.width)
-                s.save()
+                new_source = Source(asset=new_asset,
+                                    label=source.label,
+                                    url=source.url,
+                                    primary=source.primary,
+                                    media_type=source.media_type,
+                                    size=source.size,
+                                    height=source.height,
+                                    width=source.width)
+                new_source.save()
 
-            x.global_annotation(user, auto_create=True)
+            new_asset.global_annotation(user, auto_create=True)
 
-        return x
+        return new_asset
 
 
 class Asset(models.Model):
@@ -155,7 +159,7 @@ class Asset(models.Model):
                      'ogg', 'vimeo', 'kaltura',
                      'video_pseudo', 'video_rtmp', 'video',
                      'mp3', 'mp4_audio',
-                     'image_fpx',  # artstor.org and FSI flash image viewer
+                     'image_fpx', 'image_fpxid',  # artstor.org
                      'image')
 
     # not good for uniqueness
@@ -175,7 +179,7 @@ class Asset(models.Model):
     def metadata(self):
         if self.metadata_blob:
             try:
-                return simplejson.loads(str(self.metadata_blob))
+                return json.loads(str(self.metadata_blob))
             except:  # presumably json decoding, but let's quiet everything
                 return {}
         return {}
@@ -197,9 +201,9 @@ class Asset(models.Model):
 
     @property
     def primary(self):
-        p = getattr(self, '_primary_cache', None)
-        if p:
-            return p
+        primary_cache = getattr(self, '_primary_cache', None)
+        if primary_cache:
+            return primary_cache
         self._primary_cache = Source.objects.get(asset=self, primary=True)
         return self._primary_cache
 
@@ -224,10 +228,9 @@ class Asset(models.Model):
         return tags
 
     def global_annotation(self, user, auto_create=True):
-        SherdNote = models.get_model('djangosherd', 'sherdnote')
-        if SherdNote:
-            return SherdNote.objects.global_annotation(
-                self, user, auto_create=auto_create)[0]
+        note_model = models.get_model('djangosherd', 'sherdnote')
+        return note_model.objects.global_annotation(self, user,
+                                                    auto_create=auto_create)[0]
 
     def media_type(self):
         label = 'video'
@@ -247,9 +250,9 @@ class Asset(models.Model):
         is tagging the asset .. though it'd be nicer to return
         whether this function actually did anything.
         """
-        SherdNote = models.get_model('djangosherd', 'sherdnote')
-        if SherdNote:
-            bucket, created = SherdNote.objects.global_annotation(self, user)
+        note_model = models.get_model('djangosherd', 'sherdnote')
+        if note_model:
+            bucket, created = note_model.objects.global_annotation(self, user)
             bucket.add_tag(tag)
             bucket.save()
             return created
@@ -267,15 +270,15 @@ class Asset(models.Model):
     def user_analysis_count(self, user):
         # global notes y/n + global tag count + annotation count
         count = 0
-        ga = self.global_annotation(user, False)
+        gann = self.global_annotation(user, False)
         annotations = self.sherdnote_set.filter(author=user)
-        if ga:
-            if ga.body and len(ga.body) > 0:
+        if gann:
+            if gann.body and len(gann.body) > 0:
                 count += 1
-            if ga.tags and len(ga.tags) > 0:
-                count += len(ga.tags_split())
+            if gann.tags and len(gann.tags) > 0:
+                count += len(gann.tags_split())
 
-            annotations = annotations.exclude(id=ga.id)
+            annotations = annotations.exclude(id=gann.id)
 
         count += len(annotations)
         return count
@@ -331,8 +334,8 @@ class Source(models.Model):
     def is_archive(self):
         return self.label == 'archive'
 
-    def url_processed(self, request):
-        return url_processor(self, request)
+    def url_processed(self, request, obj=None):
+        return url_processor(self, request, obj)
 
 
 class SupportedSource(models.Model):

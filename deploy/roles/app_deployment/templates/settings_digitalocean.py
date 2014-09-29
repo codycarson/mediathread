@@ -45,11 +45,14 @@ SECRET_KEY = '{{secret_key}}'
 ALLOWED_HOSTS = [
     'mediathread.appsembler.com',
     '.mediathread.appsembler.com',
-    '107.170.23.107'
+    'mediathread-test.appsembler.com',
+    '.mediathread-test.appsembler.com',
+    '107.170.23.107',
+    '192.168.33.10'
 ]
 
 MEDIA_ROOT = '{{django_media_dir}}'
-MEDIA_URL = '/media/'
+MEDIA_URL = '/uploads/'
 STATIC_ROOT = '{{django_static_dir}}'
 
 COMPRESS_ENABLED = True
@@ -63,7 +66,7 @@ COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.CSSMinFilter'
 ]
-AWS_IS_GZIPPED = True
+AWS_IS_GZIPPED = False
 AWS_QUERYSTRING_EXPIRE = 63115200
 AWS_S3_SECURE_URLS = True
 AWS_S3_CUSTOM_DOMAIN = '{{cloudfront_url}}'
@@ -86,7 +89,8 @@ SEGMENTIO_JS_KEY = '{{segmentio_js_key}}'
 AWS_ACCESS_KEY_ID = '{{aws_access_key_id}}'
 AWS_SECRET_ACCESS_KEY = '{{aws_secret_access_key}}'
 AWS_PRELOAD_METADATA = True
-AWS_STORAGE_BUCKET_NAME = 'mediathread_do'
+AWS_STATIC_BUCKET_NAME = '{{aws_static_bucket_name}}'
+AWS_MEDIA_BUCKET_NAME = '{{aws_media_bucket_name}}'
 
 # Flick API key for clipping photos
 DJANGOSHERD_FLICKR_APIKEY = '{{djangosherd_flickr_apikey}}'

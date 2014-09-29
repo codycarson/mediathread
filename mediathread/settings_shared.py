@@ -1,3 +1,4 @@
+# flake8: noqa
 # Django settings for mediathread project.
 
 # if you add a 'deploy_specific' directory
@@ -6,14 +7,14 @@
 
 from courseaffils import policies
 from django.contrib.messages import constants as message_constants
-import os
+import os.path
 import re
 import sys
 
 APP_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)))
 PROJECT_ROOT = os.path.join(APP_ROOT, '..')
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     ('admin', 'mediathread@example.com'),
@@ -35,6 +36,8 @@ DATABASES = {
 }
 
 if 'test' in sys.argv or 'jenkins' in sys.argv:
+    CAPTCHA_TEST_MODE = True
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -79,7 +82,7 @@ MEDIA_ROOT = "uploads/"
 MEDIA_URL = '/uploads/'
 
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'collected_static')
-STATIC_URL = '/site_media/'
+STATIC_URL = '/media/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -107,24 +110,28 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'mediathread.main.views.django_settings',
+    'django.core.context_processors.static',
     "allauth.account.context_processors.account",
     "allauth.socialaccount.context_processors.socialaccount",
-'stagingcontext.staging_processor',
+    'stagingcontext.staging_processor',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'johnny.middleware.LocalStoreClearMiddleware',
     'johnny.middleware.QueryCacheMiddleware',
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'courseaffils.middleware.CourseManagerMiddleware',
     'mediathread.main.middleware.AuthRequirementMiddleware',
     'mediathread.course.middleware.CallToActionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware'
-)
+]
 
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -142,8 +149,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     # Put application templates before these fallback ones:
-    #"/var/www/mediathread/templates/",
-    #os.path.join(os.path.dirname(__file__), "deploy_specific/templates"),
+    os.path.join(os.path.dirname(__file__), "deploy_specific/templates"),
     os.path.join(os.path.dirname(__file__), "templates"),
 )
 
@@ -154,12 +160,10 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'django.contrib.messages',
     'django.contrib.markup',
-    'sorl.thumbnail',
     'courseaffils',
     'django.contrib.sites',
     'django.contrib.admin',
     'tagging',
-    'smartif',
     'modelversions',
     'structuredcollaboration',
     'mediathread.djangosherd',
@@ -187,11 +191,25 @@ INSTALLED_APPS = [
     'storages',
     'collectfast',
     'avatar',
-    #'smoketest'
+    'smoketest',
+    'debug_toolbar',
+    'captcha',
 ]
 
-COMPRESS_URL = "/site_media/"
-COMPRESS_ROOT = "media/"
+INTERNAL_IPS = ('127.0.0.1', )
+DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
+)
+
+COMPRESS_URL = "/media/"
 COMPRESS_PARSER = "compressor.parser.HtmlParser"
 COMPRESS_ROOT = STATIC_ROOT
 COMPRESS_CSS_FILTERS = [
@@ -239,10 +257,9 @@ JOHNNY_MIDDLEWARE_KEY_PREFIX = 'johnny'
 
 ANONYMOUS_PATHS = ('/course/create/',
                    '/user_accounts/'
-                   '/site_media/',
+                   '/media/',
                    '/accounts/',
                    '/admin/',
-                   '/api/',
                    '/help/',
                    '/course/join-sample-course/'
                    )
@@ -264,6 +281,9 @@ NON_ANONYMOUS_PATHS = ('/user_accounts/invite_students/',
                        '/_main/',
                        '/analysis/',
                        '/taxonomy/',
+                       '/api/',
+                       '/setting/',
+                       '/upgrade/',
                        re.compile(r'^/$'),
                        )
 
@@ -328,7 +348,7 @@ MESSAGE_LEVEL = message_constants.SUCCESS
 
 # URLs that appear in the header and footer
 ABOUT_URL = "http://www.getmediathread.com/"
-HELP_URL = "http://support.appsembler.com/knowledgebase/topics/39118-mediathread"
+HELP_URL = "http://appsembler.uservoice.com/knowledgebase/topics/39118-mediathread"
 PLANS_PAGE_URL = "http://getmediathread.com/plans.html"
 
 
@@ -340,6 +360,13 @@ def no_reject(request, reason):
 
 CSRF_FAILURE_VIEW = no_reject
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+}
+
+CAPTCHA_FONT_SIZE = 34
+
 # if you add a 'deploy_specific' directory
 # then you can put a settings.py file and templates/ overrides there
 try:
@@ -348,5 +375,5 @@ try:
         INSTALLED_APPS = INSTALLED_APPS + EXTRA_INSTALLED_APPS
     if 'EXTRA_MIDDLEWARE_CLASSES' in locals():
         MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + EXTRA_MIDDLEWARE_CLASSES
-except ImportError:
+except:
     pass

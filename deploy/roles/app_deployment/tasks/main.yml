@@ -2,12 +2,20 @@
 
 - name: Clone app repo
   git: repo=https://github.com/appsembler/mediathread.git dest={{git_repo_dir}} version={{git_repo_branch}}
+  tags:
+    - code
 
 - name: Clear pip build dir
   file: path=/opt/venv/build state=absent
+  tags:
+    - code
 
 - name: Create a virtual env and install app requirements
-  pip: requirements='requirements/local.txt' virtualenv=/opt/venv chdir={{git_repo_dir}}
+  pip: requirements='requirements.txt' virtualenv=/opt/venv chdir={{git_repo_dir}} extra_args='--pre'
+  notify:
+    - restart supervisor
+  tags:
+    - code
 
 - name: Install extra python libraries
   pip: name={{item}} virtualenv=/opt/venv state=latest
@@ -15,27 +23,66 @@
     - pylibmc
     - raven
     - cssmin
+  tags:
+    - code
 
 - name: Copy the WSGI script
   template: src=wsgi.py dest={{git_repo_dir}} dest={{django_project_dir}}/wsgi.py
+  notify:
+    - restart supervisor
+  tags:
+    - code
 
 - name: Copy the django settings file
-  template: src=settings_digitalocean.py dest={{django_project_dir}}
+  template: src={{ settings_module }}.py dest={{django_project_dir}}
+  notify:
+    - restart supervisor
+  tags:
+    - code
+
+- name: Run syncdb
+  django_manage: >
+      command=syncdb
+      app_path={{git_repo_dir}}
+      settings=mediathread.{{ settings_module }}
+      pythonpath={{git_repo_dir}}
+      virtualenv=/opt/venv
+  notify:
+    - restart supervisor
+  tags:
+    - code
+
+- name: Run migrations
+  django_manage: >
+      command=migrate
+      app_path={{git_repo_dir}}
+      settings=mediathread.{{ settings_module }}
+      pythonpath={{git_repo_dir}}
+      virtualenv=/opt/venv
+  notify:
+    - restart supervisor
+  tags:
+    - code
 
 - name: Run collectstatic
   django_manage: >
       command=collectstatic
       app_path={{git_repo_dir}}
-      settings=mediathread.settings_digitalocean
+      settings=mediathread.{{ settings_module }}
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
+  tags:
+    - code
 
 - name: Run offline compression of the assets
   django_manage: >
       command=compress
       app_path={{git_repo_dir}}
-      settings=mediathread.settings_digitalocean
+      settings=mediathread.{{ settings_module }}
       pythonpath={{git_repo_dir}}
       virtualenv=/opt/venv
   notify:
-    - reload supervisor config
+    - restart supervisor
+  tags:
+    - code
+  when: settings_module == "settings_digitalocean"

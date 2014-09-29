@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load tagging_tags user_projects helpful_tags coursetags comments collaborations revision static %}
+{% load tagging_tags user_projects helpful_tags coursetags comments collaborations static %}
 
 {% block title %}
     Home
@@ -76,7 +76,7 @@
                 });
             {% endif %}
         });
-    </script>
+    </script>    
 {% endblock %}
 
 {% block standardnav_help %}
@@ -89,11 +89,23 @@
     <div class="settings_submenu" style="display: none">
          <a href="/help/">Knowledge Base</a>
          <a href="#" onclick="jQuery(window).trigger('tour.start');">Homepage Tour</a>
+         <a href="/upgrade/">Upgrade Bookmarklet</a>
     </div>
 {% endblock %}
 
 {% block content %}
     {{ block.super }}
+    
+    {% if upgrade_bookmarklet %}
+    <div class="infonote">
+        <a href="#" class="dismiss" 
+           onclick="updateUserSetting('{{request.user.username}}', 'upgrade_bookmarklet', false); jQuery(this).parent().fadeOut(); return false;">
+           <img src="{% static "img/switcher/icon_x.png" %}"/>
+        </a>
+        The Mediathread bookmarklet has been updated to comply with new web security protocols. <a href="/upgrade/">Upgrade</a> your old bookmarklet now.
+    </div>
+    {% endif %}
+    
     <table id="home-columns">
     <tbody>
         <tr>
@@ -161,7 +173,7 @@
                                             <div class="actions">
                                                 {% if is_faculty %}
                                                     <a onclick="return ajaxDelete(this, 'discussion-{{disc.id}}')"
-                                                        href="{% url discussion-delete disc.id %}">                                                        
+                                                        href="{% url 'discussion-delete' disc.id %}">                                                        
                                                     <img src="{% static 'img/icons/meth_delete.png' %}" width="25" height="25" class="delete_icon" alt="Remove this Discussion"  /></a>
                                                 {% endif %}
                                             </div>
@@ -246,7 +258,7 @@
                    <div class="tour_buttons">
                         <span class="button" id="prevstep" style=""> &lt; Prev</span>
                         <span class="button start" id="nextstep"
-                            onclick="updateHelpSetting('{{request.user.username}}', 'help_show_homepage_tour', false);">
+                            onclick="updateUserSetting('{{request.user.username}}', 'help_show_homepage_tour', false);">
                             Get Started &gt;
                         </span>            
                         <span class="close ui-icon ui-icon-closethick" id="canceltour"></span>
@@ -264,64 +276,8 @@
                     <div class="arrowContent" id="import_collection" style="display: none">
                         <p>
                             Use the Mediathread Bookmarklet to import images and video from any web page containing Mediathread-friendly items.                                
-                           
-                                    <div id="firefox" class="browser-instruction"> 
-                                        <strong>Install Bookmarklet in Firefox</strong>
-                                        <ol>
-                                          <li>In the <b>View</b> menu, show the "Bookmarks"  toolbar.</li><br />
-                                          <li>Drag the link below onto your browser bookmarks toolbar.</li>
-                                        </ol>
-                                    </div>
-                                    <div id="ie" class="browser-instruction">
-                                        <strong>Install Bookmarklet in Internet Explorer</strong>
-                                        <ol>
-                                          <li>Right-click on the blue bookmarklet button below.</li>  
-                                          <li>and choose <b>Add to Favorites</b></li>
-                                        </ol>
-                                    </div>
-                                    <div id="safari" class="browser-instruction"> 
-                                        <strong>Install Bookmarklet in Safari</strong>
-                                        <ol>
-                                         <li>In the <b>View</b> menu, show the "Bookmarks Bar".</li><br />
-                                          <li>Drag the link below onto your browser bookmarks toolbar</li>
-                                        </ol>
-                                    </div>
-                                    <div id="chrome" class="browser-instruction"> 
-                                        <strong>Install Bookmarklet in Chrome</strong>
-                                        <ol>
-                                          <li>Under the <b>Tools</b> menu (the Wrench), show the "Bookmarks bar".</li><br />
-                                          <li>Drag the link below onto your browser bookmarks toolbar:  <br />Analyze w/Mediathread</li>
-                                        </ol>
-                                    </div>
-                                    <div id="ios" class="browser-instruction">
-                                        <strong>Install Bookmarklet on iOS</strong>
-                                        <ol>
-                                          <li>Click the button and follow the instructions on the next page.</li>
-                                        </ol>
-                                        <a href="{% url ios_bookmarklet %}" id="ios-bookmarklet-button" class="bookmarklet">iOS bookmarklet</a>
-                                    </div>
-                                    {% include "assetmgr/bookmarklet.html" %}
-                                    <script type="text/javascript">
-                                        var u = navigator.userAgent;
-                                        if (/Chrome/.test(u)) {
-                                            jQuery('.browser-instruction').hide();
-                                            jQuery('#chrome').show();
-                                        } else if (/(iPad|iPhone|iPod)/g.test(u)) {
-                                            jQuery('.browser-instruction').hide();
-                                            jQuery('.bookmarklet').hide();
-                                            jQuery('#ios-bookmarklet-button').show();
-                                            jQuery('#ios').show();
-                                        } else if (/Safari/.test(u)) {
-                                            jQuery('.browser-instruction').hide();
-                                            jQuery('#safari').show();
-                                        } else if (/MSIE/.test(u)) {
-                                            jQuery('.browser-instruction').hide();
-                                            jQuery('#ie').show();
-                                        } else if (/Gecko/.test(u)) {
-                                            jQuery('.browser-instruction').hide();
-                                            jQuery('#firefox').show();
-                                        }
-                                    </script>
+                            
+                            {% include "assetmgr/install_bookmarklet.html" %}
                         </p>
                     </div> <!-- end import into collection box --> 
                 </div><!-- end collection content box -->
@@ -394,7 +350,7 @@
                             {% for archive in archives %}
                                 {% if space_viewer.is_staff %}
                                     <div class="manage-archive">
-                                        <a class="manage-archive-link" href="{%url admin:assetmgr_asset_change archive.id %}">Manage</a>
+                                        <a class="manage-archive-link" href="{%url 'admin:assetmgr_asset_change' archive.id %}">Manage</a>
                                     </div>
                                 {% endif %}
                             <div class="recommend_source">

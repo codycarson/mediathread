@@ -1,10 +1,11 @@
 from django.conf.urls.defaults import patterns, url
+from mediathread.projects.views import ProjectCreateView
 
 
 urlpatterns = patterns(
     'mediathread.projects.views',
 
-    url(r'^create/$', 'project_create', name="project-create"),
+    url(r'^create/$', ProjectCreateView.as_view(), {}, "project-create"),
 
     url(r'^view/(?P<project_id>\d+)/$',
         'project_workspace',
@@ -32,6 +33,9 @@ urlpatterns = patterns(
         'project_reparent',
         name="project-reparent"),
 
+    url(r'^revisions/(?P<project_id>\d+)/$',
+        'project_revisions',
+        name="project-revisions"),
 
     # view versioned read only
     url(r'^view/(?P<project_id>\d+)/version/(?P<version_number>\d+)/$',

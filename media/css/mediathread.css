@@ -1,5 +1,7 @@
 /* ########## Standard elements ########## */
-
+.olLayerDiv div{
+  display: block !important;
+}
 html,body {
 	height: 100%;
 }
@@ -297,6 +299,7 @@ div#asset-view-details .meta {
     text-overflow:ellipsis;
 }
 
+h1#course_title,
 h1#course_title a {
 	font-weight: bold;
 	padding: 0;
@@ -1076,12 +1079,185 @@ div.button-form form, div.button-form.inline form {
 
 
 /* LOGIN PAGE */
-/*
-#id_username, #id_password {
-    width: 125px;
-    border: 1px solid #333333;    
+
+
+.login-description {
+	display: inline;
+	float: left;
+	padding: 35px;
+	width: 58%;
+    background: url("../img/login_bg.jpg") center no-repeat;
 }
-*/
+
+.login-description h1 {
+    font-weight: 200;
+    line-height: 1.5em;
+    margin-top: 0;
+}
+
+.login-description p {
+	font-size: 1.25em;
+	font-weight: 200;
+	line-height: 2em;
+}
+
+.loginbox-container {
+    float: right;
+    height: 265px;
+    margin-top: 10px;
+}
+
+.loginbox-container.columbia {
+    float: left;
+}
+
+.loginbox
+{
+    display: block;
+    width: 280px;
+    margin: 0 30px 0 20px;
+    padding: 0 0 20px 0;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    background-color: #b3d3eb;
+    }
+
+.loginbox h2
+{
+    margin: 0 !important;
+    padding: 10px 20px !important;
+    background: #a7cae6;
+     border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    color: black;
+}
+
+
+.loginbox .content
+{
+    margin: 0;
+    padding: 0 25px 0 25px;
+    border: 0;
+}
+
+.loginbox .content .btn-primary {
+	margin: 0;
+}
+
+.loginbox .seperator
+{
+    margin: 20px 0;
+    padding: 0;
+    border: 0;
+    border-top: 1px dotted #d9e3eb;
+    background-color: #d9e3eb;
+}
+
+.loginbox .fieldwrapper
+{
+    margin: 0 0 10px 10px;
+    padding: 0;
+    border: 0;
+}
+
+.loginbox .fieldwrapper label
+{
+    display: block;
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+}
+
+.loginbox .fieldwrapper input {
+    width: 200px;
+    height: 25px;
+    margin: 2px 0;
+    padding: 3px;
+    border: 0;
+    border: 1px solid #ccc;
+    background-color: #f4f4f4;
+    font: bold 12px arial, helvetica, verdana, sans-serif;
+}
+
+.loginbox .fieldwrapper input:focus
+{
+    border: 1px solid #06f;
+    background-color: #fff;
+}
+
+.loginbox .regbutton
+{
+    cursor: pointer;
+    padding: 4px 17px;
+    margin: 0 0 10px 10px;
+    color: #000;
+    font-weight: normal;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-left-color: #ccc;
+    border-right-color: #ccc;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#e6e6e6));
+    background: -moz-linear-gradient(top, #fff, #e6e6e6);
+    font: bold 14px arial, helvetica, verdana, sans-serif !important;
+    text-transform: uppercase;
+}
+
+.loginbox .regbutton:hover
+{
+    border: 1px solid #999;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+    background: -moz-linear-gradient(top, #fff, #ddd);
+}
+
+.loginbox .regbutton:active
+{
+    border: 1px solid #006666;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#669999));
+    background: -moz-linear-gradient(top, #fff, #669999);
+}
+
+.loginbox .smalltxt
+{
+    font-size: 11px;
+}
+
+.errornote {
+    background: url("/media/img/icon_alert.png") no-repeat 5px 5px #FFEBE8;
+    border: 1px solid #ebccd1 !important;
+    display: block;
+    margin: 10px;
+    padding: 10px !important;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+.errornote span {
+    color: #c00;
+}
+
+.infonote {
+    width: 900px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+.infonote a.dismiss {
+    margin-top: -10px;
+    float: right;
+    margin-right: -8px;
+}
 
 #introduction {
     text-align: left; 
@@ -1483,6 +1659,7 @@ div.panel.asset-workspace-dialog div.asset-view-tabs {
     width: 285px;
 }
 
+form#edit-global-annotation-form input[name="asset-title"],
 #id_annotation-title {
     height: 24px;
     width: 98%;
@@ -1799,6 +1976,7 @@ table.panel-subcontainer tr td div.panel-subcontainer-toolbar input.createnew-bu
     -webkit-border-radius: 10px;
     font: normal 12px/130% helvetica, arial, sans-serif;
     color: #000;
+    min-width: 800px;
 }
 
 #shieldbox .browsers
@@ -3451,7 +3629,7 @@ div.collection_table {
     padding:0 0 0 7px;
     margin:0;
     position:absolute;
-    background:url('/img/bookendleft.gif') top left no-repeat ;
+    background:url('../img/bookendleft.gif') top left no-repeat ;
     z-index:0;
 }
 
@@ -3472,7 +3650,7 @@ div.collection_table {
     width:0px;
     height:7px;
     padding:0 6px 0 0;
-    background:url('/img/bookendright.gif') top right no-repeat;
+    background:url('../img/bookendright.gif') top right no-repeat;
     position:absolute;
     z-index:0;
 }
@@ -3934,7 +4112,7 @@ div.selected-for-import div.results {
 }
 
 .import-dialog div.import-stuff table tr td.title div {
-    width: 55%;
+    width: 90%;
     text-overflow: ellipsis;
 }
 
@@ -4246,7 +4424,6 @@ div#taxonomy a.icon-link {
     margin: .5em 0;
     padding: 0;
     cursor: pointer;
-    background: none;
 }
 
 div#taxonomy a.icon-link:hover {
@@ -4349,7 +4526,7 @@ div#taxonomy div.vocabulary-display a.create-vocabulary-open {
 
 div#taxonomy div.vocabulary-display a.create-vocabulary-open img {
     float: right;
-    margin: -17px 2px 0 0;
+    margin: -2px 2px 0 0;
 }
 
 div#taxonomy div.term-container a.edit-term-close,

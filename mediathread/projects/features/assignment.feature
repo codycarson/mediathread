@@ -16,9 +16,11 @@ Feature: Assignment
         
         Then I am at the Untitled page
         There is an open Composition panel
+        And there is a Saved button
 
         # Add a title and some text
         Then I call the Composition "Assignment: Scenario 1"
+        And there is a Save button
         And I write some text for the Composition
         
         # Save as an Assignment
@@ -28,14 +30,15 @@ Feature: Assignment
         When I save the changes
         Then there is an "Assignment" link
         Then there is an open Assignment panel
-        And the composition "Assignment: Scenario 1" has text        
+        And the composition "Assignment: Scenario 1" has text 
+        And there is a Saved button       
         
         # Toggle to preview
         When I click the Preview button
         The Assignment panel has a Revisions button
         And the Assignment panel has an Edit button
         And the Assignment panel does not have a Preview button
-        And the Assignment panel has a Save button
+        And the Assignment panel has a Saved button
         And the Assignment panel has a Revisions button
         And the Assignment panel does not have a +/- Author button
         
@@ -57,7 +60,7 @@ Feature: Assignment
         The Assignment panel has a Revisions button
         And the Assignment panel has an Edit button
         And the Assignment panel does not have a Preview button
-        And the Assignment panel has a Save button
+        And the Assignment panel has a Saved button
         And the Assignment panel has a Revisions button
         And the Assignment panel does not have a +/- Author button
         And the Assignment panel does not have a Respond To Assignment button
@@ -79,7 +82,7 @@ Feature: Assignment
         And there is an open Assignment panel
         And the Assignment panel does not have an Edit button
         And the Assignment panel does not have a Preview button
-        And the Assignment panel does not have a Save button
+        And the Assignment panel does not have a Saved button
         And the Assignment panel does not have a Revisions button
         And the Assignment panel does not have a +/- Author button
         And there is not an "Assignment" link
@@ -92,7 +95,7 @@ Feature: Assignment
         The Composition panel has a Revisions button
         And the Composition panel has a Preview button
         And the Composition panel does not have an Edit button
-        And the Composition panel has a Save button
+        And the Composition panel has a Saved button
         And the Composition panel has a +/- Author button 
         
         # Add a title & text
@@ -183,12 +186,12 @@ Feature: Assignment
         The Composition panel has a Revisions button
         And the Composition panel has an Edit button
         And the Composition panel does not have a Preview button
-        And the Composition panel has a Save button
+        And the Composition panel has a Saved button
         And the Composition panel has a Revisions button
         And the Composition panel does not have a +/- Author button
         And there is a "Submitted to Instructor" link 
         
-        When I click the Save button
+        When I click the Saved button
         Then I see a Save Changes dialog
         Then I set the project visibility to "<visibility>"
         When I save the changes
@@ -251,7 +254,7 @@ Feature: Assignment
         When I click the "Sample Assignment Response" link
         Then I am at the Sample Assignment Response page
         Then there is an open Composition panel
-        When I click the Save button
+        When I click the Saved button
         Then I see a Save Changes dialog
         Then I set the project visibility to "Whole Class - all class members can view"
         When I save the changes
@@ -287,7 +290,7 @@ Feature: Assignment
         The Composition panel has a Revisions button
         And the Composition panel has a Preview button
         And the Composition panel does not have an Edit button
-        And the Composition panel has a Save button
+        And the Composition panel has a Saved button
         And the Composition panel has a +/- Author button
         
         Then I call the Composition "Assignment Response: Scenario 6"

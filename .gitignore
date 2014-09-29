@@ -23,6 +23,9 @@ coverage
 collected_static
 .vagrant
 mediathread.db
-secret_vars.yml
+reports
+deploy/hosts/*/group_vars/all
+deploy/hosts/*/*.crt
+deploy/hosts/*/*.key
 
 /CACHE/

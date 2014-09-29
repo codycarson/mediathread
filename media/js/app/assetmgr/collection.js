@@ -21,12 +21,18 @@ var CollectionList = function (config) {
     self.parent = config.parent;
     self.selected_view = config.hasOwnProperty('selectedView') ? config.selectedView : 'Medium';
     self.citable = config.hasOwnProperty('citable') ? config.citable : false;
-    self.owners = config.owners;
+    self.owners = config.owners;    
+    self.limits = {offset: 0, limit: 20};
+    self.loading = false;
+    self.current_asset = config.current_asset;
     
     self.el = jQuery(self.parent).find("div." + self.template_label)[0];
+    
     // setup some ajax progress indicator
     jQuery(self.el).bind("ajaxStart", function(){
-        jQuery("div.ajaxloader").show();
+        if (!self.loading) {
+            jQuery("div.ajaxloader").show();
+        }
      }).bind("ajaxStop", function(){  
         jQuery("div.ajaxloader").hide();
      });
@@ -60,7 +66,7 @@ var CollectionList = function (config) {
     });
     
     jQuery.ajax({
-        url: '/site_media/templates/' + config.template + '.mustache?nocache=v2',
+        url: '/media/templates/' + config.template + '.mustache?nocache=v2',
         dataType: 'text',
         cache: false, // Chrome && Internet Explorer has aggressive caching policies.
         success: function (text) {
@@ -75,7 +81,7 @@ var CollectionList = function (config) {
     return this;
 };
 
-CollectionList.prototype.refresh = function (config) {
+CollectionList.prototype.constructUrl = function(config, updating) {
     var self = this;
     var url;
     
@@ -93,6 +99,17 @@ CollectionList.prototype.refresh = function (config) {
         url = self.getSpaceUrl(active_tag, active_modified);
     }
     
+    if (updating) {
+        url += "&offset=" + self.limits.offset + "&limit=" + self.limits.limit;
+    }
+    return url;
+};
+
+CollectionList.prototype.refresh = function (config) {
+    var self = this;
+    self.limits.offset = 0;
+    var url = self.constructUrl(config, false);
+
     djangosherd.storage.get({
         type: 'asset',
         url: url
@@ -100,6 +117,23 @@ CollectionList.prototype.refresh = function (config) {
     false,
     function (the_records) {
         self.updateAssets(the_records);
+    });
+};
+
+CollectionList.prototype.appendItems = function (config) {
+    var self = this;
+    self.limits.offset += self.limits.limit;
+
+    var url = self.constructUrl(config, true);
+
+    djangosherd.storage.get({
+        type: 'asset',
+        url: url
+    },
+    false,
+    function (the_records) {
+        self.appendAssets(the_records);
+        self.loading = false;
     });
 };
 
@@ -232,11 +266,11 @@ CollectionList.prototype.createAssetThumbs = function (assets) {
         
         if (!asset.thumbable) {
             if (jQuery(target_parent).hasClass("static-height")) {
-                if (asset.sources.hasOwnProperty("thumb") &&
-                    asset.sources.thumb.hasOwnProperty("height") && 
-                        asset.sources.thumb.height > 240) {
+                var thumbs = jQuery.grep(asset.sources, function(s) {
+                   return s.label == 'thumb'; }); 
+                if (thumbs.length && thumbs[0].height > 240) {
                     jQuery(target_parent).css({
-                        height: (asset.sources.thumb.height + 75) + 'px'
+                        height: (thumbs[0].height + 75) + 'px'
                     });
                 } else {
                     jQuery(target_parent).css({height: '240px'});
@@ -270,7 +304,7 @@ CollectionList.prototype.createAssetThumbs = function (assets) {
             asset.zoom = 1;
 
             try {
-                view.html.push(obj_div, { asset: asset });
+                view.html.push(obj_div, {asset: asset});
                 view.setState(asset);
             } catch (e) {
             }
@@ -405,6 +439,29 @@ CollectionList.prototype.updateAssets = function (the_records) {
             
             self.updateSwitcher();
             
+            if (self.current_asset === null) {
+                // handles the maximized view
+                jQuery(window).scroll(function () { 
+                    if (!self.loading &&
+                        jQuery(window).scrollTop() >= jQuery(document).height() -
+                            jQuery(window).height() - 300) {
+                        self.loading = true;
+                        self.appendItems(self.current_records);
+                    }
+                });
+            } else {
+                // handle the minimized view
+                var container = jQuery(self.el).find("div.collection-assets")[0];
+                jQuery(container).scroll(function () { 
+                    if (!self.loading &&
+                        container.scrollTop + jQuery(container).innerHeight() >= 
+                            container.scrollHeight - 300) {
+                        self.loading = true;
+                        self.appendItems(self.current_records);
+                    }
+                });
+            }
+            
             jQuery(elt).fadeIn("slow");
             
             jQuery(self.el).find("a.switcher-choice.filterbydate").unbind('click').click(function (evt) {
@@ -492,13 +549,31 @@ CollectionList.prototype.updateAssets = function (the_records) {
                 self.view_callback(the_records.assets.length);
             }
             
-            jQuery(window).trigger("resize");
-            
             if (self.scrollTop) {
                 jQuery(self.el).find("div.collection-assets").scrollTop(self.scrollTop);
                 self.scrollTop = undefined;
             }
+
+            jQuery(window).trigger("resize");
+
         }
-    });
+    });    
+};
+    
+CollectionList.prototype.appendAssets = function (the_records) {
+    var self = this;
+    if (the_records.assets.length > 0) {
+        var html = jQuery(Mustache.render_partial("assets", the_records));
+        var container = jQuery(self.el).find("div.asset-table");
+        jQuery(container).append(html);
+        
+        if (self.create_annotation_thumbs) {
+            self.createThumbs(the_records.assets);
+        } else if (self.create_asset_thumbs) {
+            self.createAssetThumbs(the_records.assets);
+        }
+        
+        jQuery(window).trigger("assets.refresh", [html]);
+    }
 };
     

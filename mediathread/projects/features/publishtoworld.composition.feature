@@ -1,6 +1,5 @@
 Feature: Public Compositions
-        
-        
+
     Scenario Outline: publishtoworld.composition.feature 1. Instructor creates public to world composition - verify visibility 
         Using selenium
         Given I am test_instructor in Sample Course
@@ -51,7 +50,7 @@ Feature: Public Compositions
             The Composition panel does not have a Revisions button
             And the Composition panel does not have an Edit button
             And the Composition panel does not have a Preview button
-            And the Composition panel does not have a Save button
+            And the Composition panel does not have a Saved button
             And the Composition panel does not have a +/- Author button
             
             When I click the "<item_name>" citation in the Composition panel
