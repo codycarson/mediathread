@@ -4,6 +4,14 @@
 
 * restart nginx during deployment
 
+### 1.0.3
+
+* reorder css files, mediathread specific styles should come after bootstrap
+
+### 1.0.2
+
+* restart nginx during deployment
+
 ### 1.0.1
 
 * fix for the Digital Ocean settings file (using list instead of tuples)
